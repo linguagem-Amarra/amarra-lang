@@ -2,3 +2,4 @@ gerado/
 *.tokens
 *.interp
 __pycache__/
+.venv/

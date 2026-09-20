@@ -24,7 +24,7 @@ Mais exemplos estão em `exemplos/`.
 
 ## O que você precisa ter instalado
 
-- **Python 3.8 ou mais novo.** Confira rodando `python3 --version` (ou `python
+- **Python 3.8 ou mais novo.** Confira rodando `python3 --version` (ou `py
   --version` no Windows). Se não tiver, baixe em https://www.python.org/downloads/.
 - **pip**, o instalador de pacotes do Python (normalmente já vem junto com o
   Python).
@@ -48,82 +48,110 @@ cd amarra-lang
 Todo comando abaixo deve ser rodado a partir dessa pasta (a raiz do
 repositório), não de dentro de `src/` ou `gramatica/`.
 
-### 2. Instalar as ferramentas do ANTLR
+### 2. Criar um ambiente e instalar as ferramentas do ANTLR
 
-```bash
-pip install antlr4-tools antlr4-python3-runtime
+No Windows (PowerShell):
+
+```powershell
+py -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Isso instala dois pacotes:
+No Linux/macOS:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+```
+
+Não é necessário ativar o ambiente: os comandos usam diretamente o Python
+de `.venv/`. Se essa pasta já existir, basta executar o comando de instalação.
+
+O arquivo `requirements.txt` fixa as versões de dois pacotes:
+
 - `antlr4-tools`, que cria os comandos `antlr4` (gera código a partir da
   gramática) e `antlr4-parse` (testa a gramática direto, sem gerar código)
 - `antlr4-python3-runtime`, a biblioteca que o `lexico.py` usa para rodar o
   lexer gerado
 
-Na primeira vez que você rodar `antlr4` ou `antlr4-parse`, ele vai perguntar
-algo como "Java not found, install it? [y/n]" — responda `y`. Isso pode
-demorar alguns minutos, principalmente no Windows.
-
-Se o comando `pip` não for reconhecido, tente `pip3` no lugar, ou `python -m
-pip install antlr4-tools antlr4-python3-runtime`.
+Na primeira geração, a ferramenta baixa o ANTLR. Se não encontrar Java, ela
+também oferece instalar uma JRE — responda `y`. Isso pode demorar alguns minutos.
 
 ### 3. Gerar o código do analisador léxico
 
-```bash
-./gerar.sh
+No Windows (PowerShell):
+
+```powershell
+.\.venv\Scripts\python.exe gerar.py
 ```
 
-Se aparecer erro de permissão (`Permission denied`), rode:
+No Linux/macOS:
 
 ```bash
-bash gerar.sh
+.venv/bin/python gerar.py
 ```
 
-Esse script executa o comando `antlr4 -Dlanguage=Python3 -visitor -o gerado
-gramatica/Amarra.g4`, que lê a gramática em `gramatica/Amarra.g4` e cria uma
-pasta nova chamada `gerado/`, com o código Python do lexer dentro
-(`AmarraLexer.py` e outros arquivos de apoio). Essa pasta é gerada
-automaticamente a cada vez — por isso ela não vai para o Git (veja
-`.gitignore`).
+O script `gerar.py` lê `gramatica/AmarraLexer.g4` e cria
+`gerado/AmarraLexer.py`, usando a mesma versão do ANTLR instalada para o runtime.
+A gramática é exclusivamente léxica, correspondente à fase E2 do projeto.
+A opção [`-Xexact-output-dir`](https://github.com/antlr/antlr4/blob/master/doc/tool-options.md#-xexact-output-dir)
+garante que os arquivos sejam gravados diretamente em `gerado/`, no caminho
+esperado pelo analisador. Essa pasta é gerada automaticamente e não vai para o Git.
+
+O `gerar.sh` continua disponível para quem usa Bash com o ambiente ativado:
+`source .venv/bin/activate` e depois `bash gerar.sh`.
 
 Se a pasta `gerado/` não aparecer depois de rodar o script, o comando
-`antlr4` provavelmente falhou — role a saída do terminal para cima e leia a
+de geração provavelmente falhou — role a saída do terminal para cima e leia a
 primeira linha de erro.
 
 ### 4. Rodar o analisador léxico em um programa de exemplo
 
-```bash
-python src/lexico.py exemplos/no_simples.amr
+No Windows (PowerShell):
+
+```powershell
+.\.venv\Scripts\python.exe src/lexico.py exemplos/no_simples.amr
 ```
 
-(No Windows, pode ser necessário `python3` em vez de `python`, dependendo de
-como o Python foi instalado.)
+No Linux/macOS:
+
+```bash
+.venv/bin/python src/lexico.py exemplos/no_simples.amr
+```
 
 A saída esperada é uma linha por token reconhecido, seguida da contagem
-total, parecido com isto:
+total:
 
 ```
-COMENT '// No de cadarco simples' linha 1
 NO 'no' linha 2
-TEXTO '"cadarço simples"' linha 2
+TEXTO '"cadarco simples"' linha 2
 ABRE_CHAVE '{' linha 2
 CRUZAR 'cruzar' linha 3
 IDENT 'ponta_direita' linha 3
 IDENT 'ponta_esquerda' linha 3
 PONTOVIRG ';' linha 3
-...
-14 tokens reconhecidos
+PASSAR_BAIXO 'passar_baixo' linha 4
+IDENT 'ponta_direita' linha 4
+PONTOVIRG ';' linha 4
+APERTAR 'apertar' linha 5
+PONTOVIRG ';' linha 5
+FINALIZAR 'finalizar' linha 6
+TEXTO '"no pronto"' linha 6
+PONTOVIRG ';' linha 6
+FECHA_CHAVE '}' linha 7
+16 tokens reconhecidos
 ```
 
-(comentários e espaços em branco são descartados na regra do lexer, então na
-prática eles não aparecem na contagem final — se aparecerem, é sinal de que a
-regra `-> skip` não está funcionando, avise o grupo.)
+Comentários e espaços em branco são descartados pela regra `-> skip` e não
+aparecem na saída nem na contagem final.
 
 ### 5. Rodar em um exemplo com erro
 
-```bash
-python src/lexico.py exemplos/invalidos/caractere_invalido.amr
+```powershell
+.\.venv\Scripts\python.exe src/lexico.py exemplos/invalidos/caractere_invalido.amr
 ```
+
+No Linux/macOS, substitua `.\.venv\Scripts\python.exe` por `.venv/bin/python`.
 
 Em vez da lista de tokens, deve aparecer uma mensagem apontando a linha e a
 coluna do problema, por exemplo:
@@ -137,15 +165,15 @@ Erro lexico na linha 4, coluna 12: token recognition error at: '@'
 No Linux/macOS:
 
 ```bash
-for f in exemplos/*.amr; do echo "--- $f ---"; python src/lexico.py "$f"; done
-for f in exemplos/invalidos/*.amr; do echo "--- $f ---"; python src/lexico.py "$f"; done
+for f in exemplos/*.amr; do echo "--- $f ---"; .venv/bin/python src/lexico.py "$f"; done
+for f in exemplos/invalidos/*.amr; do echo "--- $f ---"; .venv/bin/python src/lexico.py "$f"; done
 ```
 
 No Windows (PowerShell):
 
 ```powershell
-Get-ChildItem exemplos\*.amr | ForEach-Object { Write-Host "--- $_ ---"; python src/lexico.py $_.FullName }
-Get-ChildItem exemplos\invalidos\*.amr | ForEach-Object { Write-Host "--- $_ ---"; python src/lexico.py $_.FullName }
+Get-ChildItem exemplos\*.amr | ForEach-Object { Write-Host "--- $_ ---"; .\.venv\Scripts\python.exe src/lexico.py $_.FullName }
+Get-ChildItem exemplos\invalidos\*.amr | ForEach-Object { Write-Host "--- $_ ---"; .\.venv\Scripts\python.exe src/lexico.py $_.FullName }
 ```
 
 ## Estrutura do repositório
@@ -153,10 +181,12 @@ Get-ChildItem exemplos\invalidos\*.amr | ForEach-Object { Write-Host "--- $_ ---
 ```
 amarra-lang/
 ├── README.md              este arquivo
-├── .gitignore              ignora a pasta gerado/ e arquivos temporários
-├── gerar.sh                 script que gera o código a partir da gramática
+├── .gitignore              ignora gerado/, .venv/ e arquivos temporários
+├── requirements.txt         versões das dependências Python
+├── gerar.py                 gera o lexer no Windows, Linux e macOS
+├── gerar.sh                 atalho para gerar.py em Bash
 ├── gramatica/
-│   └── Amarra.g4            regras do lexer (o que vira cada tipo de token)
+│   └── AmarraLexer.g4       regras do lexer (o que vira cada tipo de token)
 ├── gerado/                  criado pelo passo 3 — não editar, não versionar
 ├── src/
 │   └── lexico.py            lê um .amr e imprime os tokens reconhecidos
@@ -174,11 +204,15 @@ amarra-lang/
 
 | Sintoma | Causa provável | O que fazer |
 |---|---|---|
-| `antlr4: command not found` | O `pip install` do passo 2 não terminou certo, ou o PATH do Python não inclui a pasta de scripts | Rode o `pip install` de novo e confira se não apareceu erro; no Windows, reabra o terminal depois de instalar |
+| `python` não é reconhecido ou abre a Microsoft Store | O comando aponta para um alias do Windows | Crie o ambiente com `py -m venv .venv` e use `.\.venv\Scripts\python.exe` nos demais comandos |
+| `./gerar.sh` não funciona no PowerShell | Esse script é para Bash | Use `.\.venv\Scripts\python.exe gerar.py` |
+| `Dependencias ausentes` ou `Biblioteca antlr4 ausente` | Os pacotes não foram instalados no Python em uso | Execute `.\.venv\Scripts\python.exe -m pip install -r requirements.txt` |
 | Trava perguntando sobre Java e nunca termina | Rede lenta ou bloqueada baixando o Java | Tente de novo com conexão melhor; se estiver numa rede restrita (ex: rede de faculdade), tente em outra rede |
-| `ModuleNotFoundError: No module named 'gerado'` | O passo 3 (`./gerar.sh`) não foi rodado, ou foi rodado de dentro da pasta errada | Volte pra raiz do repositório (`amarra-lang/`) e rode `./gerar.sh` de novo |
-| `ModuleNotFoundError: No module named 'antlr4'` | O pacote `antlr4-python3-runtime` não foi instalado | Rode `pip install antlr4-python3-runtime` |
-| Tokens aparecem com nome errado ou fora de ordem | A gramática (`Amarra.g4`) foi editada depois da última geração | Rode `./gerar.sh` de novo para atualizar a pasta `gerado/` |
+| `Lexer nao gerado` | O passo 3 não foi concluído | Execute `.\.venv\Scripts\python.exe gerar.py` e verifique se houve erro |
+| `Nao foi possivel abrir` | O arquivo informado não existe ou não pode ser lido | Confira o caminho e execute a partir da raiz do projeto |
+| Tokens aparecem com nome errado ou fora de ordem | A gramática (`AmarraLexer.g4`) foi editada depois da última geração | Rode `gerar.py` de novo para atualizar a pasta `gerado/` |
+
+Os comandos da tabela são para PowerShell; no Linux/macOS, use `.venv/bin/python`.
 
 ## Fase atual do projeto
 
@@ -188,6 +222,5 @@ sintática) e E4 (análise semântica e execução).
 
 ## Versão do ANTLR usada
 
-Depois de instalar, confirme a versão com `antlr4 --version` e atualize esta
-linha com o número exato — código gerado por uma versão pode não rodar com o
-runtime de outra.
+**4.13.2**, fixada em `requirements.txt`. O script `gerar.py` seleciona a versão
+do gerador a partir do runtime instalado para manter ambos compatíveis.
