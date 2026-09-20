@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="116" viewBox="0 0 1280 116" role="img" aria-labelledby="title">
+<title id="title">Amarra — conectando ações, construindo uma linguagem.</title>
+<rect width="1280" height="116" rx="16" fill="#FBE5CE"/>
+<rect x="0" y="25" width="5" height="66" rx="2" fill="#DD5C16"/>
+<text x="42" y="75" font-family="DejaVu Sans, Arial, sans-serif" font-size="45" font-weight="700" letter-spacing="-3" fill="#DD5C16">amarra</text>
+<path d="M246 36 V80" stroke="#D9B797"/>
+<text x="285" y="67" font-family="Arial, sans-serif" font-size="24" fill="#5C3926">Conectando ações. Construindo uma linguagem.</text>
+<circle cx="1217" cy="58" r="7" fill="#DD5C16"/>
+</svg>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="133" height="30" viewBox="0 0 133 30" role="img" aria-label="ARQUIVOS: .amr">
+<title>ARQUIVOS: .amr</title>
+<defs><clipPath id="pill"><rect width="133" height="30" rx="7"/></clipPath></defs>
+<g clip-path="url(#pill)">
+<rect width="133" height="30" fill="#FBE5CE"/>
+<rect x="83" width="50" height="30" fill="#B8420C"/>
+</g>
+<g font-family="Arial, sans-serif" font-size="11" font-weight="700" text-anchor="middle" dominant-baseline="central">
+<text x="41.5" y="15" fill="#6B3A20" letter-spacing=".5">ARQUIVOS</text>
+<text x="108.0" y="15" fill="#FFFFFF">.amr</text>
+</g>
+</svg>
