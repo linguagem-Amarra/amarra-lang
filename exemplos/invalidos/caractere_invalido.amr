@@ -1,0 +1,5 @@
+// Contem um caractere que nenhuma regra do lexer reconhece: @
+no "teste" {
+    cruzar ponta_direita ponta_esquerda;
+    apertar @;
+}

@@ -1,0 +1,5 @@
+// O numero termina em ponto sem digito depois, o que a regra NUMERO nao aceita
+no "teste" {
+    inteiro voltas = 2.;
+    apertar;
+}

@@ -1,0 +1,5 @@
+// O literal de texto abre aspas mas nunca fecha
+no "cadarco simples {
+    cruzar ponta_direita ponta_esquerda;
+    apertar;
+}

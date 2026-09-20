@@ -1,0 +1,18 @@
+// No de cadarco com reforco
+no "cadarco reforcado" {
+    inteiro voltas = 2;
+
+    cruzar ponta_direita ponta_esquerda;
+    passar_baixo ponta_direita;
+    apertar;
+
+    repetir voltas {
+        enrolar ponta_esquerda 1;
+    }
+
+    se voltas > 1 {
+        apertar;
+    }
+
+    finalizar "no reforcado pronto";
+}

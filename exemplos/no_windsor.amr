@@ -1,0 +1,12 @@
+// No de gravata Windsor
+no "windsor" {
+    real comprimento = 150.0;
+
+    cruzar ponta_larga ponta_estreita;
+    passar_cima ponta_larga;
+    passar_baixo ponta_larga;
+    enrolar ponta_larga 2;
+    apertar;
+
+    finalizar "windsor pronto";
+}

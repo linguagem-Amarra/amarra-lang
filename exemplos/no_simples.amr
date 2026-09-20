@@ -1,0 +1,7 @@
+// No de cadarco simples
+no "cadarco simples" {
+    cruzar ponta_direita ponta_esquerda;
+    passar_baixo ponta_direita;
+    apertar;
+    finalizar "no pronto";
+}
