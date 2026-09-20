@@ -1,3 +1,4 @@
 #!/bin/bash
-# Regenera o código do ANTLR a partir da gramática
-antlr4 -Dlanguage=Python3 -visitor -o gerado gramatica/Amarra.g4
+# Regenera o lexer usando o mesmo script disponivel no Windows.
+set -eu
+exec python3 "$(dirname "$0")/gerar.py"

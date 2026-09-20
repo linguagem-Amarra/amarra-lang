@@ -11,9 +11,23 @@ import os
 # permite importar o pacote gerado/ (código do ANTLR) a partir da raiz do repo
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from antlr4 import FileStream, CommonTokenStream
-from antlr4.error.ErrorListener import ErrorListener
-from gerado.AmarraLexer import AmarraLexer
+try:
+    from antlr4 import FileStream, CommonTokenStream
+    from antlr4.error.ErrorListener import ErrorListener
+except ModuleNotFoundError as erro:
+    if erro.name != "antlr4":
+        raise
+    sys.exit(
+        "Biblioteca antlr4 ausente. Use o Python do ambiente .venv e instale "
+        "as dependencias com: python -m pip install -r requirements.txt"
+    )
+
+try:
+    from gerado.AmarraLexer import AmarraLexer
+except ModuleNotFoundError as erro:
+    if erro.name not in {"gerado", "gerado.AmarraLexer"}:
+        raise
+    sys.exit("Lexer nao gerado. Na raiz do projeto, execute: python gerar.py")
 
 
 class ErroLexicoListener(ErrorListener):
@@ -31,7 +45,10 @@ def main():
 
     caminho = sys.argv[1]
 
-    entrada = FileStream(caminho, encoding="utf-8")
+    try:
+        entrada = FileStream(caminho, encoding="utf-8")
+    except OSError as erro:
+        sys.exit(f"Nao foi possivel abrir '{caminho}': {erro.strerror}")
     lexer = AmarraLexer(entrada)
 
     lexer.removeErrorListeners()

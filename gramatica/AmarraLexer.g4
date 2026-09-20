@@ -1,4 +1,4 @@
-grammar Amarra;
+lexer grammar AmarraLexer;
 
 // ---- LEXER: MAIUSCULAS ----
 
