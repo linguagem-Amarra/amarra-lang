@@ -307,7 +307,7 @@ Os comandos da tabela são para PowerShell. No Linux/macOS, substitua `.\.venv\S
 
 A entrega E2 corresponde a **1,5 ponto na Avaliação de Grau 1**. A evolução do trabalho do grupo está registrada no [diário do projeto](DIARIO.md).
 
-## 08 · Alunos
+## 08 · Integrantes
 
 - Lucas da Silva Nascimento
 - Magno Vinicius Coelho Lima
