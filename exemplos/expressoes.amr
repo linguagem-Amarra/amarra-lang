@@ -1,0 +1,18 @@
+// Precedencia, parenteses, menos unario e blocos aninhados
+no "expressoes e reforcos" {
+    inteiro voltas = 2 + 3 * 4;
+    inteiro reforcos = (2 + 3) * 4;
+    real ajuste = -2.5;
+    texto mensagem = "no pronto";
+    booleano reforcar = voltas > 1 e ajuste < 0 ou falso;
+
+    repetir reforcos {
+        se reforcar {
+            enrolar ponta_esquerda 1;
+            apertar;
+        }
+    }
+
+    voltas = voltas - 1;
+    finalizar mensagem;
+}

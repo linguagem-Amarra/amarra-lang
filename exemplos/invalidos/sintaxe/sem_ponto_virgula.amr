@@ -1,0 +1,5 @@
+// Os tokens sao validos, mas falta o ponto e virgula depois de apertar
+no "sem ponto e virgula" {
+    apertar
+    finalizar "pronto";
+}

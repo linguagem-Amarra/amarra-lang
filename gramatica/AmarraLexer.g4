@@ -23,6 +23,10 @@ TIPO_BOOLEANO : 'booleano' ;
 VERDADEIRO : 'verdadeiro' ;
 FALSO      : 'falso' ;
 
+// Operadores logicos (antes de IDENT)
+E  : 'e' ;
+OU : 'ou' ;
+
 // Operadores
 MAIS    : '+' ;
 MENOS   : '-' ;
@@ -37,6 +41,8 @@ ATRIB   : '=' ;
 ABRE_CHAVE  : '{' ;
 FECHA_CHAVE : '}' ;
 PONTOVIRG   : ';' ;
+ABRE_PAREN  : '(' ;
+FECHA_PAREN : ')' ;
 
 // Identificadores e literais (vêm depois das palavras-chave)
 IDENT  : [a-zA-Z_][a-zA-Z_0-9]* ;

@@ -1,0 +1,5 @@
+// Falta fechar o bloco externo
+no "chave sem fechar" {
+    repetir 2 {
+        apertar;
+    }

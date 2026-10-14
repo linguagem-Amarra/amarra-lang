@@ -1,4 +1,4 @@
-"""Gera o lexer do ANTLR no Windows, Linux ou macOS: python gerar.py."""
+"""Gera o lexer e o parser no Windows, Linux ou macOS: python gerar.py."""
 
 import sys
 from importlib.metadata import PackageNotFoundError, version
@@ -19,15 +19,20 @@ def main():
         return 1
 
     raiz = Path(__file__).resolve().parent
+    saida = raiz / "gerado"
+    saida.mkdir(exist_ok=True)
     # Usa a mesma versao do runtime e grava diretamente em gerado/.
     sys.argv = [
         "antlr4",
         "-v", versao,
         "-Dlanguage=Python3",
+        "-no-listener",
         "-encoding", "UTF-8",
         "-Xexact-output-dir",
-        "-o", str(raiz / "gerado"),
+        "-o", str(saida),
+        "-lib", str(saida),
         str(raiz / "gramatica" / "AmarraLexer.g4"),
+        str(raiz / "gramatica" / "AmarraParser.g4"),
     ]
     antlr4_tool_runner.tool()
 

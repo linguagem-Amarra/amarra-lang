@@ -17,7 +17,7 @@
     <text x="1042" y="394" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" letter-spacing="3" font-weight="700" fill="#A35A31">DO GESTO AO CÓDIGO</text>
     <rect y="444" width="1280" height="76" fill="#3D281E"/>
     <circle cx="64" cy="482" r="5" fill="#F07A33"/>
-    <text x="81" y="488" font-family="Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="1.4" fill="#FBE5CE">E2 · ANÁLISE LÉXICA</text>
+    <text x="81" y="488" font-family="Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="1.4" fill="#FBE5CE">E3 · ANÁLISE SINTÁTICA</text>
     <text x="580" y="488" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" letter-spacing="1.2" fill="#E5C2A6">COMANDOS EM PORTUGUÊS</text>
     <path d="M967 468 V496" stroke="#77503A"/>
     <text x="1218" y="488" text-anchor="end" font-family="Arial, sans-serif" font-size="16" letter-spacing="1.4" fill="#FBE5CE">EXTENSÃO .amr</text>
