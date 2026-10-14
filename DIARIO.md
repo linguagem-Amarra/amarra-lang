@@ -31,3 +31,19 @@ ou parentizado e informa erros com linha e coluna. Acrescentamos exemplos válid
 exemplos com erros sintáticos e testes de estrutura, precedência e diagnósticos.
 A relação entre os conceitos da aula e o código está em `docs/aula10.md`.
 Análise semântica e execução permanecem como etapas futuras.
+
+## 14/10 — Autômatos de pilha (Aula 11)
+
+Relacionamos as regras da gramática com os métodos gerados pelo ANTLR e com os
+contextos mantidos durante a análise. Acrescentamos `--rastrear` ao analisador
+sintático para observar entradas e saídas de regras, consumo de tokens e a pilha
+de contextos. O rastreamento utiliza os eventos do próprio parser.
+
+A opção `--regra` permite testar expressões, blocos e outras regras separadamente,
+sempre verificando se toda a entrada foi consumida. A condicional ganhou o bloco
+opcional `senao`, com chaves obrigatórias para definir sua associação ao `se`.
+
+Adicionamos exemplos de condicionais aninhadas, fragmentos para depuração e erros
+com parênteses e `senao`. Os testes cobrem essas construções, a evolução da pilha,
+os tokens consumidos e a preservação da árvore com rastreamento. A explicação dos
+conceitos e dos diagnósticos está em `docs/aula11.md`.

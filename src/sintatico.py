@@ -29,6 +29,8 @@ except ModuleNotFoundError as erro:
         raise
     sys.exit("Analisadores nao gerados. Na raiz do projeto, execute: python gerar.py")
 
+from src.rastreamento import RastreadorPilha, formatar_evento
+
 
 class ErroAnalise(ValueError):
     """Erro lexico ou sintatico com a localizacao no programa de entrada."""
@@ -46,8 +48,11 @@ class ErroAnaliseListener(ErrorListener):
         )
 
 
-def analisar(codigo):
-    """Retorna (arvore, parser) somente se toda a entrada for valida."""
+def analisar(codigo, regra="programa", registrar=None):
+    """Analisa toda a entrada pela regra escolhida; registrar recebe eventos opcionais."""
+    if regra not in AmarraParser.ruleNames:
+        raise ValueError(f"Regra desconhecida: {regra}")
+
     lexer = AmarraLexer(InputStream(codigo))
     lexer.removeErrorListeners()
     lexer.addErrorListener(ErroAnaliseListener("lexico"))
@@ -59,7 +64,14 @@ def analisar(codigo):
     parser = AmarraParser(tokens)
     parser.removeErrorListeners()
     parser.addErrorListener(ErroAnaliseListener("sintatico"))
-    arvore = parser.programa()
+    if registrar is not None:
+        parser.addParseListener(RastreadorPilha(parser, registrar))
+
+    arvore = getattr(parser, regra)()
+    # As regras isoladas nao incluem EOF; confira tambem o restante do arquivo.
+    token = parser.getCurrentToken()
+    if token.type != Token.EOF:
+        parser.notifyErrorListeners(f"extraneous input {token.text!r} expecting <EOF>")
     return arvore, parser
 
 
@@ -84,16 +96,29 @@ def main(argv=None):
     argumentos = argparse.ArgumentParser(
         description="Valida a sintaxe de um programa Amarra e mostra sua arvore."
     )
-    argumentos.add_argument("arquivo", type=Path, help="programa .amr salvo em UTF-8")
+    argumentos.add_argument("arquivo", type=Path, help="programa ou fragmento salvo em UTF-8")
+    argumentos.add_argument(
+        "--regra", choices=AmarraParser.ruleNames, default="programa",
+        help="regra inicial para depurar um fragmento (padrao: programa)",
+    )
+    argumentos.add_argument(
+        "--rastrear", action="store_true",
+        help="mostra entradas, saidas e consumo de tokens com a pilha de contextos",
+    )
     argumentos.add_argument(
         "--formato", choices=("indentado", "lisp"), default="indentado",
         help="formato da arvore (padrao: indentado)",
     )
     args = argumentos.parse_args(argv)
 
+    def registrar(evento):
+        print(formatar_evento(evento), file=sys.stderr)
+
     try:
         codigo = args.arquivo.read_text(encoding="utf-8")
-        arvore, parser = analisar(codigo)
+        arvore, parser = analisar(
+            codigo, regra=args.regra, registrar=registrar if args.rastrear else None,
+        )
     except (OSError, UnicodeError) as erro:
         print(f"Nao foi possivel ler '{args.arquivo}': {erro}", file=sys.stderr)
         return 1

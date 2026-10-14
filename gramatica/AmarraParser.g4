@@ -32,7 +32,8 @@ comando
 // A recursao bloco -> instrucao -> repeticao/condicional -> bloco
 // permite repetir e se aninhados.
 repeticao : REPETIR expr bloco ;
-condicional : SE expr bloco ;
+// O segundo bloco e opcional. As chaves definem a qual se o senao pertence.
+condicional : SE expr bloco (SENAO bloco)? ;
 
 // Nas alternativas recursivas, a ordem determina a precedencia no ANTLR.
 // Operadores do mesmo grupo associam a esquerda.

@@ -1,0 +1,4 @@
+// Falta o parenteses de fechamento antes do ponto e virgula
+no "parentese sem fechar" {
+    inteiro voltas = 2 + (3 * 4;
+}

@@ -1,0 +1,6 @@
+// Senao deve acompanhar um se
+no "senao isolado" {
+    senao {
+        apertar;
+    }
+}

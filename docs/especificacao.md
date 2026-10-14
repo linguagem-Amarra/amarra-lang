@@ -53,6 +53,7 @@ no "cadarço simples" {                  // inicia a definição de um nó com e
 | `apertar` | Aperta o nó no ponto atual |
 | `repetir n { ... }` | Repete o bloco de comandos `n` vezes |
 | `se condição { ... }` | Executa o bloco somente se a condição for verdadeira |
+| `se condição { ... } senao { ... }` | Acrescenta um bloco alternativo para a condição falsa |
 | `finalizar expressão` | Encerra a definição do nó e imprime a mensagem, como `finalizar "pronto";` |
 
 ## 5. Operadores e precedência
@@ -75,8 +76,8 @@ A atribuição `=` é parte de uma instrução, não de uma expressão. Em
 `voltas = base + 1 * 2;`, a árvore coloca `1 * 2` dentro da soma, que é o valor
 atribuído a `voltas`. O parser representa essa estrutura; a avaliação virá em E4.
 
-Os nomes `e` e `ou` passam a ser palavras reservadas. Nomes maiores como
-`enrolar`, `esquerda` e `outra_ponta` continuam sendo reconhecidos normalmente.
+Os nomes `e`, `ou` e `senao` são palavras reservadas. Nomes maiores como
+`enrolar`, `esquerda`, `outra_ponta` e `senao_extra` continuam sendo reconhecidos normalmente.
 
 ## 6. Comentários
 
@@ -108,12 +109,17 @@ O lexer permanece em `gramatica/AmarraLexer.g4`. O parser está em
 | `atribuicao` | Identificador, `=` e expressão. |
 | `comando` | `cruzar`, `passar_baixo`, `passar_cima`, `enrolar`, `apertar` ou `finalizar`, com seus argumentos. |
 | `repeticao` | `repetir` seguido de uma expressão e um bloco. |
-| `condicional` | `se` seguido de uma expressão e um bloco. |
+| `condicional` | `se` seguido de uma expressão e um bloco, com `senao` e outro bloco opcionais. |
 | `expr` | Literais, identificadores, agrupamentos e operações da seção 5. |
 
 Declarações, atribuições e comandos terminam com `;`. Os blocos de `repetir` e
 `se` terminam com `}` e não recebem `;` depois da chave. Eles podem conter novos
 blocos de `repetir` e `se`. A definição de um `no` dentro de outro não é permitida.
+
+A condicional usa `condicional : SE expr bloco (SENAO bloco)? ;`. O bloco de
+`senao` também exige chaves. Ele deve acompanhar o fechamento do bloco do `se`,
+sem `;` entre os dois. As chaves determinam a associação em condicionais
+aninhadas. Espaços e comentários entre `}` e `senao` são permitidos.
 
 Os argumentos de `cruzar`, `passar_baixo` e `passar_cima` são identificadores de
 pontas. `enrolar` recebe um identificador de ponta e uma expressão para a
@@ -124,9 +130,20 @@ O parser encerra no primeiro erro, informando linha (a partir de 1) e coluna
 (a partir de 0). Ele só apresenta a árvore quando o arquivo inteiro foi aceito.
 O comando `src/sintatico.py` também detecta erros léxicos antes da análise sintática.
 
+Para depuração, `--regra` seleciona uma regra isolada, como `expr` ou `bloco`.
+O padrão permanece `programa`. O analisador exige o fim da entrada em todos os
+modos, inclusive quando a regra escolhida não contém `EOF` explicitamente.
+Os fragmentos de exemplo ficam em `exemplos/fragmentos/`.
+
+Com `--rastrear`, o analisador mostra entradas e saídas de regras e tokens
+consumidos com a pilha de contextos do ANTLR. O rastro é emitido durante a
+análise e pode ser parcial quando há erro; a árvore só é exibida após o sucesso.
+
 Aceitar a sintaxe não garante que variáveis foram declaradas, que os tipos são
 compatíveis, que existe um comando `finalizar` ou que os movimentos fazem sentido.
 Essas verificações pertencem à análise semântica e à execução.
 
 Consulte [a aplicação dos conceitos da Aula 10](aula10.md) para ver o vocabulário
 formal, uma derivação e exemplos de árvore e precedência na linguagem Amarra.
+Consulte também [a aplicação da Aula 11](aula11.md), sobre a pilha do parser,
+opcionalidade, recursão à esquerda e depuração de regras.

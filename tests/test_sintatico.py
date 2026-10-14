@@ -41,7 +41,7 @@ class TestSintatico(unittest.TestCase):
         arvore, _ = analisar('no "teste" { repetir 2 { se verdadeiro { apertar; } } }')
         repeticao = arvore.definicaoNo(0).bloco().instrucao(0).repeticao()
         condicional = repeticao.bloco().instrucao(0).condicional()
-        self.assertEqual(condicional.bloco().instrucao(0).comando().getText(), "apertar")
+        self.assertEqual(condicional.bloco(0).instrucao(0).comando().getText(), "apertar")
 
     def test_exemplos_com_erro_lexico(self):
         for arquivo in sorted((RAIZ / "exemplos" / "invalidos").glob("*.amr")):

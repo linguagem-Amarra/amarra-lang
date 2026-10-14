@@ -11,6 +11,7 @@ ENROLAR       : 'enrolar' ;
 APERTAR       : 'apertar' ;
 REPETIR       : 'repetir' ;
 SE            : 'se' ;
+SENAO         : 'senao' ;
 FINALIZAR     : 'finalizar' ;
 
 // Palavras-chave de tipo

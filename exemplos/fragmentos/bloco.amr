@@ -1,0 +1,9 @@
+{
+    repetir 2 {
+        se verdadeiro {
+            apertar;
+        } senao {
+            passar_baixo ponta_direita;
+        }
+    }
+}

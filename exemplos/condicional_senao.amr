@@ -1,0 +1,19 @@
+// Aula 11: bloco opcional e aninhamento
+no "reforco condicional" {
+    inteiro voltas = 2 + 3 * (4 - 1);
+    booleano firme = falso;
+
+    se voltas > 1 {
+        repetir 2 {
+            se firme {
+                apertar;
+            } senao {
+                enrolar ponta_esquerda 1;
+            }
+        }
+    } senao {
+        cruzar ponta_direita ponta_esquerda;
+    }
+
+    finalizar "no pronto";
+}

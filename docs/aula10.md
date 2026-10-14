@@ -72,7 +72,7 @@ concretos são `no`, `"simples"`, `{`, `apertar`, `;` e `}`.
 bloco : ABRE_CHAVE instrucao* FECHA_CHAVE ;
 // Entre as alternativas de instrucao estao repeticao e condicional.
 repeticao : REPETIR expr bloco ;
-condicional : SE expr bloco ;
+condicional : SE expr bloco (SENAO bloco)? ;
 ```
 
 Um bloco pode conter uma repetição, que contém outro bloco, que pode conter uma
@@ -183,3 +183,6 @@ imprime uma árvore de sucesso nesses casos.
 
 As próximas etapas incluem análise de tipos, resolução de nomes e execução.
 O parser atual não garante que uma sequência de movimentos forme um nó válido.
+
+A continuação está em [Aula 11: autômatos de pilha](aula11.md), que acrescenta
+`senao`, rastreamento dos contextos do parser e análise de regras isoladas.

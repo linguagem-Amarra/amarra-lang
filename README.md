@@ -16,6 +16,7 @@
   <a href="#exemplo">Exemplo</a> &nbsp;·&nbsp;
   <a href="#executar">Como executar</a> &nbsp;·&nbsp;
   <a href="docs/aula10.md">Aula 10</a> &nbsp;·&nbsp;
+  <a href="docs/aula11.md">Aula 11</a> &nbsp;·&nbsp;
   <a href="#estrutura">Estrutura</a> &nbsp;·&nbsp;
   <a href="#evolucao">Evolução</a>
 </p>
@@ -80,6 +81,18 @@ Comentários e espaços em branco são descartados pelas regras com `-> skip`. E
 A [explicação da Aula 10 aplicada à Amarra](docs/aula10.md) inclui o vocabulário
 formal, uma derivação e um diagrama de árvore. O programa
 [`exemplos/expressoes.amr`](exemplos/expressoes.amr) demonstra as novas construções.
+
+### O que foi acrescentado a partir da Aula 11
+
+| Conceito da aula | Aplicação no projeto |
+| :--- | :--- |
+| Regras, chamadas e pilha | `--rastrear` mostra os contextos do ANTLR ao entrar e sair de regras e consumir tokens. |
+| Depuração por regra | `--regra expr`, `--regra bloco` e as demais regras permitem analisar fragmentos isolados. |
+| Elementos opcionais | A condicional aceita um bloco `senao` opcional com `(SENAO bloco)?`. |
+| Consumo completo | A entrada deve terminar em `EOF`, inclusive ao testar uma regra isolada. |
+
+Veja a [Aula 11 aplicada à Amarra](docs/aula11.md) para entender a pilha, os padrões
+de repetição, a recursão à esquerda e as mensagens de erro do parser.
 
 <a name="executar"></a>
 
@@ -277,6 +290,49 @@ Para ver expressões, blocos aninhados e a representação parentizada do ANTLR:
 Nas próximas execuções, basta chamar o analisador com o caminho do arquivo `.amr`
 salvo em UTF-8. Repita `gerar.py` sempre que alterar um dos arquivos `.g4`.
 
+### Pilha e depuração de regras (Aula 11)
+
+Primeiro, execute `gerar.py` para atualizar os analisadores. Depois, experimente
+uma expressão isolada ou um programa completo com `senao`:
+
+**Windows — PowerShell**
+
+```powershell
+.\.venv\Scripts\python.exe src/sintatico.py exemplos/fragmentos/expressao.amr --regra expr --rastrear --formato lisp
+.\.venv\Scripts\python.exe src/sintatico.py exemplos/condicional_senao.amr --rastrear
+```
+
+**Linux ou macOS**
+
+```bash
+.venv/bin/python src/sintatico.py exemplos/fragmentos/expressao.amr --regra expr --rastrear --formato lisp
+.venv/bin/python src/sintatico.py exemplos/condicional_senao.amr --rastrear
+```
+
+`--rastrear` mostra eventos `ENTRAR`, `CONSUMIR` e `SAIR`, com o token e os
+contextos ativos da base para o topo. O rastro acompanha a análise e é enviado
+para `stderr`; o resultado e a árvore continuam em `stdout`. Em um terminal,
+as duas saídas são visíveis.
+
+`--regra` usa `programa` por padrão. Os arquivos em `exemplos/fragmentos/` são
+partes de um programa: use `--regra expr` para `expressao.amr` e `--regra bloco`
+para `bloco.amr`. O analisador rejeita tokens restantes depois do fragmento.
+Consulte todas as regras disponíveis com `src/sintatico.py --help`, usando o
+Python do ambiente como nos comandos acima.
+
+A condicional agora permite escrever:
+
+```amarra
+se voltas > 1 {
+    enrolar ponta_esquerda 1;
+} senao {
+    apertar;
+}
+```
+
+As chaves são obrigatórias e definem a qual `se` cada `senao` pertence.
+O parser reconhece os dois blocos; a escolha de qual executar pertence à E4.
+
 ### Um programa com erro léxico
 
 Execute o exemplo que contém um caractere inválido:
@@ -302,7 +358,8 @@ Erro lexico na linha 4, coluna 12: token recognition error at: '@'
 ### Um programa com erro sintático
 
 Os exemplos em `exemplos/invalidos/sintaxe/` contêm tokens válidos, mas estruturas
-incorretas: falta de `;`, chave sem fechamento ou expressão incompleta.
+incorretas: falta de `;`, chave ou parêntese sem fechamento, expressão incompleta
+ou `senao` sem um `se` correspondente.
 
 **Windows — PowerShell**
 
@@ -379,7 +436,8 @@ Depois de gerar os analisadores, execute na raiz do projeto:
 
 Os testes cobrem exemplos válidos e inválidos, blocos aninhados, precedência,
 associatividade, consumo até `EOF`, saída no terminal e os tokens dos exemplos
-originais da E2. A saída deve terminar com `OK`.
+originais da E2. Também verificam `senao`, regras isoladas, consumo de tokens no
+rastro e preservação da árvore ao observar a pilha. A saída deve terminar com `OK`.
 
 <a name="estrutura"></a>
 
@@ -397,15 +455,20 @@ originais da E2. A saída deve terminar com `OK`.
 | `gerado/` | Recebe os arquivos gerados pelo ANTLR; não editar nem versionar. |
 | [`src/lexico.py`](src/lexico.py) | Lê um arquivo `.amr` e apresenta os tokens reconhecidos. |
 | [`src/sintatico.py`](src/sintatico.py) | Valida a sintaxe e apresenta a árvore ou o primeiro erro. |
+| [`src/rastreamento.py`](src/rastreamento.py) | Observa os contextos do parser em entradas, saídas e consumo de tokens. |
 | [`exemplos/no_simples.amr`](exemplos/no_simples.amr) | Demonstra um programa válido com um nó simples. |
 | [`exemplos/no_reforcado.amr`](exemplos/no_reforcado.amr) | Demonstra um programa válido com `repetir` e `se`. |
 | [`exemplos/no_windsor.amr`](exemplos/no_windsor.amr) | Demonstra um programa válido que usa o tipo real. |
 | [`exemplos/expressoes.amr`](exemplos/expressoes.amr) | Demonstra precedência, parênteses, lógica e blocos aninhados. |
+| [`exemplos/condicional_senao.amr`](exemplos/condicional_senao.amr) | Demonstra condicionais com `senao` e aninhamento. |
+| [`exemplos/fragmentos/`](exemplos/fragmentos/) | Contém expressão e bloco isolados para testar com `--regra`. |
 | [`exemplos/invalidos/`](exemplos/invalidos/) | Reúne programas com erros propositais. |
 | [`exemplos/invalidos/sintaxe/`](exemplos/invalidos/sintaxe/) | Demonstra erros de estrutura com tokens válidos. |
 | [`tests/test_sintatico.py`](tests/test_sintatico.py) | Verifica árvores, precedência, diagnósticos e execução no terminal. |
+| [`tests/test_aula11.py`](tests/test_aula11.py) | Verifica `senao`, regras isoladas e o rastreamento do parser. |
 | [`docs/especificacao.md`](docs/especificacao.md) | Documenta a especificação completa da linguagem. |
 | [`docs/aula10.md`](docs/aula10.md) | Relaciona os conceitos da aula com a implementação da Amarra. |
+| [`docs/aula11.md`](docs/aula11.md) | Explica a pilha do parser, os padrões de regras e a depuração. |
 | [`docs/assets/amarra/`](docs/assets/amarra/) | Guarda a capa, os selos e os demais elementos visuais deste README. |
 | [`DIARIO.md`](DIARIO.md) | Registra cada sessão de trabalho do grupo. |
 
@@ -425,6 +488,8 @@ originais da E2. A saída deve terminar com `OK`.
 | `Lexer nao gerado` | A geração não foi concluída. | Execute `.\.venv\Scripts\python.exe gerar.py` e confira a primeira mensagem de erro. |
 | `Analisadores nao gerados` | O parser ainda não foi gerado, por exemplo após atualizar da E2. | Execute `.\.venv\Scripts\python.exe gerar.py` novamente. |
 | `Erro sintatico` | Os tokens não seguem uma regra da gramática. | Confira a linha e a coluna indicadas, os argumentos dos comandos, os `;` e o fechamento de chaves e parênteses. |
+| `expecting <EOF>` ao testar um fragmento | Sobraram tokens depois da regra selecionada. | Confira `--regra`: `expr` e `comando` não incluem `;`, enquanto `instrucao` inclui o terminador dos comandos. |
+| `senao` é rejeitado após atualizar o projeto | O lexer ou o parser gerado ainda corresponde à versão anterior. | Execute `gerar.py` novamente e confira se o `senao` acompanha um bloco de `se`. |
 | `Nao foi possivel abrir` | O arquivo não existe no caminho informado ou não pode ser lido. | Confira o caminho e execute a partir da raiz do projeto. |
 | Tokens aparecem com nome errado ou fora de ordem | A gramática foi alterada depois da última geração. | Execute `gerar.py` novamente para atualizar `gerado/`. |
 
@@ -439,7 +504,7 @@ Os comandos da tabela são para PowerShell. No Linux/macOS, substitua `.\.venv\S
 | Etapa | Foco | Situação |
 | :---: | :--- | :--- |
 | **E2** | Especificação da linguagem e analisador léxico. | Implementada; o comando `src/lexico.py` continua disponível. |
-| **E3** | Analisador sintático e árvore sintática. | **Fase atual: elementos da Aula 10 implementados.** |
+| **E3** | Analisador sintático, árvore e depuração. | **Fase atual: elementos das Aulas 10 e 11 implementados.** |
 | **E4** | Análise semântica e execução. | Fase futura. |
 
 A entrega E2 corresponde a **1,5 ponto na Avaliação de Grau 1**. A evolução do trabalho do grupo está registrada no [diário do projeto](DIARIO.md).
