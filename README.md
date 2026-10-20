@@ -17,6 +17,7 @@
   <a href="#executar">Como executar</a> &nbsp;·&nbsp;
   <a href="docs/aula10.md">Aula 10</a> &nbsp;·&nbsp;
   <a href="docs/aula11.md">Aula 11</a> &nbsp;·&nbsp;
+  <a href="docs/validacao-sintatica.md">Relatório de testes</a> &nbsp;·&nbsp;
   <a href="#estrutura">Estrutura</a> &nbsp;·&nbsp;
   <a href="#evolucao">Evolução</a>
 </p>
@@ -36,6 +37,11 @@ O projeto aproxima o estudo de compiladores de uma atividade cotidiana: **transf
 | Sequências de ações para montar nós. | Python e código gerado pelo ANTLR. | **E3:** análise léxica, análise sintática e árvore sintática. |
 
 > **Escopo atual (E3)** — O projeto reconhece tokens, valida a estrutura do programa e produz uma árvore sintática concreta. A análise de tipos e nomes, a validação dos movimentos e a execução ficam para E4.
+
+**Validação da E3:** 108 testes automatizados passaram na execução de 20/10/2026.
+A coleção adicional contém 72 entradas identificadas: **20 válidas, 48 com erro
+sintático e 4 com erro léxico**. Consulte o [relatório de validação](docs/validacao-sintatica.md)
+para ver a matriz dos casos, os resultados e a relação com as Aulas 10 e 11.
 
 <a name="exemplo"></a>
 
@@ -439,6 +445,22 @@ associatividade, consumo até `EOF`, saída no terminal e os tokens dos exemplos
 originais da E2. Também verificam `senao`, regras isoladas, consumo de tokens no
 rastro e preservação da árvore ao observar a pilha. A saída deve terminar com `OK`.
 
+São **108 testes descobertos pelo `unittest`**: os 36 testes anteriores e 72 casos
+adicionais de [`tests/casos_sintaticos.json`](tests/casos_sintaticos.json). Cada
+entrada dessa coleção vira um teste independente, com ID e descrição na saída.
+Um teste de entrada inválida passa quando o analisador rejeita o código na fase
+esperada; erro léxico não substitui erro sintático.
+
+Para executar somente a coleção adicional:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p test_casos_sintaticos.py -v
+```
+
+No Linux/macOS, substitua o executável por `.venv/bin/python`. Para investigar um
+único caso, acrescente `-k S16`, por exemplo. O [relatório de validação](docs/validacao-sintatica.md)
+explica os IDs, os critérios de aprovação e os limites da análise.
+
 <a name="estrutura"></a>
 
 ## 05 · Cada arquivo tem seu papel
@@ -466,6 +488,9 @@ rastro e preservação da árvore ao observar a pilha. A saída deve terminar co
 | [`exemplos/invalidos/sintaxe/`](exemplos/invalidos/sintaxe/) | Demonstra erros de estrutura com tokens válidos. |
 | [`tests/test_sintatico.py`](tests/test_sintatico.py) | Verifica árvores, precedência, diagnósticos e execução no terminal. |
 | [`tests/test_aula11.py`](tests/test_aula11.py) | Verifica `senao`, regras isoladas e o rastreamento do parser. |
+| [`tests/casos_sintaticos.json`](tests/casos_sintaticos.json) | Reúne 72 entradas com ID, descrição, regra inicial e resultado esperado. |
+| [`tests/test_casos_sintaticos.py`](tests/test_casos_sintaticos.py) | Executa cada caso da coleção como um teste independente. |
+| [`docs/validacao-sintatica.md`](docs/validacao-sintatica.md) | Registra as alterações, os resultados e a matriz de validação da E3. |
 | [`docs/especificacao.md`](docs/especificacao.md) | Documenta a especificação completa da linguagem. |
 | [`docs/aula10.md`](docs/aula10.md) | Relaciona os conceitos da aula com a implementação da Amarra. |
 | [`docs/aula11.md`](docs/aula11.md) | Explica a pilha do parser, os padrões de regras e a depuração. |

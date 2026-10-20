@@ -1,0 +1,510 @@
+[
+  {
+    "id": "V01",
+    "descricao": "Nó com bloco vazio",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"minimo\" {}"
+  },
+  {
+    "id": "V02",
+    "descricao": "Os seis comandos com seus argumentos",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"comandos\" { cruzar direita esquerda; passar_baixo direita; passar_cima esquerda; enrolar direita 2; apertar; finalizar \"pronto\"; }"
+  },
+  {
+    "id": "V03",
+    "descricao": "Declarações dos quatro tipos",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"tipos\" { inteiro voltas = 2; real tamanho = 3.5; texto nome = \"corda\"; booleano pronto = falso; }"
+  },
+  {
+    "id": "V04",
+    "descricao": "Atribuição com expressão aritmética",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"atribuicao\" { inteiro voltas = 1; voltas = voltas + 2 * 3 - 8 / 4; }"
+  },
+  {
+    "id": "V05",
+    "descricao": "Comparações e operadores lógicos combinados",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"logica\" { booleano pronto = 2 < 3 e 4 > 1 ou 2 == 2; }"
+  },
+  {
+    "id": "V06",
+    "descricao": "Parênteses aninhados e menos unário",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"parenteses\" { real valor = -((2 + 3) * (4 - 1)) / 2; }"
+  },
+  {
+    "id": "V07",
+    "descricao": "Repetição e condicionais aninhadas com dois senao",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"aninhamento\" { repetir 2 { se verdadeiro { se falso { apertar; } senao { enrolar ponta 1; } } senao { passar_cima ponta; } } }"
+  },
+  {
+    "id": "V08",
+    "descricao": "Blocos vazios nas duas alternativas da condicional",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"vazios\" { se verdadeiro {} senao {} }"
+  },
+  {
+    "id": "V09",
+    "descricao": "Repetição cujo contador é uma expressão",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"repeticao\" { inteiro voltas = 2; repetir (voltas + 1) * 2 { apertar; } }"
+  },
+  {
+    "id": "V10",
+    "descricao": "Três definições de nó no mesmo arquivo",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"a\" {} no \"b\" { apertar; } no \"c\" { finalizar \"fim\"; }"
+  },
+  {
+    "id": "V11",
+    "descricao": "Texto com acentos, chaves e marcador de comentário",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"nó náutico\" { texto mensagem = \"ação { } // se senao\"; finalizar mensagem; }"
+  },
+  {
+    "id": "V12",
+    "descricao": "Tabulações, linhas CRLF e comentário até o fim do arquivo",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "// inicio\r\nno \"espacos\"\r\n{\r\n\tapertar; // comando\r\n}\r\n// fim sem quebra de linha"
+  },
+  {
+    "id": "V13",
+    "descricao": "Identificadores com prefixos de palavras reservadas",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"identificadores\" { inteiro senao_extra = 1; inteiro repetir2 = 2; inteiro _ponta = senao_extra + repetir2; }"
+  },
+  {
+    "id": "V14",
+    "descricao": "Zero inteiro e literal real",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"numeros\" { inteiro zero = 0; real medida = 0.25; }"
+  },
+  {
+    "id": "V15",
+    "descricao": "Instruções após blocos de controle consecutivos",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"sequencia\" { repetir 2 {} se verdadeiro {} apertar; se falso {} senao {} finalizar \"fim\"; }"
+  },
+  {
+    "id": "V16",
+    "descricao": "Expressão isolada sem ponto e vírgula",
+    "regra": "expr",
+    "resultado": "valido",
+    "codigo": "2 + 3 * (4 - 1)"
+  },
+  {
+    "id": "V17",
+    "descricao": "Instrução isolada com ponto e vírgula",
+    "regra": "instrucao",
+    "resultado": "valido",
+    "codigo": "enrolar ponta 2 + 1;"
+  },
+  {
+    "id": "V18",
+    "descricao": "Comando isolado sem ponto e vírgula",
+    "regra": "comando",
+    "resultado": "valido",
+    "codigo": "cruzar direita esquerda"
+  },
+  {
+    "id": "V19",
+    "descricao": "Nome não declarado é questão semântica, com sintaxe válida",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"limite nomes\" { finalizar desconhecido; }"
+  },
+  {
+    "id": "V20",
+    "descricao": "Incompatibilidade de tipos não é rejeitada na fase sintática",
+    "regra": "programa",
+    "resultado": "valido",
+    "codigo": "no \"limite tipos\" { inteiro voltas = \"corda\"; }"
+  },
+  {
+    "id": "S01",
+    "descricao": "Programa vazio",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": ""
+  },
+  {
+    "id": "S02",
+    "descricao": "Arquivo contendo somente comentário",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "// falta uma definicao de no"
+  },
+  {
+    "id": "S03",
+    "descricao": "Definição sem a palavra no",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "\"teste\" {}"
+  },
+  {
+    "id": "S04",
+    "descricao": "Nome do nó sem aspas",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no teste {}"
+  },
+  {
+    "id": "S05",
+    "descricao": "Definição sem nome",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no {}"
+  },
+  {
+    "id": "S06",
+    "descricao": "Bloco sem chave de abertura",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" apertar; }"
+  },
+  {
+    "id": "S07",
+    "descricao": "Fim do arquivo antes da chave de fechamento",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" {\n    apertar;\n",
+    "posicao": [3, 0]
+  },
+  {
+    "id": "S08",
+    "descricao": "Chave de fechamento excedente",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { apertar; }}"
+  },
+  {
+    "id": "S09",
+    "descricao": "Definição de nó dentro de outro nó",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"externo\" { no \"interno\" {} }"
+  },
+  {
+    "id": "S10",
+    "descricao": "Comando fora do nó após uma definição válida",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" {} apertar;"
+  },
+  {
+    "id": "S11",
+    "descricao": "Declaração sem identificador",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro = 2; }"
+  },
+  {
+    "id": "S12",
+    "descricao": "Palavra reservada usada como identificador",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro repetir = 2; }"
+  },
+  {
+    "id": "S13",
+    "descricao": "Declaração sem inicialização obrigatória",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro voltas; }"
+  },
+  {
+    "id": "S14",
+    "descricao": "Declaração sem sinal de atribuição",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro voltas 2; }"
+  },
+  {
+    "id": "S15",
+    "descricao": "Declaração sem expressão após o igual",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro voltas = ; }"
+  },
+  {
+    "id": "S16",
+    "descricao": "Declaração sem terminador antes da instrução seguinte",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" {\n    inteiro voltas = 2\n    apertar;\n}",
+    "posicao": [3, 4]
+  },
+  {
+    "id": "S17",
+    "descricao": "Atribuição sem sinal de igual",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { voltas 2; }"
+  },
+  {
+    "id": "S18",
+    "descricao": "Atribuições encadeadas não previstas na gramática",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { a = b = 2; }"
+  },
+  {
+    "id": "S19",
+    "descricao": "Comando sem ponto e vírgula",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { apertar }"
+  },
+  {
+    "id": "S20",
+    "descricao": "Ponto e vírgula isolado não forma instrução",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { ; }"
+  },
+  {
+    "id": "S21",
+    "descricao": "Cruzar com apenas uma ponta",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { cruzar direita; }"
+  },
+  {
+    "id": "S22",
+    "descricao": "Cruzar com uma terceira ponta excedente",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { cruzar direita esquerda extra; }"
+  },
+  {
+    "id": "S23",
+    "descricao": "Passar por baixo com número no lugar de identificador",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { passar_baixo 2; }"
+  },
+  {
+    "id": "S24",
+    "descricao": "Passar por cima sem a ponta",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { passar_cima; }"
+  },
+  {
+    "id": "S25",
+    "descricao": "Enrolar sem expressão de quantidade",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { enrolar ponta; }"
+  },
+  {
+    "id": "S26",
+    "descricao": "Enrolar sem identificador da ponta",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { enrolar 2; }"
+  },
+  {
+    "id": "S27",
+    "descricao": "Apertar com argumento não permitido",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { apertar ponta; }"
+  },
+  {
+    "id": "S28",
+    "descricao": "Finalizar sem expressão",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { finalizar; }"
+  },
+  {
+    "id": "S29",
+    "descricao": "Repetição sem expressão",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { repetir { apertar; } }"
+  },
+  {
+    "id": "S30",
+    "descricao": "Repetição sem bloco delimitado por chaves",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { repetir 2 apertar; }"
+  },
+  {
+    "id": "S31",
+    "descricao": "Aninhamento de repetição com uma chave faltando",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { repetir 2 { repetir 3 { apertar; } }"
+  },
+  {
+    "id": "S32",
+    "descricao": "Se sem condição",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { se { apertar; } }"
+  },
+  {
+    "id": "S33",
+    "descricao": "Se sem bloco delimitado por chaves",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { se verdadeiro apertar; }"
+  },
+  {
+    "id": "S34",
+    "descricao": "Senao sem se correspondente",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { senao { apertar; } }"
+  },
+  {
+    "id": "S35",
+    "descricao": "Senao sem bloco delimitado por chaves",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { se verdadeiro {} senao apertar; }"
+  },
+  {
+    "id": "S36",
+    "descricao": "Dois senao para a mesma condicional",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { se verdadeiro {} senao {} senao {} }"
+  },
+  {
+    "id": "S37",
+    "descricao": "Condição indevida após senao",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { se verdadeiro {} senao falso {} }"
+  },
+  {
+    "id": "S38",
+    "descricao": "Terminador indevido após bloco de controle",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { repetir 2 {}; }"
+  },
+  {
+    "id": "S39",
+    "descricao": "Parênteses sem expressão interna",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro valor = (); }"
+  },
+  {
+    "id": "S40",
+    "descricao": "Expressão com parêntese sem fechamento",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro valor = (2 + 3; }"
+  },
+  {
+    "id": "S41",
+    "descricao": "Expressão com parêntese de fechamento excedente",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro valor = 2 + 3); }"
+  },
+  {
+    "id": "S42",
+    "descricao": "Operador binário sem operando à direita",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro valor = 2 + ; }"
+  },
+  {
+    "id": "S43",
+    "descricao": "Operadores aritméticos em sequência inválida",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro valor = 2 + * 3; }"
+  },
+  {
+    "id": "S44",
+    "descricao": "Mais unário não previsto na linguagem",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { inteiro valor = +2; }"
+  },
+  {
+    "id": "S45",
+    "descricao": "Operadores lógicos sem operando intermediário",
+    "regra": "programa",
+    "resultado": "sintatico",
+    "codigo": "no \"teste\" { booleano valor = verdadeiro e ou falso; }"
+  },
+  {
+    "id": "S46",
+    "descricao": "Tokens restantes após expressão isolada",
+    "regra": "expr",
+    "resultado": "sintatico",
+    "codigo": "2 3",
+    "posicao": [1, 2]
+  },
+  {
+    "id": "S47",
+    "descricao": "Ponto e vírgula excedente na regra comando",
+    "regra": "comando",
+    "resultado": "sintatico",
+    "codigo": "cruzar direita esquerda;"
+  },
+  {
+    "id": "S48",
+    "descricao": "Ponto e vírgula excedente na regra declaracao",
+    "regra": "declaracao",
+    "resultado": "sintatico",
+    "codigo": "inteiro voltas = 2;"
+  },
+  {
+    "id": "L01",
+    "descricao": "Caractere não reconhecido dentro de bloco",
+    "regra": "programa",
+    "resultado": "lexico",
+    "codigo": "no \"teste\" {\n    @\n}",
+    "posicao": [2, 4]
+  },
+  {
+    "id": "L02",
+    "descricao": "Literal de texto sem aspas de fechamento",
+    "regra": "programa",
+    "resultado": "lexico",
+    "codigo": "no \"teste\" { finalizar \"sem fechamento; }"
+  },
+  {
+    "id": "L03",
+    "descricao": "Número real com dois pontos decimais",
+    "regra": "programa",
+    "resultado": "lexico",
+    "codigo": "no \"teste\" { real medida = 1.2.3; }"
+  },
+  {
+    "id": "L04",
+    "descricao": "Quebra de linha dentro de literal de texto",
+    "regra": "programa",
+    "resultado": "lexico",
+    "codigo": "no \"teste\" { texto mensagem = \"linha um\nlinha dois\"; }"
+  }
+]

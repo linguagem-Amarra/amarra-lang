@@ -47,3 +47,26 @@ Adicionamos exemplos de condicionais aninhadas, fragmentos para depuração e er
 com parênteses e `senao`. Os testes cobrem essas construções, a evolução da pilha,
 os tokens consumidos e a preservação da árvore com rastreamento. A explicação dos
 conceitos e dos diagnósticos está em `docs/aula11.md`.
+
+## 20/10/2026 — Validação da entrega sintática
+
+Revisamos o analisador sintático já implementado nas etapas das Aulas 10 e 11.
+Regeneramos o lexer e o parser e executamos os 36 testes existentes, que passaram.
+
+Acrescentamos uma coleção de 72 entradas em `tests/casos_sintaticos.json`, com
+identificadores, descrições, regras iniciais e resultados esperados. São 20
+entradas sintaticamente válidas, 48 com erros sintáticos e 4 com erros léxicos.
+Os casos incluem argumentos ausentes ou excedentes, declarações incompletas,
+delimitadores incorretos, condicionais, repetições, expressões e tokens restantes.
+Também verificamos textos com acentos, comentários, quebras de linha do Windows
+e a distinção entre erro sintático e questão semântica.
+
+O novo `tests/test_casos_sintaticos.py` registra cada entrada como um teste
+independente. A execução completa passou com **108 testes, sem falhas ou erros**.
+Os testes anteriores continuam verificando a estrutura das árvores, a
+precedência, a associatividade, a pilha e a interface de terminal.
+
+Criamos `docs/validacao-sintatica.md` com a matriz de casos, os resultados,
+o ambiente utilizado e os comandos para reproduzir a validação. Atualizamos
+o README para dar acesso direto a esse relatório e explicar a contagem dos testes.
+Nesta revisão, não foi necessário alterar a gramática ou o analisador.
