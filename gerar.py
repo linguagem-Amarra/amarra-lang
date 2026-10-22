@@ -1,4 +1,4 @@
-"""Gera o lexer e o parser no Windows, Linux ou macOS: python gerar.py."""
+"""Gera lexer, parser e visitor no Windows, Linux ou macOS: python gerar.py."""
 
 import sys
 from importlib.metadata import PackageNotFoundError, version
@@ -26,6 +26,7 @@ def main():
         "antlr4",
         "-v", versao,
         "-Dlanguage=Python3",
+        "-visitor",
         "-no-listener",
         "-encoding", "UTF-8",
         "-Xexact-output-dir",

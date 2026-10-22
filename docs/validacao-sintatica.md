@@ -2,6 +2,9 @@
 
 Data da execução: **20/10/2026**.
 
+Este relatório preserva o resultado da revisão de 20/10. A atualização da
+[Aula 13, em 21/10](aula13.md), acrescenta 24 testes e leva a suíte atual a 132.
+
 O analisador sintático da Amarra foi gerado novamente e validado com
 **108 testes automatizados: todos passaram, sem falhas ou erros**. Este documento
 registra a evolução do projeto léxico para o sintático e a ampliação dos testes,
@@ -43,7 +46,7 @@ quando ocorre erro.
 | Conjunto | Testes independentes | Resultado |
 | :--- | ---: | :--- |
 | `test_sintatico.py` — árvores, precedência, diagnósticos e terminal | 17 | Todos passaram |
-| `test_aula11.py` — condicionais, regras isoladas, pilha e terminal | 19 | Todos passaram |
+| `test_condicionais_regras_rastreamento.py` — condicionais, regras isoladas, pilha e terminal | 19 | Todos passaram |
 | Coleção V01–V20 — entradas sintaticamente válidas | 20 | Todas aceitas até EOF |
 | Coleção S01–S48 — entradas com erro sintático | 48 | Todas rejeitadas pelo parser |
 | Coleção L01–L04 — entradas com erro léxico | 4 | Todas rejeitadas pelo lexer |

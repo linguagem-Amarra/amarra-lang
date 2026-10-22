@@ -13,7 +13,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 try:
     from antlr4 import FileStream, CommonTokenStream
-    from antlr4.error.ErrorListener import ErrorListener
 except ModuleNotFoundError as erro:
     if erro.name != "antlr4":
         raise
@@ -30,12 +29,7 @@ except ModuleNotFoundError as erro:
     sys.exit("Lexer nao gerado. Na raiz do projeto, execute: python gerar.py")
 
 
-class ErroLexicoListener(ErrorListener):
-    """Reporta caracteres não reconhecidos apontando linha e coluna."""
-
-    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
-        print(f"Erro lexico na linha {line}, coluna {column}: {msg}")
-        sys.exit(1)
+from src.diagnosticos import ErroAnalise, ErroAnaliseListener
 
 
 def main():
@@ -52,10 +46,14 @@ def main():
     lexer = AmarraLexer(entrada)
 
     lexer.removeErrorListeners()
-    lexer.addErrorListener(ErroLexicoListener())
+    lexer.addErrorListener(ErroAnaliseListener("lexico"))
 
     stream = CommonTokenStream(lexer)
-    stream.fill()
+    try:
+        stream.fill()
+    except ErroAnalise as erro:
+        print(erro, file=sys.stderr)
+        sys.exit(1)
 
     total = 0
     for token in stream.tokens:

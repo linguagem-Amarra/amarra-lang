@@ -192,7 +192,12 @@ Na raiz do projeto, depois de instalar as dependências do README:
 | `Erro lexico` | O problema ocorreu no reconhecimento de caracteres, antes da análise sintática. |
 
 [`parentese_sem_fechar.amr`](../exemplos/invalidos/sintaxe/parentese_sem_fechar.amr)
-produz `Erro sintatico na linha 3, coluna 31: missing ')' at ';'`.
+produz, no formato introduzido na Aula 13,
+`Erro sintatico na linha 3, coluna 31: esperava ')'; encontrou ';'`.
+
+Os nomes da tabela acima são as mensagens originais do ANTLR. O projeto agora
+apresenta diagnósticos em português e oferece `--recuperar` para buscar mais
+erros; veja [Aula 13: erros e preparação para AST](aula13.md).
 [`senao_sem_se.amr`](../exemplos/invalidos/sintaxe/senao_sem_se.amr) demonstra um
 `senao` sem condicional correspondente. Em ambos os casos, o processo encerra
 com código `1`, preservando o diagnóstico e sem imprimir uma árvore de sucesso.

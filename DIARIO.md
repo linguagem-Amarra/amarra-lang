@@ -70,3 +70,40 @@ Criamos `docs/validacao-sintatica.md` com a matriz de casos, os resultados,
 o ambiente utilizado e os comandos para reproduzir a validação. Atualizamos
 o README para dar acesso direto a esse relatório e explicar a contagem dos testes.
 Nesta revisão, não foi necessário alterar a gramática ou o analisador.
+
+## 21/10/2026 — Diagnósticos e preparação do visitor (Aula 13)
+
+Aplicamos os conceitos do material `Aula13 - Erros e AST-1.pdf`. As mensagens
+léxicas e sintáticas agora apresentam linha, coluna, símbolos esperados e entrada
+encontrada em português. Os diagnósticos também ficam disponíveis como dados
+estruturados em `ErroAnalise.diagnosticos`.
+
+Acrescentamos `--recuperar` ao analisador sintático. O modo pânico descarta a
+instrução defeituosa até um ponto seguro (`;` ou `}`), preserva a chave do bloco
+externo e permite encontrar outros erros. Mantivemos a interrupção no primeiro
+erro como padrão. Nenhuma árvore de sucesso é apresentada quando há diagnósticos.
+
+O script `gerar.py` passou a incluir `-visitor`, garantindo que o visitor seja
+recriado junto com o lexer e o parser. Os testes demonstram a visita aos comandos
+e o retorno de resultados entre subexpressões. A AST completa será construída
+na etapa seguinte, conforme a indicação da Aula 14 no material.
+
+Incluímos o exemplo `multiplos_erros.amr`, a documentação `docs/aula13.md` e 24
+testes novos. Os **132 testes passaram**, incluindo os casos anteriores e a
+verificação das 72 entradas da coleção também com recuperação ativada.
+
+## 21/10/2026 — Conferência da Aula 12
+
+Comparamos o material `Aula12 - Analise descendente-2 (3).pdf` com a gramática,
+o parser gerado e os testes existentes. Confirmamos que a escolha de instruções
+pelo próximo token, a precedência das expressões e o `senao` opcional já estavam
+contemplados nas implementações anteriores.
+
+Acrescentamos `docs/aula12.md` para explicar FIRST e FOLLOW com exemplos da
+Amarra e indicar onde esses conceitos aparecem no código. As decisões são
+realizadas pelo ANTLR; não foi acrescentado um calculador próprio desses conjuntos.
+Atualizamos também o README e as referências na especificação.
+
+Os três testes selecionados de precedência e os quatro testes de condicionais
+passaram. Esta conferência não alterou a gramática nem acrescentou testes:
+a suíte continua com 132 testes.

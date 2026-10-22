@@ -82,7 +82,7 @@ class TestRegrasIsoladas(unittest.TestCase):
             ("bloco", "{} {}"), ("tipo", "real inteiro"),
         ]:
             with self.subTest(regra=regra, codigo=codigo):
-                with self.assertRaisesRegex(ErroAnalise, "expecting <EOF>"):
+                with self.assertRaisesRegex(ErroAnalise, r"esperava fim da entrada \(EOF\)"):
                     analisar(codigo, regra=regra)
 
     def test_regra_deve_pertencer_a_gramatica(self):
@@ -91,7 +91,7 @@ class TestRegrasIsoladas(unittest.TestCase):
 
     def test_erro_lexico_e_parentese_ausente_em_fragmento(self):
         for codigo, mensagem in [
-            ("2 + @", "Erro lexico"), ("2 + (3 * 4", r"missing '\)'"),
+            ("2 + @", "Erro lexico"), ("2 + (3 * 4", r"esperava '\)'"),
         ]:
             with self.subTest(codigo=codigo):
                 with self.assertRaisesRegex(ErroAnalise, mensagem):
@@ -160,7 +160,7 @@ class TestRastreamento(unittest.TestCase):
         self.assertTrue(any(e.acao == "CONSUMIR" and e.texto_token == "apertar" for e in eventos))
 
 
-class TestTerminalAula11(unittest.TestCase):
+class TestTerminalRegrasRastreamento(unittest.TestCase):
     def executar(self, *argumentos):
         return subprocess.run(
             [sys.executable, str(RAIZ / "src" / "sintatico.py"), *argumentos],

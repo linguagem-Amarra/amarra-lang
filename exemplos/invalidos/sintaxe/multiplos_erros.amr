@@ -1,0 +1,8 @@
+// A primeira expressao gera somente um diagnostico no modo panico.
+no "recuperacao" {
+    inteiro voltas = 1 + ) * ( + 2 * ) + 3;
+    apertar;
+    cruzar ponta_direita;
+    passar_cima ponta_esquerda;
+    finalizar;
+}

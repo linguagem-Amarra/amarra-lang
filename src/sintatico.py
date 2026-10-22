@@ -11,7 +11,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 try:
     from antlr4 import CommonTokenStream, InputStream, Token
-    from antlr4.error.ErrorListener import ErrorListener
     from antlr4.tree.Tree import TerminalNode
 except ModuleNotFoundError as erro:
     if erro.name != "antlr4":
@@ -30,48 +29,46 @@ except ModuleNotFoundError as erro:
     sys.exit("Analisadores nao gerados. Na raiz do projeto, execute: python gerar.py")
 
 from src.rastreamento import RastreadorPilha, formatar_evento
+from src.diagnosticos import ErroAnalise, ErroAnaliseListener, erro_sintatico
+from src.recuperacao import ParserRecuperavel
 
 
-class ErroAnalise(ValueError):
-    """Erro lexico ou sintatico com a localizacao no programa de entrada."""
-
-
-class ErroAnaliseListener(ErrorListener):
-    def __init__(self, fase):
-        super().__init__()
-        self.fase = fase
-
-    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
-        # Interrompe antes de o ANTLR recuperar o erro e produzir uma arvore parcial.
-        raise ErroAnalise(
-            f"Erro {self.fase} na linha {line}, coluna {column}: {msg}"
-        )
-
-
-def analisar(codigo, regra="programa", registrar=None):
-    """Analisa toda a entrada pela regra escolhida; registrar recebe eventos opcionais."""
+def analisar(codigo, regra="programa", registrar=None, recuperar=False):
+    """Analisa toda a entrada; recuperar coleta erros sem aceitar arvore parcial."""
     if regra not in AmarraParser.ruleNames:
         raise ValueError(f"Regra desconhecida: {regra}")
 
     lexer = AmarraLexer(InputStream(codigo))
     lexer.removeErrorListeners()
-    lexer.addErrorListener(ErroAnaliseListener("lexico"))
+    erros_lexicos = []
+    lexer.addErrorListener(ErroAnaliseListener(
+        "lexico", coletar=erros_lexicos.append if recuperar else None,
+    ))
 
     tokens = CommonTokenStream(lexer)
     tokens.fill()
+    if erros_lexicos:
+        # Tokens descartados pelo lexer nao devem gerar erros sintaticos fantasmas.
+        raise ErroAnalise(erros_lexicos)
     tokens.seek(0)
 
-    parser = AmarraParser(tokens)
+    parser = ParserRecuperavel(tokens) if recuperar else AmarraParser(tokens)
     parser.removeErrorListeners()
     parser.addErrorListener(ErroAnaliseListener("sintatico"))
     if registrar is not None:
         parser.addParseListener(RastreadorPilha(parser, registrar))
 
-    arvore = getattr(parser, regra)()
+    diagnosticos = parser.diagnosticos if recuperar else []
+    try:
+        arvore = getattr(parser, regra)()
+    except ErroAnalise as erro:
+        raise ErroAnalise([*diagnosticos, *erro.diagnosticos]) from None
     # As regras isoladas nao incluem EOF; confira tambem o restante do arquivo.
     token = parser.getCurrentToken()
     if token.type != Token.EOF:
-        parser.notifyErrorListeners(f"extraneous input {token.text!r} expecting <EOF>")
+        diagnosticos.append(erro_sintatico(parser, token, [Token.EOF]))
+    if diagnosticos:
+        raise ErroAnalise(diagnosticos)
     return arvore, parser
 
 
@@ -106,6 +103,10 @@ def main(argv=None):
         help="mostra entradas, saidas e consumo de tokens com a pilha de contextos",
     )
     argumentos.add_argument(
+        "--recuperar", action="store_true",
+        help="busca mais erros, descartando instrucoes invalidas ate ; ou }",
+    )
+    argumentos.add_argument(
         "--formato", choices=("indentado", "lisp"), default="indentado",
         help="formato da arvore (padrao: indentado)",
     )
@@ -118,6 +119,7 @@ def main(argv=None):
         codigo = args.arquivo.read_text(encoding="utf-8")
         arvore, parser = analisar(
             codigo, regra=args.regra, registrar=registrar if args.rastrear else None,
+            recuperar=args.recuperar,
         )
     except (OSError, UnicodeError) as erro:
         print(f"Nao foi possivel ler '{args.arquivo}': {erro}", file=sys.stderr)

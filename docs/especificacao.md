@@ -126,9 +126,18 @@ pontas. `enrolar` recebe um identificador de ponta e uma expressão para a
 quantidade de voltas. `finalizar` recebe uma expressão, como um literal de texto
 ou o nome de uma variável. A compatibilidade dos tipos será verificada em E4.
 
-O parser encerra no primeiro erro, informando linha (a partir de 1) e coluna
-(a partir de 0). Ele só apresenta a árvore quando o arquivo inteiro foi aceito.
+Por padrão, o parser encerra no primeiro erro. Os diagnósticos informam linha
+(a partir de 1), coluna (a partir de 0), símbolos esperados e entrada encontrada.
+Ele só apresenta a árvore quando o arquivo inteiro foi aceito.
 O comando `src/sintatico.py` também detecta erros léxicos antes da análise sintática.
+
+Com `--recuperar`, tenta continuar após erros dentro de instruções, descartando
+tokens até `;` ou `}`. A chave do bloco chamador é preservada e blocos pertencentes
+à instrução descartada são balanceados. Operadores e parênteses não são pontos
+de sincronização. Erros estruturais fora desses limites podem encerrar a análise.
+Qualquer diagnóstico impede a devolução da árvore e mantém o código de saída 1.
+Se houver erros léxicos, o parser não começa; o modo de recuperação coleta os
+diagnósticos do lexer antes de encerrar.
 
 Para depuração, `--regra` seleciona uma regra isolada, como `expr` ou `bloco`.
 O padrão permanece `programa`. O analisador exige o fim da entrada em todos os
@@ -147,3 +156,8 @@ Consulte [a aplicação dos conceitos da Aula 10](aula10.md) para ver o vocabul�
 formal, uma derivação e exemplos de árvore e precedência na linguagem Amarra.
 Consulte também [a aplicação da Aula 11](aula11.md), sobre a pilha do parser,
 opcionalidade, recursão à esquerda e depuração de regras.
+Consulte a [Aula 12](aula12.md) para relacionar as escolhas do parser com FIRST,
+FOLLOW, a precedência das expressões e o `senao` opcional.
+Consulte a [Aula 13](aula13.md) para os diagnósticos, o modo pânico e a preparação
+do visitor. `gerar.py` gera também `AmarraParserVisitor.py`; a AST completa e a
+análise semântica continuam como etapas futuras.
