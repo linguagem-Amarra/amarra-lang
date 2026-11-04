@@ -7,9 +7,9 @@ gravatas e nós náuticos simples). Um programa em Amarra é uma sequência de c
 A proposta é produzir um roteiro de montagem do nó e validar a ordem lógica dos
 movimentos quando a etapa de execução for implementada.
 
-Na implementação atual (E3), os analisadores reconhecem os tokens, validam a
-sintaxe e produzem uma árvore sintática concreta. A análise de tipos, a validação
-da sequência de movimentos e a execução dos comandos ficam para E4.
+Na implementação atual (E3 e início da E4), os analisadores reconhecem os tokens,
+validam a sintaxe, constroem a AST e verificam nomes, escopos e tipos. A validação
+da sequência de movimentos e a execução dos comandos permanecem como próximas etapas.
 
 ## 2. Programa de exemplo comentado
 
@@ -87,7 +87,7 @@ de bloco — mantém a gramática do lexer simples e evita ambiguidade com outro
 ## 7. Três coisas que a linguagem deliberadamente não faz
 
 1. **Não simula física real do nó** (tensão, atrito, material do cadarço) — só valida a
-   ordem lógica dos movimentos, não o resultado mecânico real.
+   ordem lógica dos movimentos quando o executor for implementado, não o resultado mecânico real.
 2. **Não permite funções definidas pelo usuário nem chamadas recursivas** — reuso de ações
    é feito com `repetir`, sem chamar um nó dentro de outro. Essa restrição não impede a
    recursão das regras gramaticais, que permite aninhar blocos de `repetir` e `se`.
@@ -124,7 +124,8 @@ aninhadas. Espaços e comentários entre `}` e `senao` são permitidos.
 Os argumentos de `cruzar`, `passar_baixo` e `passar_cima` são identificadores de
 pontas. `enrolar` recebe um identificador de ponta e uma expressão para a
 quantidade de voltas. `finalizar` recebe uma expressão, como um literal de texto
-ou o nome de uma variável. A compatibilidade dos tipos será verificada em E4.
+ou o nome de uma variável. A fase semântica exige quantidade inteira em `enrolar`
+e texto em `finalizar`, conforme a seção 9.
 
 Por padrão, o parser encerra no primeiro erro. Os diagnósticos informam linha
 (a partir de 1), coluna (a partir de 0), símbolos esperados e entrada encontrada.
@@ -159,5 +160,61 @@ opcionalidade, recursão à esquerda e depuração de regras.
 Consulte a [Aula 12](aula12.md) para relacionar as escolhas do parser com FIRST,
 FOLLOW, a precedência das expressões e o `senao` opcional.
 Consulte a [Aula 13](aula13.md) para os diagnósticos, o modo pânico e a preparação
-do visitor. `gerar.py` gera também `AmarraParserVisitor.py`; a AST completa e a
-análise semântica continuam como etapas futuras.
+do visitor. `gerar.py` gera também `AmarraParserVisitor.py`.
+Consulte a [Aula 14](aula14.md) para a AST e as regras semânticas implementadas.
+
+## 9. Regras semânticas e início da E4
+
+`src/construtor_ast.py` transforma a árvore concreta em nós próprios da Amarra.
+`src/semantico.py` analisa essa AST e mantém uma pilha de tabelas de símbolos.
+O comando sintático continua verificando apenas a estrutura; para verificar
+também nomes e tipos, use o comando semântico.
+
+### Nomes e escopos
+
+Variáveis precisam ser declaradas antes de seu uso, inclusive no destino de
+atribuições. Uma declaração duplicada no mesmo bloco é rejeitada. Cada bloco
+cria um escopo; a busca começa no bloco atual e segue para os externos. Nomes
+iguais em blocos internos são permitidos, ocultando temporariamente o externo.
+Declarações internas não ficam disponíveis após sair do bloco. Cada `no` tem
+variáveis independentes, e os ramos `se` e `senao` não compartilham declarações.
+
+O inicializador é verificado antes de registrar a nova variável. Uma referência
+ao próprio nome exige uma declaração anterior visível, por exemplo no bloco
+externo. Mesmo blocos de condições constantes falsas são verificados.
+
+Identificadores de pontas são nomes simbólicos próprios dos movimentos, sem
+declaração de variável. Assim, `enrolar ponta_esquerda voltas;` exige declarar
+`voltas`, mas não `ponta_esquerda`. Não há verificação física dessas referências.
+
+### Compatibilidade e operadores
+
+Declarações e atribuições aceitam tipos iguais ou promoção de `inteiro` para
+`real`. Não há conversão implícita nos demais casos. Números com ponto são
+reais, mesmo quando a parte fracionária é zero.
+
+| Construção | Operandos exigidos | Resultado |
+| :--- | :--- | :--- |
+| `+`, `-`, `*` | Números | `real` se algum operando for real, caso contrário `inteiro`. |
+| `/` | Números | Sempre `real`. |
+| `-` unário | Número | Mesmo tipo do operando. |
+| `>`, `<` | Números | `booleano`. |
+| `==` | Mesmo tipo ou dois números | `booleano`. |
+| `e`, `ou` | Booleanos | `booleano`. |
+
+`+` não concatena textos. Uma condição de `se` exige booleano. `repetir` e
+`enrolar` exigem quantidade inteira. `finalizar` exige mensagem de tipo texto.
+Por exemplo, `inteiro x = 4 / 2;` é rejeitado porque `/` produz real; use `real`.
+
+### Erros e limites
+
+Os diagnósticos semânticos indicam linha, coluna, código e mensagem: `S001`
+para nome ausente, `S002` para duplicidade, `S003` para atribuição incompatível,
+`S004` para tipo inadequado em condição/comando e `S005` para operador inválido.
+A análise coleta erros independentes e rejeita o programa se houver qualquer um.
+Erros léxicos ou sintáticos impedem essa fase; não há análise de AST parcial.
+
+Não há avaliação de valores nem execução. Divisão por zero, quantidades
+negativas, finalização em todos os caminhos e sequência de movimentos ainda
+não são verificados. Um programa pode ser semanticamente válido e não formar
+um nó correto. A AST e a tabela de símbolos são a base para essas próximas etapas.

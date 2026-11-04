@@ -1,0 +1,19 @@
+// A variavel interna existe apenas no bloco do se.
+no "escopos e tipos" {
+    inteiro voltas = 2;
+    real comprimento = voltas + 0.5;
+    texto mensagem = "no pronto";
+    booleano reforcar = comprimento > 2 e voltas == 2;
+
+    se reforcar {
+        inteiro voltas = 1;
+        enrolar ponta_esquerda voltas;
+    } senao {
+        passar_cima ponta_direita;
+    }
+
+    repetir voltas {
+        apertar;
+    }
+    finalizar mensagem;
+}

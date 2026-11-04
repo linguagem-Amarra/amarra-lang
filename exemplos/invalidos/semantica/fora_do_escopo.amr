@@ -1,0 +1,8 @@
+no "fora do escopo" {
+    se verdadeiro {
+        inteiro voltas = 2;
+    }
+    repetir voltas {
+        apertar;
+    }
+}
