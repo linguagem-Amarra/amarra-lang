@@ -3,3 +3,4 @@ gerado/
 *.interp
 __pycache__/
 .venv/
+dist/

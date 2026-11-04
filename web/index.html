@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f3ec">
+  <meta name="description" content="Escreva em Amarra e acompanhe cada movimento do nó. Um editor e um tutorial visual para aprender compiladores e nós.">
+  <title>Amarra — do código ao nó</title>
+  <link rel="icon" href="./marca.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./estilo.css">
+</head>
+<body>
+<header class="cabecalho">
+  <a class="marca" href="./" aria-label="Amarra, início"><img src="./marca.svg" alt="" width="38" height="38"><span>amarra<span class="ponto">.</span></span></a>
+  <span class="assinatura">CADA COMANDO, UM PASSO.</span>
+  <a class="link-repo" href="https://github.com/linguagem-Amarra/amarra-lang" target="_blank" rel="noopener noreferrer">Conheça o projeto <span aria-hidden="true">↗</span></a>
+</header>
+<main>
+  <section class="abertura">
+    <div><p class="sobretitulo"><span></span> LABORATÓRIO DA LINGUAGEM</p><h1>Do código <em>ao nó.</em></h1><p class="introducao">Escreva uma ideia. Veja cada movimento. Entenda como tudo se conecta.</p></div>
+    <div class="escolha"><label for="exemplo">COMECE POR UM EXEMPLO</label><select id="exemplo"><option value="simples">01 · Nó inicial do cadarço</option><option value="reforco">02 · Uma volta a mais</option><option value="condicao">03 · Escolha com uma condição</option><option value="erro">04 · Encontre o erro</option></select></div>
+  </section>
+  <div class="bancada">
+    <section class="visual painel" aria-labelledby="titulo-visual">
+      <div class="barra-painel"><div><span class="indicador"></span><h2 id="titulo-visual">O nó, passo a passo</h2></div><span class="etiqueta">VISTA DIDÁTICA · 2D</span></div>
+      <div class="canvas-area">
+        <div class="legenda"><span><i class="azul"></i><b id="nome-azul">Ponta direita</b></span><span><i class="laranja"></i><b id="nome-laranja">Ponta esquerda</b></span></div>
+        <canvas id="cordas" width="1440" height="940" role="img" aria-label="Duas pontas de cadarço, azul e laranja, prontas para começar."></canvas>
+        <span class="nota-diagrama">Nó inicial do cadarço · a base antes de fazer o laço</span>
+        <div id="aviso-visual" class="aviso-visual" hidden></div>
+      </div>
+      <div class="instrucao" aria-live="polite"><span id="numero-passo" class="numero-passo">00</span><div><p id="rotulo-passo" class="sobretitulo">ANTES DE COMEÇAR</p><h3 id="titulo-passo">Tudo começa com duas pontas.</h3><p id="descricao-passo">Analise o código e avance para acompanhar os movimentos.</p></div></div>
+      <div class="controles"><div class="botoes-player"><button id="reiniciar" class="botao-icone" aria-label="Reiniciar" title="Reiniciar" disabled>↺</button><button id="anterior" class="botao-icone" aria-label="Etapa anterior" title="Etapa anterior" disabled>‹</button><button id="reproduzir" class="botao-play" disabled><span aria-hidden="true">▶</span> Reproduzir</button><button id="proximo" class="botao-icone" aria-label="Próxima etapa" title="Próxima etapa" disabled>›</button></div><label class="velocidade" for="velocidade">Ritmo <select id="velocidade"><option value="0.6">Lento</option><option value="1" selected>Normal</option><option value="1.6">Rápido</option></select></label></div>
+      <div class="progresso"><span id="progresso"></span></div>
+    </section>
+    <section class="editor painel" aria-labelledby="titulo-editor">
+      <div class="barra-painel"><div><span class="icone-codigo" aria-hidden="true">&lt;/&gt;</span><h2 id="titulo-editor">Seu código Amarra</h2></div><span class="etiqueta arquivo">.amr</span></div>
+      <div class="editor-toolbar"><span id="nome-arquivo">cadarco.amr</span><div><button id="abrir" class="botao-texto">Abrir arquivo</button><button id="baixar" class="botao-texto" title="Baixar o código como .amr">Salvar ↓</button></div><input id="arquivo" type="file" accept=".amr,text/plain" hidden></div>
+      <div class="fonte"><div class="numeros" aria-hidden="true"><pre id="numeros"></pre></div><textarea id="codigo" aria-label="Código do programa Amarra" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" wrap="off" maxlength="20000"></textarea></div>
+      <div class="rodape-editor"><span id="estado-editor">Seu código é executado neste navegador.</span><kbd>Ctrl + Enter</kbd></div>
+      <div class="executar"><button id="analisar" class="botao-principal" disabled><span aria-hidden="true">↗</span> Analisar e montar</button><span id="estado" role="status">Preparando o compilador…</span></div>
+      <button id="tentar" class="botao-texto tentar" hidden>Tentar carregar novamente</button>
+      <div id="diagnosticos" class="diagnosticos" aria-live="polite" hidden></div>
+    </section>
+  </div>
+  <section class="roteiro painel" aria-labelledby="titulo-roteiro"><div class="barra-painel"><div><h2 id="titulo-roteiro">Seu roteiro de movimentos</h2><span id="total-etapas" class="contador">—</span></div><label id="seletor-no" hidden>Nó <select id="no-ativo"></select></label></div><ol id="etapas" class="etapas"><li class="vazio">As etapas aparecem aqui depois da análise.</li></ol></section>
+  <section class="detalhes painel" aria-labelledby="titulo-detalhes"><div class="detalhes-topo"><div><p class="sobretitulo">POR DENTRO DA LINGUAGEM</p><h2 id="titulo-detalhes">Veja o que o compilador entendeu.</h2></div><div class="abas" role="tablist" aria-label="Resultados do compilador"><button role="tab" id="tab-tokens" aria-controls="dados" aria-selected="true" data-aba="tokens">Tokens <span id="total-tokens">0</span></button><button role="tab" id="tab-ast" aria-controls="dados" aria-selected="false" tabindex="-1" data-aba="ast">AST</button><button role="tab" id="tab-simbolos" aria-controls="dados" aria-selected="false" tabindex="-1" data-aba="simbolos">Símbolos</button><button role="tab" id="tab-variaveis" aria-controls="dados" aria-selected="false" tabindex="-1" data-aba="variaveis">Valores da etapa</button></div></div><div id="dados" class="dados" role="tabpanel" aria-labelledby="tab-tokens" tabindex="0"><p class="texto-vazio">Analise um programa para explorar seus tokens, a AST e as variáveis.</p></div></section>
+  <details class="ajuda"><summary>Como experimentar?</summary><p>Comece com o nó inicial do cadarço. Clique em <strong>Analisar e montar</strong> e depois em <strong>Reproduzir</strong>, ou avance uma etapa de cada vez. O comando correspondente fica destacado no editor.</p><p>No exemplo “Uma volta a mais”, altere o valor de <code>voltas</code> e analise novamente. Abra um arquivo <code>.amr</code> do seu computador ou salve seu código. Os controles voltam às etapas já calculadas sem executar novamente o programa.</p><p>Este diagrama acompanha duas pontas e ilustra os movimentos; não simula tensão ou atrito e não certifica a estrutura física de qualquer sequência. O nó inicial é a primeira parte do cadarço, antes das alças do laço. <a href="https://www.animatedknots.com/shoelace-bow-knot" target="_blank" rel="noopener noreferrer">Veja a referência do laço completo ↗</a></p></details>
+</main>
+<footer><span class="marca-footer">amarra.</span><span>Uma linguagem para conectar código e movimento.</span><span>Python + ANTLR · Feito para aprender</span></footer>
+<noscript>Ative o JavaScript para utilizar o editor e a demonstração.</noscript>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

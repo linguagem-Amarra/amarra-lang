@@ -135,3 +135,24 @@ Atualizamos o README e a especificação, criamos `docs/aula14.md` e o relatóri
 dependências: `gerar.py` já produzia o visitor. Esta entrega verifica nomes,
 escopos e tipos; execução, validação dos movimentos e tutorial visual permanecem
 como próximas etapas.
+
+## 04/11/2026 — Interface visual e interpretador
+
+Criamos a interface web com o nó inicial do cadarço, editor `.amr`, controles
+de reprodução e navegação, destaque da linha atual, diagnósticos clicáveis e
+abas de tokens, AST, símbolos e valores. A animação usa curvas com sobreposição
+para ilustrar duas pontas; não é uma simulação física nem um laço completo.
+
+O interpretador executa a AST já validada, incluindo variáveis, escopos,
+aritmética, lógica com curto-circuito, condicionais e repetições. Cada volta
+gera uma etapa; `finalizar` encerra a definição de nó atual. Acrescentamos erros
+de execução e limites de recursos. Alterar o código invalida o roteiro anterior.
+
+O compilador Python é empacotado com o runtime ANTLR e carregado por Pyodide em
+um Web Worker. Assim, a aplicação pode ser publicada no GitHub Pages sem
+servidor Python. O workflow gera os analisadores, testa e publica os arquivos.
+
+Os 244 testes Python passaram. Também verificamos os estados visuais em
+JavaScript e, no Chrome, reprodução/pausa, repetições, ramos condicionais, abas,
+erros, importação/download, várias definições de nó e layout de celular.
+O guia de uso, arquitetura e limites está em `docs/interface-visual.md`.

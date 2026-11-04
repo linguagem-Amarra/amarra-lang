@@ -8,8 +8,9 @@ A proposta é produzir um roteiro de montagem do nó e validar a ordem lógica d
 movimentos quando a etapa de execução for implementada.
 
 Na implementação atual (E3 e início da E4), os analisadores reconhecem os tokens,
-validam a sintaxe, constroem a AST e verificam nomes, escopos e tipos. A validação
-da sequência de movimentos e a execução dos comandos permanecem como próximas etapas.
+validam a sintaxe, constroem a AST e verificam nomes, escopos e tipos. O
+interpretador executa as instruções e a interface web apresenta as etapas em
+um diagrama de duas pontas. A correção física dos movimentos não é certificada.
 
 ## 2. Programa de exemplo comentado
 
@@ -214,7 +215,27 @@ para nome ausente, `S002` para duplicidade, `S003` para atribuição incompatív
 A análise coleta erros independentes e rejeita o programa se houver qualquer um.
 Erros léxicos ou sintáticos impedem essa fase; não há análise de AST parcial.
 
-Não há avaliação de valores nem execução. Divisão por zero, quantidades
-negativas, finalização em todos os caminhos e sequência de movimentos ainda
-não são verificados. Um programa pode ser semanticamente válido e não formar
-um nó correto. A AST e a tabela de símbolos são a base para essas próximas etapas.
+A fase semântica não avalia valores. O interpretador, executado depois dela,
+verifica divisão por zero e quantidades negativas durante a execução. A presença
+de finalização em todos os caminhos e a correção física de uma sequência de
+movimentos não são verificadas. Um programa semanticamente válido pode não
+formar um nó correto.
+
+## 10. Execução e interface visual
+
+`src/interpretador.py` avalia a AST validada com escopos e variáveis locais,
+preservando a promoção de inteiro para real. As expressões usam a precedência
+representada na AST; `e` e `ou` fazem curto-circuito. `se` executa apenas o ramo
+selecionado. `repetir` avalia sua quantidade uma vez ao entrar e executa o corpo
+essa quantidade de vezes, criando um novo escopo a cada iteração.
+
+Cada comando de movimento gera uma etapa, com posição e valores das variáveis.
+Cada volta de `enrolar` gera uma etapa separada. Quantidade zero não gera etapas;
+quantidade negativa é rejeitada. `finalizar` registra a mensagem e encerra o nó
+atual, inclusive dentro de blocos; outros nós do arquivo podem ser executados.
+
+A interface usa um limite de 300 etapas, 20.000 operações e 20.000 caracteres
+de entrada. Erros de execução têm posição e códigos `E001` a `E005`. Não é
+entregue um roteiro parcial após erro. A representação visual cobre duas pontas
+e identifica as limitações para programas mais gerais. Consulte
+[interface-visual.md](interface-visual.md) para os comandos e os detalhes.

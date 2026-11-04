@@ -15,6 +15,7 @@
   <a href="#linguagem">A linguagem</a> &nbsp;·&nbsp;
   <a href="#exemplo">Exemplo</a> &nbsp;·&nbsp;
   <a href="#executar">Como executar</a> &nbsp;·&nbsp;
+  <a href="docs/interface-visual.md">Interface visual</a> &nbsp;·&nbsp;
   <a href="docs/aula10.md">Aula 10</a> &nbsp;·&nbsp;
   <a href="docs/aula11.md">Aula 11</a> &nbsp;·&nbsp;
   <a href="docs/aula12.md">Aula 12</a> &nbsp;·&nbsp;
@@ -39,15 +40,39 @@ O projeto aproxima o estudo de compiladores de uma atividade cotidiana: **transf
 | :--- | :--- | :--- |
 | Sequências de ações para montar nós. | Python e código gerado pelo ANTLR. | **Início da E4:** AST e análise semântica, além das análises léxica e sintática. |
 
-> **Escopo atual** — O projeto reconhece tokens, valida a sintaxe, constrói a AST e verifica nomes, escopos e tipos. A execução, a validação da sequência de movimentos e o tutorial visual são próximas etapas.
+> **Escopo atual** — O projeto reconhece tokens, valida a sintaxe, constrói a AST e verifica nomes, escopos e tipos. A interface web executa o programa e apresenta um roteiro visual de duas pontas, começando pela base do cadarço. A simulação física e a certificação dos nós permanecem fora do escopo.
 
-**Validação atual:** 224 testes automatizados passaram na execução de 04/11/2026.
+**Validação atual:** 244 testes Python passaram na execução de 04/11/2026,
+além da verificação dos estados visuais em JavaScript e dos testes no navegador.
 A coleção sintática possui **72 entradas: 20 válidas, 48 com erro sintático
 e 4 com erro léxico**. A nova coleção semântica possui **62 entradas: 23 válidas
 e 39 inválidas**. Consulte o [relatório semântico](docs/validacao-semantica.md)
 e o [relatório histórico da sintaxe](docs/validacao-sintatica.md).
 
 <a name="exemplo"></a>
+
+### Use pelo navegador
+
+**[Abrir a Amarra online](https://linguagem-amarra.github.io/amarra-lang/)**
+
+A [interface visual](docs/interface-visual.md) permite editar código, analisar
+erros, acompanhar o nó com pontas coloridas e consultar tokens, AST e símbolos.
+Na primeira abertura, aguarde o carregamento do compilador. Escolha **Nó inicial
+do cadarço**, clique em **Analisar e montar** e depois em **Reproduzir**.
+
+O exemplo [cadarco_visual.amr](exemplos/cadarco_visual.amr) gera seis etapas;
+trocar `voltas = 2` por `voltas = 3` produz sete. O desenho representa a base
+do cadarço, antes das alças do laço completo.
+
+Para testar a interface localmente, após a instalação e geração abaixo:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/construir_web.py
+.\.venv\Scripts\python.exe -m http.server 8000 --bind 127.0.0.1 --directory dist
+```
+
+Abra `http://127.0.0.1:8000/`. A publicação no GitHub Pages usa o workflow
+`.github/workflows/publicar-interface.yml`, descrito no guia da interface.
 
 ## 02 · Um primeiro nó, em código
 
@@ -565,9 +590,9 @@ associatividade, consumo até `EOF`, saída no terminal e os tokens dos exemplos
 originais da E2. Também verificam `senao`, regras isoladas, consumo de tokens no
 rastro e preservação da árvore ao observar a pilha. A saída deve terminar com `OK`.
 
-São **224 testes descobertos pelo `unittest`**: 132 anteriores, 15 de AST,
+São **244 testes descobertos pelo `unittest`**: 132 anteriores, 15 de AST,
 62 de [`tests/casos_semanticos.json`](tests/casos_semanticos.json) e 15 de
-API/terminal semântico. As coleções sintática e semântica registram cada
+API/terminal semântico e 20 de execução/interface. As coleções sintática e semântica registram cada
 entrada como um teste independente, com ID e descrição na saída.
 Um teste de entrada inválida passa quando o analisador rejeita o código na fase
 esperada; erro léxico não substitui erro sintático.
@@ -610,6 +635,11 @@ apresenta a matriz de casos e o resultado da execução completa.
 | [`src/arvore_abstrata.py`](src/arvore_abstrata.py) | Define os nós da AST, seu percurso e sua representação. |
 | [`src/construtor_ast.py`](src/construtor_ast.py) | Constrói a AST com o visitor e a exibe como texto ou JSON. |
 | [`src/semantico.py`](src/semantico.py) | Verifica nomes, escopos e tipos; exibe os diagnósticos e a tabela de símbolos. |
+| [`src/interpretador.py`](src/interpretador.py) | Executa a AST validada e produz etapas com os valores das variáveis. |
+| [`src/interface_web.py`](src/interface_web.py) | Expõe o resultado da análise e execução como JSON para o navegador. |
+| [`web/`](web/) | Editor, worker Python, player e desenho das cordas. |
+| [`scripts/construir_web.py`](scripts/construir_web.py) | Empacota os arquivos estáticos e o compilador para publicação. |
+| [`docs/interface-visual.md`](docs/interface-visual.md) | Explica uso, arquitetura, testes, limites e publicação da interface. |
 | [`src/diagnosticos.py`](src/diagnosticos.py) | Formata erros com posição, símbolos esperados e entrada encontrada. |
 | [`src/recuperacao.py`](src/recuperacao.py) | Implementa a recuperação opcional em modo pânico sobre o parser gerado. |
 | [`src/rastreamento.py`](src/rastreamento.py) | Observa os contextos do parser em entradas, saídas e consumo de tokens. |
@@ -677,7 +707,7 @@ Os comandos da tabela são para PowerShell. No Linux/macOS, substitua `.\.venv\S
 | :---: | :--- | :--- |
 | **E2** | Especificação da linguagem e analisador léxico. | Implementada; o comando `src/lexico.py` continua disponível. |
 | **E3** | Analisador sintático, árvore, diagnósticos e depuração. | Conceitos das Aulas 10, 11, 12 e 13 aplicados e documentados. |
-| **E4** | AST, análise semântica e execução. | **AST, tabela de símbolos e regras de nomes, escopos e tipos implementadas. Execução e visualização dos movimentos pendentes.** |
+| **E4** | AST, análise semântica e execução. | **AST, símbolos, tipos, interpretador e interface visual implementados. Diagrama didático inicial de duas pontas.** |
 
 A entrega E2 corresponde a **1,5 ponto na Avaliação de Grau 1**. A evolução do trabalho do grupo está registrada no [diário do projeto](DIARIO.md).
 

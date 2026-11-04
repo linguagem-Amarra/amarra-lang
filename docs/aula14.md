@@ -5,6 +5,9 @@ Material de referência: **Aula14 - Construindo a AST-1.pdf**, Encontro 14,
 de 28/10. Implementação no projeto em **04/11/2026**. Os números abaixo são
 os números impressos nos slides; o PDF repete páginas para revelar os tópicos.
 
+Esta página registra a entrega da AST e da análise semântica. A evolução
+posterior com execução e animação está em [interface-visual.md](interface-visual.md).
+
 ## Relação com a aula
 
 | Conceito | Slides | Implementação |
