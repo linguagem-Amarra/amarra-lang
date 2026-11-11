@@ -1,5 +1,9 @@
 <a name="inicio"></a>
 
+**Amarra Studio:** editor React com animação 3D e integração com o compilador existente.
+A demonstração padrão é o [nó simples duplo](exemplos/no_simples_duplo.amr): duas passagens pelo mesmo laço antes do aperto.
+Consulte [como executar localmente, arquitetura e limites do visualizador](docs/studio.md).
+
 <p align="center">
   <img src="docs/assets/amarra/capa.svg" alt="Amarra — cada comando, um passo. Cada passo, um nó. Linguagem de domínio específico para descrever nós." width="100%">
 </p>
