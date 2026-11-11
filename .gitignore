@@ -3,3 +3,10 @@ gerado/
 *.interp
 __pycache__/
 .venv/
+node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/playwright-report/
+frontend/test-results/
+*.tsbuildinfo
+.studio-cache/
