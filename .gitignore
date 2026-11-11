@@ -4,3 +4,10 @@ gerado/
 __pycache__/
 .venv/
 dist/
+node_modules/
+web/studio/dist/
+web/studio/.vite/
+web/studio/playwright-report/
+web/studio/test-results/
+*.tsbuildinfo
+.studio-cache/

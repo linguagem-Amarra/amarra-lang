@@ -1,0 +1,8 @@
+// No simples duplo (Double Overhand Stopper Knot)
+no "no simples duplo" {
+    cruzar parte_firme ponta_trabalho;
+    passar_baixo ponta_trabalho;
+    passar_baixo ponta_trabalho;
+    apertar;
+    finalizar "no simples duplo pronto";
+}
