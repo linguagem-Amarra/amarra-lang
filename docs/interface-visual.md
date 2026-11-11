@@ -101,11 +101,14 @@ explorador: o worker e o pacote Python precisam ser servidos por HTTP.
 ## Publicação
 
 O workflow [.github/workflows/publicar-interface.yml](../.github/workflows/publicar-interface.yml)
-instala Python e Java, gera os analisadores, executa os testes e cria `dist/`.
-Depois publica essa pasta com GitHub Pages. Em **Settings → Pages**, a origem
-deve ser **GitHub Actions**. O workflow atende à `main` e à branch inicial
-`codex/interface-visual-nos`; depois da integração, a `main` pode ser a única
-branch de publicação. Nenhuma chave ou credencial é armazenada no projeto.
+instala Python, Java e Node, gera os analisadores, testa o compilador e o Studio
+3D, constrói o Studio e cria `dist/` para a interface 2D. O build do Studio fica
+disponível como artefato `studio-3d` da execução. O GitHub Pages publica apenas
+`dist/`, pois o Studio completo também precisa da API Python. Em
+**Settings → Pages**, a origem deve ser **GitHub Actions**. O workflow atende à
+`main` e à branch `codex/interface-visual-nos`; depois da integração, a `main`
+pode ser a única branch de publicação. Nenhuma chave ou credencial é armazenada
+no projeto.
 
 O resultado é uma aplicação estática, compatível também com hospedagem estática
 na Vercel. Nesse caso, construa `dist/` primeiro e publique seu conteúdo; a
