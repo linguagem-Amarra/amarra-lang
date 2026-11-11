@@ -7,6 +7,9 @@ import { initialFrame } from './geometry'
 import { describe, motionCaption, stepDuration, stepName, type Diagnostic, type Example, type Plan, type Frame } from './types'
 import { KnotAnimationEngine } from './animation/KnotAnimationEngine'
 import { registeredKnot } from './knots/knotRegistry'
+import { compileInBrowser } from './staticCompiler'
+
+const staticSite = import.meta.env.VITE_STUDIO_STATIC === 'true'
 
 function Brand({ small = false }: { small?: boolean }) {
   return <div className={`brand ${small ? 'brand-small' : ''}`}><svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
@@ -102,12 +105,14 @@ export default function App() {
     setBusy(true); setPlaying(false); setProgress(0); setPlan(null); setSelected(selection)
     setNetworkError(''); setDiagnostics([])
     try {
-      const response = await fetch('/api/compilar', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ codigo: source, selecionado: selection }),
-      })
-      if (!response.ok) throw new Error(`A API respondeu com HTTP ${response.status}.`)
-      const result = await response.json()
+      const result = staticSite ? await compileInBrowser(source, selection) : await (async () => {
+        const response = await fetch('/api/compilar', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo: source, selecionado: selection }),
+        })
+        if (!response.ok) throw new Error(`A API respondeu com HTTP ${response.status}.`)
+        return response.json()
+      })()
       if (id !== request.current) return
       setDirty(false)
       if (result.nos) setCatalog(result.nos)
@@ -123,7 +128,7 @@ export default function App() {
   const loadExamples = useCallback(async () => {
     setNetworkError('')
     try {
-      const response = await fetch('/api/exemplos')
+      const response = await fetch(staticSite ? new URL('examples.json', document.baseURI) : '/api/exemplos')
       if (!response.ok) throw new Error('Não foi possível carregar os exemplos da API.')
       const items: Example[] = await response.json()
       setExamples(items)

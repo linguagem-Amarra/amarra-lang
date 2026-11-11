@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { readFile } from 'node:fs/promises'
 
 export default defineConfig({
+  base: './',
   plugins: [react()],
   optimizeDeps: { esbuildOptions: { plugins: [{
     name: 'theatre-local-development',

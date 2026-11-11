@@ -1,4 +1,4 @@
-name: Testar Studio 3D e publicar interface 2D
+name: Publicar Studio 3D no GitHub Pages
 
 on:
   push:
@@ -42,11 +42,13 @@ jobs:
       - name: Construir Studio 3D
         run: npm run build
         working-directory: web/studio
+        env:
+          VITE_STUDIO_STATIC: 'true'
+      - run: python scripts/construir_web.py
       - uses: actions/upload-artifact@v4
         with:
-          name: studio-3d
-          path: web/studio/dist
-      - run: python scripts/construir_web.py
+          name: site-amarra
+          path: dist
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

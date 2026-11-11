@@ -17,6 +17,13 @@ Na raiz do repositório:
 Abra **http://127.0.0.1:8000**. Para outra porta: `studio.py --port 8001`.
 O servidor escuta somente em `127.0.0.1`. Não publica o projeto.
 
+## GitHub Pages
+
+O workflow `publicar-interface.yml` constrói uma versão estática do Studio 3D
+na raiz do site. Nessa versão, o compilador Python roda em um Web Worker com
+Pyodide; a API FastAPI é usada apenas no servidor local. A interface 2D fica
+em `/classico/`. Para reproduzir o build estático, use o comando do README.
+
 ## Preparar uma nova instalação
 
 Requisitos: Python 3.10 ou superior, Node.js compatível com Vite 7 (20.19+ ou

@@ -90,21 +90,28 @@ As ilustrações desta aplicação foram desenhadas para o projeto.
 Depois de instalar as dependências e gerar os analisadores, conforme o README:
 
 ```powershell
+cd web/studio
+$env:VITE_STUDIO_STATIC='true'
+npm ci
+npm run build
+cd ../..
 .\.venv\Scripts\python.exe scripts/construir_web.py
 .\.venv\Scripts\python.exe -m http.server 8000 --bind 127.0.0.1 --directory dist
 ```
 
-Abra `http://127.0.0.1:8000/`. No Linux/macOS, use `.venv/bin/python`. A pasta
+Abra `http://127.0.0.1:8000/classico/` para a interface 2D; a raiz abre o
+Studio 3D. No Linux/macOS, use `.venv/bin/python` e defina
+`VITE_STUDIO_STATIC=true` antes do build. A pasta
 `dist/` é gerada e ignorada pelo Git. Não abra `index.html` diretamente pelo
 explorador: o worker e o pacote Python precisam ser servidos por HTTP.
 
 ## Publicação
 
 O workflow [.github/workflows/publicar-interface.yml](../.github/workflows/publicar-interface.yml)
-instala Python, Java e Node, gera os analisadores, testa o compilador e o Studio
-3D, constrói o Studio e cria `dist/` para a interface 2D. O build do Studio fica
-disponível como artefato `studio-3d` da execução. O GitHub Pages publica apenas
-`dist/`, pois o Studio completo também precisa da API Python. Em
+instala Python, Java e Node, gera os analisadores, executa os testes e monta
+`dist/`. O GitHub Pages publica o Studio 3D na raiz e a interface 2D em
+`/classico/`. O Studio compila programas no navegador com Pyodide, sem servidor
+Python. O site completo fica no artefato `site-amarra` da execução. Em
 **Settings → Pages**, a origem deve ser **GitHub Actions**. O workflow atende à
 `main` e à branch `codex/interface-visual-nos`; depois da integração, a `main`
 pode ser a única branch de publicação. Nenhuma chave ou credencial é armazenada

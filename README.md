@@ -59,18 +59,25 @@ e o [relatório histórico da sintaxe](docs/validacao-sintatica.md).
 
 **[Abrir a Amarra online](https://linguagem-amarra.github.io/amarra-lang/)**
 
-A [interface visual](docs/interface-visual.md) permite editar código, analisar
-erros, acompanhar o nó com pontas coloridas e consultar tokens, AST e símbolos.
-Na primeira abertura, aguarde o carregamento do compilador. Escolha **Nó inicial
-do cadarço**, clique em **Analisar e montar** e depois em **Reproduzir**.
+A página principal abre o [Studio 3D](docs/studio.md): edite o código, escolha um
+exemplo e acompanhe os movimentos da corda. Na primeira abertura, aguarde o
+carregamento do compilador Python no navegador. A
+[interface clássica 2D](docs/interface-visual.md) continua em
+[**/classico/**](https://linguagem-amarra.github.io/amarra-lang/classico/),
+com tokens, AST e símbolos.
 
 O exemplo [cadarco_visual.amr](exemplos/cadarco_visual.amr) gera seis etapas;
 trocar `voltas = 2` por `voltas = 3` produz sete. O desenho representa a base
 do cadarço, antes das alças do laço completo.
 
-Para testar a interface localmente, após a instalação e geração abaixo:
+Para testar a publicação estática localmente, após a instalação e geração abaixo:
 
 ```powershell
+cd web/studio
+$env:VITE_STUDIO_STATIC='true'
+npm ci
+npm run build
+cd ../..
 .\.venv\Scripts\python.exe scripts/construir_web.py
 .\.venv\Scripts\python.exe -m http.server 8000 --bind 127.0.0.1 --directory dist
 ```
