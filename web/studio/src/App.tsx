@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowDownToLine, ArrowLeft, ArrowRight, Braces, Check, CheckCircle2, ChevronDown,
   CircleHelp, Code2, FileCode2, FolderOpen, Grid2X2, Maximize2, Pause, Play, RotateCcw,
-  ScanLine, Terminal, X, XCircle } from 'lucide-react'
+  ScanLine, Search, Terminal, X, XCircle } from 'lucide-react'
 import { RopeScene } from './RopeScene'
 import { initialFrame } from './geometry'
 import { describe, motionCaption, stepDuration, stepName, type Diagnostic, type Example, type Plan, type Frame } from './types'
@@ -45,6 +45,7 @@ function Highlight({ line }: { line: string }) {
 export default function App() {
   const [examples, setExamples] = useState<Example[]>([])
   const [exampleId, setExampleId] = useState('no_simples_duplo')
+  const [catalogQuery, setCatalogQuery] = useState('')
   const [code, setCode] = useState('')
   const [plan, setPlan] = useState<Plan | null>(null)
   const [catalog, setCatalog] = useState<Plan['nos']>([])
@@ -79,6 +80,8 @@ export default function App() {
   const file = useRef<HTMLInputElement>(null)
   const scene = useRef<HTMLDivElement>(null)
   const help = useRef<HTMLDialogElement>(null)
+  const knotCatalog = useRef<HTMLDialogElement>(null)
+  const catalogSearch = useRef<HTMLInputElement>(null)
   const emptyFrames = useMemo(() => [initialFrame()], [])
   const [geometry, setGeometry] = useState<{ plan: Plan | null; frames: Frame[]; error: string }>({ plan: null, frames: emptyFrames, error: '' })
   const frames = geometry.plan === plan ? geometry.frames : emptyFrames
@@ -89,6 +92,17 @@ export default function App() {
   const active = plan?.passos[activeIndex]
   const definition = plan ? registeredKnot(plan) : undefined
   const lines = code.split('\n')
+  const featuredExamples = useMemo(() => {
+    const featured = examples.slice(0, 3)
+    const current = examples.find(item => item.id === exampleId)
+    if (current && !featured.some(item => item.id === current.id)) featured.splice(2, 1, current)
+    return featured
+  }, [examples, exampleId])
+  const filteredExamples = useMemo(() => {
+    const normalize = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR')
+    const query = normalize(catalogQuery.trim())
+    return query ? examples.filter(item => normalize(`${item.nome} ${item.descricao} ${item.id}`).includes(query)) : examples
+  }, [examples, catalogQuery])
 
   useEffect(() => {
     if (!plan) return
@@ -177,11 +191,13 @@ export default function App() {
 
   const edit = (value: string) => {
     ++request.current
-    setCode(value); setDirty(true); setPlan(null); setCatalog([]); setSelected(0)
+    setCode(value); setExampleId(''); setDirty(true); setPlan(null); setCatalog([]); setSelected(0)
     setPlaying(false); setProgress(0); setDiagnostics([]); setBusy(false)
   }
 
   const load = (item: Example) => {
+    knotCatalog.current?.close()
+    setCatalogQuery('')
     setExampleId(item.id); setFileName(`${item.id}.amr`); setCode(item.codigo)
     setSelected(0); setCatalog([]); setView('code')
     void compile(item.codigo)
@@ -221,10 +237,11 @@ export default function App() {
 
       <div className="studio-layout">
         <aside className="library"><div className="section-label"><span>EXPLORAR NÓS</span><span>{String(examples.length).padStart(2, '0')}</span></div>
-          <nav aria-label="Exemplos de nós">{examples.map(item => <button key={item.id} className={`example-card ${exampleId === item.id ? 'selected' : ''}`} onClick={() => load(item)}>
+          <nav aria-label="Nós em destaque">{featuredExamples.map(item => <button key={item.id} className={`example-card ${exampleId === item.id ? 'selected' : ''}`} onClick={() => load(item)}>
             <div className="example-top"><span className="example-number">{item.numero}</span><span className="knot-icon"><svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><path d={knotIcons[item.id]} stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span>{exampleId === item.id && <span className="selected-dot" />}</div>
             <strong>{item.nome}</strong><p>{item.descricao}</p><span className="example-link">Abrir no editor <ArrowRight size={13} /></span>
           </button>)}</nav>
+          <button className="catalog-open" onClick={() => { knotCatalog.current?.showModal(); catalogSearch.current?.focus() }} disabled={!examples.length}>Ver todos os nós <span>{examples.length}</span><ArrowRight size={15} /></button>
           <div className="library-bottom"><Braces size={22} /><p>Pequenas instruções.<br /><strong>Infinitas possibilidades.</strong></p><span>Feito com Amarra + ANTLR4</span></div>
         </aside>
 
@@ -266,7 +283,7 @@ export default function App() {
         </section>
 
         <section className="visualizer-panel" aria-label="Visualizador de nós"><div className="panel-header"><div className="panel-title"><ScanLine size={16} /><span>Visualização 3D</span></div><div className="scene-tools"><button className={`icon-button ${grid ? 'on' : ''}`} aria-label="Mostrar grade" aria-pressed={grid} title="Mostrar ou ocultar grade" onClick={() => setGrid(!grid)}><Grid2X2 size={15} /></button><button className="icon-button" aria-label="Restaurar câmera" title="Restaurar câmera" onClick={() => setCameraKey(k => k + 1)}><RotateCcw size={15} /></button>{document.fullscreenEnabled && <button className="icon-button" aria-label="Tela cheia" title="Tela cheia" onClick={() => { if (document.fullscreenElement) void document.exitFullscreen(); else void scene.current?.requestFullscreen() }}><Maximize2 size={15} /></button>}</div></div>
-          <div className="scene" ref={scene}><div className="scene-caption"><span className="eyebrow">{plan ? 'SEU NÓ, EM MOVIMENTO' : 'VISUALIZADOR'}</span><h2>{plan?.nome ?? 'Uma ideia começa aqui.'}</h2><span className="scene-model-label">{definition ? 'Nó simples duplo · duas passagens · uma corda' : 'Corda contínua · pontas A e B'}</span></div>
+          <div className="scene" ref={scene}><div className="scene-caption"><span className="eyebrow">{plan ? 'SEU NÓ, EM MOVIMENTO' : 'VISUALIZADOR'}</span><h2>{plan?.nome ?? 'Uma ideia começa aqui.'}</h2><span className="scene-model-label">{exampleId === 'no_oito' ? 'Estudo visual · nó em oito ainda não reproduzido fielmente' : definition ? 'Nó simples duplo · duas passagens · uma corda' : 'Corda contínua · pontas A e B'}</span></div>
             <div className="scene-view-switch" role="group" aria-label="Enquadramento da corda"><button aria-pressed={!detail} onClick={() => setDetail(false)}>Visão geral</button><button aria-pressed={detail} onClick={() => setDetail(true)}>Foco no nó</button></div>
             <RopeScene engine={engine} onPlayback={publishPlayback} frames={frames} progress={progress} cameraKey={cameraKey} showGrid={grid} detail={detail} />
             {plan && !geometryReady && <div className="scene-preparing" role="status">{geometryError || 'Preparando trajetória contínua…'}</div>}
@@ -283,6 +300,7 @@ export default function App() {
       </div>
       <footer><span>AMARRA STUDIO <span className="footer-dot">·</span> Cada comando, um passo. Cada passo, um nó.</span><span>Python + ANTLR4 <span className="footer-dot">/</span> React + Three.js</span></footer>
     </main>
+    <dialog ref={knotCatalog} className="catalog-dialog" aria-labelledby="catalog-title" onClose={() => setCatalogQuery('')}><div className="catalog-header"><div><span className="section-label">BIBLIOTECA DE NÓS</span><h2 id="catalog-title">Encontre seu próximo nó.</h2></div><button className="icon-button" aria-label="Fechar biblioteca de nós" onClick={() => knotCatalog.current?.close()}><X size={19} /></button></div><label className="catalog-search"><Search size={17} /><input ref={catalogSearch} type="search" value={catalogQuery} onChange={event => setCatalogQuery(event.target.value)} placeholder="Buscar pelo nome ou descrição" aria-label="Buscar nós" /></label><div className="catalog-results" aria-live="polite"><span>{filteredExamples.length} {filteredExamples.length === 1 ? 'nó encontrado' : 'nós encontrados'}</span><div className="catalog-list">{filteredExamples.map(item => <button key={item.id} className={`catalog-item ${exampleId === item.id ? 'selected' : ''}`} onClick={() => load(item)} aria-current={exampleId === item.id ? 'true' : undefined}><span className="catalog-item-icon"><svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><path d={knotIcons[item.id]} stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span><span className="catalog-item-text"><strong>{item.nome}</strong><small>{item.descricao}</small></span>{exampleId === item.id ? <Check size={16} /> : <ArrowRight size={16} />}</button>)}</div>{filteredExamples.length === 0 && <p className="catalog-empty">Nenhum nó encontrado. Tente outro termo.</p>}</div></dialog>
     <dialog ref={help} className="help-dialog"><div className="help-header"><Brand small /><button className="icon-button" aria-label="Fechar ajuda" onClick={() => help.current?.close()}><X size={18} /></button></div><h2>Do código ao movimento.</h2><p>Escolha um exemplo ou abra um arquivo .amr. Edite o programa e use <kbd>Ctrl + Enter</kbd> para compilar com o analisador ANTLR existente.</p><ol><li>O primeiro <code>cruzar A B;</code> define as duas pontas da corda.</li><li>Use <code>passar_baixo</code>, <code>passar_cima</code>, <code>enrolar</code> e <code>apertar</code> para transformá-la.</li><li>Reproduza, pause ou navegue pela linha do tempo. Clique em um passo para encontrar sua instrução.</li></ol><p>A cena é uma representação geométrica didática, sem simulação de tensão ou atrito. O nó simples duplo usa duas passagens pelo mesmo laço antes do aperto. Sua sequência é reconhecida pelos comandos, independentemente do nome do programa. Outros comandos usam o modelo geométrico livre.</p><p>O Studio verifica tipos e nomes durante a execução, aceita até 500 movimentos e 2.000 iterações, e encerra o nó em <code>finalizar</code>. Arquivos e alterações ficam neste ambiente local.</p><button className="primary-button" onClick={() => help.current?.close()}>Começar a explorar <ArrowRight size={15} /></button></dialog>
   </div>
 }

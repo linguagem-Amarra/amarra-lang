@@ -1,8 +1,8 @@
-// Estudo didatico do no em oito: volta na parte firme e retorno pelo laco.
-no "no em oito" {
+// Estudo visual: a geometria atual ainda nao reproduz o no em oito fielmente.
+no "estudo do no em oito" {
     cruzar parte_firme ponta_trabalho;
     passar_baixo ponta_trabalho;
     passar_cima ponta_trabalho;
     apertar;
-    finalizar "no em oito pronto";
+    finalizar "estudo visual concluido";
 }

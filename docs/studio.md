@@ -67,13 +67,16 @@ editor, código e exemplos não dependem de serviços externos.
 ## Uso
 
 - A abertura padrão e o cartão **Nó reforçado** carregam `exemplos/no_simples_duplo.amr`.
-  O catálogo também inclui nó simples, nó simples triplo, nó em oito, reforço com
-  voltas e Windsor. Cada cartão abre um programa `.amr` válido com uma sequência
-  própria de movimentos.
-- O nó em oito é um estudo didático inspirado na [sequência de formação do nó em
-  oito](https://www.animatedknots.com/figure-8-knot). O visualizador genérico
-  mostra os comandos, mas não comprova a topologia final desse nó nem sua
-  adequação a usos práticos.
+  A lateral mostra até três exemplos, incluindo o selecionado. **Ver todos os nós**
+  abre a biblioteca com busca por nome e descrição. Ela também inclui nó simples,
+  nó simples triplo, estudo do nó em oito, reforço com voltas e Windsor. Cada item
+  abre um programa `.amr` válido com uma sequência própria de movimentos.
+- O estudo do nó em oito é inspirado na [sequência de formação do nó em
+  oito](https://www.animatedknots.com/figure-8-knot), mas a animação atual **não
+  reproduz esse nó fielmente**: a segunda passagem desloca a ponta sem
+  atravessar a abertura e a projeção final tem três cruzamentos, enquanto o
+  nó em oito tem quatro. O Studio identifica esse exemplo como estudo visual,
+  não como instrução de amarração.
 - Edite o programa e clique em **Compilar código** ou use **Ctrl + Enter**.
   A edição invalida o plano anterior até uma nova compilação.
 - Reproduza, pause, ajuste a velocidade, avance/retorne um passo ou arraste a
