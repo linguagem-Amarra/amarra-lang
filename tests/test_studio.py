@@ -24,10 +24,10 @@ def programa(corpo):
 
 
 class TestPlanoStudio(unittest.TestCase):
-    def test_catalogo_tem_cinco_programas_validos_com_sequencias_distintas(self):
+    def test_catalogo_tem_seis_programas_validos_com_sequencias_distintas(self):
         exemplos = listar_exemplos(RAIZ)
-        self.assertEqual(len(exemplos), 5)
-        self.assertNotIn("no_oito", {exemplo["id"] for exemplo in exemplos})
+        self.assertEqual(len(exemplos), 6)
+        self.assertIn("no_oito", {exemplo["id"] for exemplo in exemplos})
         sequencias = set()
         for exemplo in exemplos:
             with self.subTest(exemplo=exemplo["id"]):
@@ -117,7 +117,7 @@ class TestAPIStudio(unittest.TestCase):
     def test_health_e_exemplos_lidos_do_repositorio(self):
         self.assertEqual(self.client.get("/api/health").json()["status"], "ok")
         exemplos = self.client.get("/api/exemplos").json()
-        self.assertEqual(len(exemplos), 5)
+        self.assertEqual(len(exemplos), 6)
         for item in exemplos:
             self.assertEqual(item["codigo"], (RAIZ / "exemplos" / (item["id"] + ".amr")).read_text(encoding="utf-8"))
             resposta = self.client.post("/api/compilar", json={"codigo": item["codigo"]})
@@ -154,6 +154,14 @@ class TestAPIStudio(unittest.TestCase):
         self.assertEqual(len(plano["passos"]), 5)
         self.assertEqual(plano["animacao"]["id"], "double-overhand")
         self.assertEqual(plano["animacao"]["pontaTrabalho"], "ponta_trabalho")
+
+    def test_no_em_oito_tem_animacao_propria(self):
+        codigo = (RAIZ / "exemplos/no_oito.amr").read_text(encoding="utf-8")
+        plano = self.client.post("/api/compilar", json={"codigo": codigo}).json()
+        self.assertTrue(plano["ok"])
+        self.assertEqual(plano["animacao"]["id"], "figure-eight")
+        self.assertEqual(plano["animacao"]["pontaTrabalho"], "ponta_trabalho")
+        self.assertEqual(plano["animacao"]["passagens"], 1)
 
     def test_registro_considera_acoes_resolvidas_e_nao_nome(self):
         codigo = 'no "outro nome" { cruzar a b; repetir 2 { passar_baixo b; } apertar; }'

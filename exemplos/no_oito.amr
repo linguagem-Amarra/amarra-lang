@@ -1,8 +1,8 @@
-// Estudo visual: a geometria atual ainda nao reproduz o no em oito fielmente.
-no "estudo do no em oito" {
+// No em oito simples, usado como no de parada.
+no "no em oito" {
     cruzar parte_firme ponta_trabalho;
     passar_baixo ponta_trabalho;
     passar_cima ponta_trabalho;
     apertar;
-    finalizar "estudo visual concluido";
+    finalizar "no em oito pronto";
 }

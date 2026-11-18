@@ -4,6 +4,11 @@
 def reconhecer_no(plano):
     passos = plano["passos"]
     movimentos = passos[:-1] if passos and passos[-1]["acao"] == "finalizar" else passos
+    if [p["acao"] for p in movimentos] == ["cruzar", "passar_baixo", "passar_cima", "apertar"]:
+        trabalho = movimentos[1]["pontas"][0]
+        if movimentos[2]["pontas"] == [trabalho] and trabalho in movimentos[0]["pontas"]:
+            return {"id": "figure-eight", "nome": "Nó em oito", "pontaTrabalho": trabalho,
+                    "passagens": 1, "versao": 1}
     if [p["acao"] for p in movimentos] != ["cruzar", "passar_baixo", "passar_baixo", "apertar"]:
         return None
     trabalho = movimentos[1]["pontas"][0]

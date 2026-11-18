@@ -55,6 +55,11 @@ export function stepDuration(step: Step, target?: Frame) {
 export function knotStateAt(knot: Frame['knot'], fraction: number): Frame['knot'] {
   if (!knot) return undefined
   const current = { ...knot }
+  if (knot.id === 'figure-eight') {
+    if (knot.phase === 'first-pass') current.passes = passageProgress(fraction) >= .5 ? 1 : 0
+    if (knot.phase === 'tighten') current.tightness = smoothMotion(fraction)
+    return current
+  }
   if (knot.phase === 'first-pass' || knot.phase === 'second-pass') {
     const base = knot.phase === 'first-pass' ? 0 : 1
     current.passes = base + (passageProgress(fraction) >= .5 ? 1 : 0)
@@ -68,7 +73,8 @@ export function knotStateAt(knot: Frame['knot'], fraction: number): Frame['knot'
 }
 
 export function stepName(step: Step, target?: Frame) {
-  return target?.knot ? target.knot.phase === 'tighten' ? 'Organizar e apertar' : target.knot.stage : actionNames[step.acao]
+  return target?.knot ? target.knot.phase === 'tighten' && target.knot.id === 'double-overhand'
+    ? 'Organizar e apertar' : target.knot.stage : actionNames[step.acao]
 }
 
 export function motionCaption(step: Step, target: Frame, fraction: number) {

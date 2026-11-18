@@ -59,6 +59,18 @@ test('nó simples duplo e Windsor usam movimentos reais do código', async ({ pa
   await expect(page.locator('.variable')).toContainText('150')
 })
 
+test('nó em oito carrega a trajetória própria e chega à forma final', async ({ page }) => {
+  test.setTimeout(45000)
+  await page.goto('/')
+  await page.getByRole('button', { name: /Ver todos os nós/ }).click()
+  await page.getByRole('searchbox', { name: 'Buscar nós' }).fill('oito')
+  await page.locator('.catalog-dialog').getByRole('button', { name: /Nó em oito/ }).click()
+  await expect(page.getByText('Nó em oito · nó de parada · uma corda')).toBeVisible()
+  await expect(page.getByText('5 movimentos prontos para visualizar.')).toBeVisible({ timeout: 30000 })
+  await page.getByRole('slider', { name: 'Posição da animação' }).fill('4')
+  await expect(page.locator('.motion-caption')).toContainText('Nó em oito finalizado')
+})
+
 test('duas passagens, organização e aperto são fases distintas e podem ser buscadas', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
