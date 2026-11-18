@@ -14,7 +14,6 @@ const knotIcons: Record<string, string> = {
   no_simples: 'M6 34C18 36 35 3 49 11S45 47 30 36 38 5 73 15',
   no_simples_duplo: 'M4 34C22 41 28 5 42 10S27 46 42 39 52 6 63 15 64 36 76 30',
   no_simples_triplo: 'M3 35C17 40 24 6 36 11S23 44 37 38 41 8 52 11 48 43 60 37 63 15 77 21',
-  no_oito: 'M5 38C24 31 28 5 43 8 61 12 30 43 41 39 54 35 26 6 48 9 60 10 61 29 75 36',
   no_reforcado: 'M4 36C20 36 24 12 39 12S55 40 40 39 29 22 45 18 58 32 68 24 70 16 77 17',
   no_windsor: 'M15 7 41 31 65 7M19 15 40 41 61 15M30 27 25 44M49 27 55 44',
 }
@@ -283,7 +282,7 @@ export default function App() {
         </section>
 
         <section className="visualizer-panel" aria-label="Visualizador de nós"><div className="panel-header"><div className="panel-title"><ScanLine size={16} /><span>Visualização 3D</span></div><div className="scene-tools"><button className={`icon-button ${grid ? 'on' : ''}`} aria-label="Mostrar grade" aria-pressed={grid} title="Mostrar ou ocultar grade" onClick={() => setGrid(!grid)}><Grid2X2 size={15} /></button><button className="icon-button" aria-label="Restaurar câmera" title="Restaurar câmera" onClick={() => setCameraKey(k => k + 1)}><RotateCcw size={15} /></button>{document.fullscreenEnabled && <button className="icon-button" aria-label="Tela cheia" title="Tela cheia" onClick={() => { if (document.fullscreenElement) void document.exitFullscreen(); else void scene.current?.requestFullscreen() }}><Maximize2 size={15} /></button>}</div></div>
-          <div className="scene" ref={scene}><div className="scene-caption"><span className="eyebrow">{plan ? 'SEU NÓ, EM MOVIMENTO' : 'VISUALIZADOR'}</span><h2>{plan?.nome ?? 'Uma ideia começa aqui.'}</h2><span className="scene-model-label">{exampleId === 'no_oito' ? 'Estudo visual · nó em oito ainda não reproduzido fielmente' : definition ? 'Nó simples duplo · duas passagens · uma corda' : 'Corda contínua · pontas A e B'}</span></div>
+          <div className="scene" ref={scene}><div className="scene-caption"><span className="eyebrow">{plan ? 'SEU NÓ, EM MOVIMENTO' : 'VISUALIZADOR'}</span><h2>{plan?.nome ?? 'Uma ideia começa aqui.'}</h2><span className="scene-model-label">{definition ? 'Nó simples duplo · duas passagens · uma corda' : 'Corda contínua · pontas A e B'}</span></div>
             <div className="scene-view-switch" role="group" aria-label="Enquadramento da corda"><button aria-pressed={!detail} onClick={() => setDetail(false)}>Visão geral</button><button aria-pressed={detail} onClick={() => setDetail(true)}>Foco no nó</button></div>
             <RopeScene engine={engine} onPlayback={publishPlayback} frames={frames} progress={progress} cameraKey={cameraKey} showGrid={grid} detail={detail} />
             {plan && !geometryReady && <div className="scene-preparing" role="status">{geometryError || 'Preparando trajetória contínua…'}</div>}

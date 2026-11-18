@@ -7,9 +7,8 @@ EXEMPLOS = (
     ("no_simples", "Nó simples", "O primeiro encontro entre duas pontas.", "01"),
     ("no_simples_duplo", "Nó reforçado", "Nó simples duplo: duas passagens pelo mesmo laço.", "02"),
     ("no_simples_triplo", "Nó simples triplo", "Três passagens pelo laço antes do aperto.", "03"),
-    ("no_oito", "Estudo do nó em oito", "Modelo visual em revisão: ainda não forma o nó fielmente.", "04"),
-    ("no_reforcado", "Reforço com voltas", "Cadarço com duas voltas adicionais.", "05"),
-    ("no_windsor", "Windsor", "Explore a sequência do nó de gravata.", "06"),
+    ("no_reforcado", "Reforço com voltas", "Cadarço com duas voltas adicionais.", "04"),
+    ("no_windsor", "Windsor", "Explore a sequência do nó de gravata.", "05"),
 )
 
 

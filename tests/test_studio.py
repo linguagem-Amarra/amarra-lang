@@ -24,9 +24,10 @@ def programa(corpo):
 
 
 class TestPlanoStudio(unittest.TestCase):
-    def test_catalogo_tem_seis_programas_validos_com_sequencias_distintas(self):
+    def test_catalogo_tem_cinco_programas_validos_com_sequencias_distintas(self):
         exemplos = listar_exemplos(RAIZ)
-        self.assertEqual(len(exemplos), 6)
+        self.assertEqual(len(exemplos), 5)
+        self.assertNotIn("no_oito", {exemplo["id"] for exemplo in exemplos})
         sequencias = set()
         for exemplo in exemplos:
             with self.subTest(exemplo=exemplo["id"]):
@@ -116,7 +117,7 @@ class TestAPIStudio(unittest.TestCase):
     def test_health_e_exemplos_lidos_do_repositorio(self):
         self.assertEqual(self.client.get("/api/health").json()["status"], "ok")
         exemplos = self.client.get("/api/exemplos").json()
-        self.assertEqual(len(exemplos), 6)
+        self.assertEqual(len(exemplos), 5)
         for item in exemplos:
             self.assertEqual(item["codigo"], (RAIZ / "exemplos" / (item["id"] + ".amr")).read_text(encoding="utf-8"))
             resposta = self.client.post("/api/compilar", json={"codigo": item["codigo"]})
