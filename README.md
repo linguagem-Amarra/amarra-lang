@@ -61,8 +61,9 @@ e o [relatório histórico da sintaxe](docs/validacao-sintatica.md).
 
 A página principal abre o [Studio 3D](docs/studio.md): edite o código, escolha um
 exemplo e acompanhe os movimentos da corda. Na primeira abertura, aguarde o
-carregamento do compilador Python no navegador. A
-[interface clássica 2D](docs/interface-visual.md) continua em
+carregamento do compilador Python no navegador. O
+[catálogo do Studio](docs/studio.md) oferece seis programas de nó válidos para
+explorar. A [interface clássica 2D](docs/interface-visual.md) continua em
 [**/classico/**](https://linguagem-amarra.github.io/amarra-lang/classico/),
 com tokens, AST e símbolos.
 

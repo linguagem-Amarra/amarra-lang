@@ -67,8 +67,13 @@ editor, código e exemplos não dependem de serviços externos.
 ## Uso
 
 - A abertura padrão e o cartão **Nó reforçado** carregam `exemplos/no_simples_duplo.amr`.
-  Nó simples e Windsor continuam disponíveis. O exemplo original `no_reforcado.amr`
-  foi preservado e pode ser aberto pelo editor.
+  O catálogo também inclui nó simples, nó simples triplo, nó em oito, reforço com
+  voltas e Windsor. Cada cartão abre um programa `.amr` válido com uma sequência
+  própria de movimentos.
+- O nó em oito é um estudo didático inspirado na [sequência de formação do nó em
+  oito](https://www.animatedknots.com/figure-8-knot). O visualizador genérico
+  mostra os comandos, mas não comprova a topologia final desse nó nem sua
+  adequação a usos práticos.
 - Edite o programa e clique em **Compilar código** ou use **Ctrl + Enter**.
   A edição invalida o plano anterior até uma nova compilação.
 - Reproduza, pause, ajuste a velocidade, avance/retorne um passo ou arraste a
@@ -133,7 +138,7 @@ rejeite sua execução por incompatibilidade de tipos ou falta de cruzamento.
 ### API
 
 - `GET /api/health`: disponibilidade e versão do contrato.
-- `GET /api/exemplos`: lê os três exemplos diretamente do repositório.
+- `GET /api/exemplos`: lê os seis exemplos diretamente do repositório.
 - `POST /api/compilar`: recebe `{"codigo": "...", "selecionado": 0}` e devolve
   o catálogo de definições, valores das variáveis e movimentos resolvidos.
   Inclui `animacao` quando a sequência corresponde ao nó cadastrado; programas

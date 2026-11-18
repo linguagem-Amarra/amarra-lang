@@ -6,7 +6,10 @@ from pathlib import Path
 EXEMPLOS = (
     ("no_simples", "Nó simples", "O primeiro encontro entre duas pontas.", "01"),
     ("no_simples_duplo", "Nó reforçado", "Nó simples duplo: duas passagens pelo mesmo laço.", "02"),
-    ("no_windsor", "Windsor", "Explore a sequência do nó de gravata.", "03"),
+    ("no_simples_triplo", "Nó simples triplo", "Três passagens pelo laço antes do aperto.", "03"),
+    ("no_oito", "Nó em oito", "Estudo de uma volta e retorno pelo laço.", "04"),
+    ("no_reforcado", "Reforço com voltas", "Cadarço com duas voltas adicionais.", "05"),
+    ("no_windsor", "Windsor", "Explore a sequência do nó de gravata.", "06"),
 )
 
 

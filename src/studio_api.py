@@ -36,7 +36,7 @@ def analisar_plano(entrada: Entrada):
 
 
 DIST = RAIZ / "web" / "studio" / "dist"
-if DIST.is_dir():
+if (DIST / "assets").is_dir():
     app.mount("/assets", StaticFiles(directory=DIST / "assets"), name="assets")
 
 

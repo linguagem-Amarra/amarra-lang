@@ -252,6 +252,11 @@ h1 span {
   display:flex;
   flex-direction:column;
   gap:12px;
+  max-height:820px;
+  overflow-y:auto;
+  padding-right:5px;
+  scrollbar-width:thin;
+  scrollbar-color:#53624d transparent;
 }
 
 .example-card {
@@ -1371,6 +1376,9 @@ footer {
     display:grid;
     grid-template-columns:repeat(3,1fr);
     gap:12px;
+    max-height:none;
+    overflow:visible;
+    padding-right:0;
   }
   .example-card {
     padding:12px 15px;

@@ -10,6 +10,14 @@ import { registeredKnot } from './knots/knotRegistry'
 import { compileInBrowser } from './staticCompiler'
 
 const staticSite = import.meta.env.VITE_STUDIO_STATIC === 'true'
+const knotIcons: Record<string, string> = {
+  no_simples: 'M6 34C18 36 35 3 49 11S45 47 30 36 38 5 73 15',
+  no_simples_duplo: 'M4 34C22 41 28 5 42 10S27 46 42 39 52 6 63 15 64 36 76 30',
+  no_simples_triplo: 'M3 35C17 40 24 6 36 11S23 44 37 38 41 8 52 11 48 43 60 37 63 15 77 21',
+  no_oito: 'M5 38C24 31 28 5 43 8 61 12 30 43 41 39 54 35 26 6 48 9 60 10 61 29 75 36',
+  no_reforcado: 'M4 36C20 36 24 12 39 12S55 40 40 39 29 22 45 18 58 32 68 24 70 16 77 17',
+  no_windsor: 'M15 7 41 31 65 7M19 15 40 41 61 15M30 27 25 44M49 27 55 44',
+}
 
 function Brand({ small = false }: { small?: boolean }) {
   return <div className={`brand ${small ? 'brand-small' : ''}`}><svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
@@ -214,7 +222,7 @@ export default function App() {
       <div className="studio-layout">
         <aside className="library"><div className="section-label"><span>EXPLORAR NÓS</span><span>{String(examples.length).padStart(2, '0')}</span></div>
           <nav aria-label="Exemplos de nós">{examples.map(item => <button key={item.id} className={`example-card ${exampleId === item.id ? 'selected' : ''}`} onClick={() => load(item)}>
-            <div className="example-top"><span className="example-number">{item.numero}</span><span className="knot-icon"><svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><path d={item.id === 'no_simples' ? 'M6 34C18 36 35 3 49 11S45 47 30 36 38 5 73 15' : item.id === 'no_reforcado' || item.id === 'no_simples_duplo' ? 'M4 34C22 41 28 5 42 10S27 46 42 39 52 6 63 15 64 36 76 30' : 'M15 7 41 31 65 7M19 15 40 41 61 15M30 27 25 44M49 27 55 44'} stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span>{exampleId === item.id && <span className="selected-dot" />}</div>
+            <div className="example-top"><span className="example-number">{item.numero}</span><span className="knot-icon"><svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><path d={knotIcons[item.id]} stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span>{exampleId === item.id && <span className="selected-dot" />}</div>
             <strong>{item.nome}</strong><p>{item.descricao}</p><span className="example-link">Abrir no editor <ArrowRight size={13} /></span>
           </button>)}</nav>
           <div className="library-bottom"><Braces size={22} /><p>Pequenas instruções.<br /><strong>Infinitas possibilidades.</strong></p><span>Feito com Amarra + ANTLR4</span></div>

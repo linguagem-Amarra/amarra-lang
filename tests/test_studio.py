@@ -12,6 +12,8 @@ from fastapi.testclient import TestClient
 from src.studio_api import app
 from src.studio_plano import FalhaStudio, compilar
 from src.studio_nos import reconhecer_no
+from src.studio_exemplos import listar_exemplos
+from src.studio_web import analisar
 
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -22,6 +24,20 @@ def programa(corpo):
 
 
 class TestPlanoStudio(unittest.TestCase):
+    def test_catalogo_tem_seis_programas_validos_com_sequencias_distintas(self):
+        exemplos = listar_exemplos(RAIZ)
+        self.assertEqual(len(exemplos), 6)
+        sequencias = set()
+        for exemplo in exemplos:
+            with self.subTest(exemplo=exemplo["id"]):
+                plano = analisar(exemplo["codigo"])
+                self.assertTrue(plano["ok"], plano.get("diagnosticos"))
+                self.assertGreater(len(plano["passos"]), 0)
+                self.assertEqual(plano["passos"][-1]["acao"], "finalizar")
+                sequencias.add(tuple((passo["acao"], passo["valor"] if passo["acao"] == "enrolar" else None)
+                                    for passo in plano["passos"]))
+        self.assertEqual(len(sequencias), len(exemplos))
+
     def test_exemplos_originais_e_origem_dos_movimentos(self):
         for nome, quantidade in [("no_simples", 4), ("no_reforcado", 7), ("no_windsor", 6)]:
             with self.subTest(nome=nome):
@@ -100,7 +116,7 @@ class TestAPIStudio(unittest.TestCase):
     def test_health_e_exemplos_lidos_do_repositorio(self):
         self.assertEqual(self.client.get("/api/health").json()["status"], "ok")
         exemplos = self.client.get("/api/exemplos").json()
-        self.assertEqual(len(exemplos), 3)
+        self.assertEqual(len(exemplos), 6)
         for item in exemplos:
             self.assertEqual(item["codigo"], (RAIZ / "exemplos" / (item["id"] + ".amr")).read_text(encoding="utf-8"))
             resposta = self.client.post("/api/compilar", json={"codigo": item["codigo"]})
