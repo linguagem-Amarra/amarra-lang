@@ -126,8 +126,8 @@ class AnalisadorSemantico:
                              "inteiro", "quantidade de repetir")
             self.bloco(campos["corpo"])
         elif no.classe == "Comando":
-            if campos["nome"] in {"enrolar", "finalizar"}:
-                esperado = "inteiro" if campos["nome"] == "enrolar" else "texto"
+            if campos["nome"] in {"enrolar", "dar_volta", "finalizar"}:
+                esperado = "texto" if campos["nome"] == "finalizar" else "inteiro"
                 self.exigir_tipo(campos["valor"], self.expressao(campos["valor"]),
                                  esperado, "argumento de " + campos["nome"])
             # Pontas pertencem ao dominio dos movimentos, nao a tabela de variaveis.

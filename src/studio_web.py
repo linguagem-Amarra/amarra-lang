@@ -11,6 +11,8 @@ def analisar(codigo, selecionado=0):
     try:
         plano = compilar(codigo, selecionado)
         animacao = reconhecer_no(plano)
+        if plano.get("cenario") and animacao is None:
+            raise FalhaStudio("A visualização da rede exige: passar_em punho; dar_volta gancho 2; duas meia_volta parte_firme; apertar;", plano["passos"][-1]["origem"], plano["nos"])
         if animacao is not None:
             plano["animacao"] = animacao
         return plano

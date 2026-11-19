@@ -24,9 +24,9 @@ def programa(corpo):
 
 
 class TestPlanoStudio(unittest.TestCase):
-    def test_catalogo_tem_seis_programas_validos_com_sequencias_distintas(self):
+    def test_catalogo_tem_sete_programas_validos_com_sequencias_distintas(self):
         exemplos = listar_exemplos(RAIZ)
-        self.assertEqual(len(exemplos), 6)
+        self.assertEqual(len(exemplos), 7)
         self.assertIn("no_oito", {exemplo["id"] for exemplo in exemplos})
         sequencias = set()
         for exemplo in exemplos:
@@ -117,7 +117,7 @@ class TestAPIStudio(unittest.TestCase):
     def test_health_e_exemplos_lidos_do_repositorio(self):
         self.assertEqual(self.client.get("/api/health").json()["status"], "ok")
         exemplos = self.client.get("/api/exemplos").json()
-        self.assertEqual(len(exemplos), 6)
+        self.assertEqual(len(exemplos), 7)
         for item in exemplos:
             self.assertEqual(item["codigo"], (RAIZ / "exemplos" / (item["id"] + ".amr")).read_text(encoding="utf-8"))
             resposta = self.client.post("/api/compilar", json={"codigo": item["codigo"]})
@@ -162,6 +162,21 @@ class TestAPIStudio(unittest.TestCase):
         self.assertEqual(plano["animacao"]["id"], "figure-eight")
         self.assertEqual(plano["animacao"]["pontaTrabalho"], "ponta_trabalho")
         self.assertEqual(plano["animacao"]["passagens"], 1)
+
+    def test_rede_de_dormir_reconhece_suporte_e_duas_meias_voltas(self):
+        codigo = (RAIZ / "exemplos/no_rede.amr").read_text(encoding="utf-8")
+        plano = self.client.post("/api/compilar", json={"codigo": codigo}).json()
+        self.assertTrue(plano["ok"], plano.get("diagnosticos"))
+        self.assertEqual(plano["cenario"], {"tipo": "rede"})
+        self.assertEqual(plano["animacao"]["id"], "hammock-round-turn")
+        self.assertEqual([p["acao"] for p in plano["passos"]],
+                         ["passar_em", "dar_volta", "meia_volta", "meia_volta", "apertar", "finalizar"])
+        for alterado in [codigo.replace("gancho 2", "gancho 1"),
+                         codigo.replace("meia_volta parte_firme;", "meia_volta gancho;", 1),
+                         codigo.replace("    meia_volta parte_firme;\n", "", 1)]:
+            resposta = self.client.post("/api/compilar", json={"codigo": alterado}).json()
+            self.assertFalse(resposta["ok"])
+            self.assertEqual(resposta["diagnosticos"][0]["fase"], "semantico")
 
     def test_registro_considera_acoes_resolvidas_e_nao_nome(self):
         codigo = 'no "outro nome" { cruzar a b; repetir 2 { passar_baixo b; } apertar; }'

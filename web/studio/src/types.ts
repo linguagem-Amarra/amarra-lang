@@ -4,11 +4,12 @@ import { getDoubleOverhandTimeline } from './knots/doubleOverhandTimeline'
 export type Point = [number, number, number]
 export type Source = { linha: number; coluna: number; fimLinha: number; fimColuna: number }
 export type Step = {
-  id: number; acao: 'cruzar' | 'passar_baixo' | 'passar_cima' | 'enrolar' | 'apertar' | 'finalizar'
+  id: number; acao: 'cruzar' | 'passar_baixo' | 'passar_cima' | 'passar_em' | 'dar_volta' | 'meia_volta' | 'enrolar' | 'apertar' | 'finalizar'
   pontas: string[]; valor: number | string | boolean | null; origem: Source; duracao: number
 }
 export type Diagnostic = { fase: string; mensagem: string; linha: number; coluna: number }
 export type Plan = {
+  cenario?: { tipo: 'rede' }
   animacao?: { id: string; nome: string; pontaTrabalho: string; passagens: number; versao: number }
   ok: true; versao: number; nome: string; selecionado: number
   nos: { id: number; nome: string }[]; pontas: string[]; passos: Step[]
@@ -20,6 +21,7 @@ export type Reinforcement = {
   tip: 'A' | 'B'; fromTurns: number; turns: number; tension: number; approach?: boolean; approachEnd?: number; focus?: Point
 }
 export type Frame = {
+  scenario?: { kind: 'hammock'; stage: string; finished: boolean }
   knot?: { id: string; stage: string; passes: number; tightness: number; labels: ['A' | 'B', 'A' | 'B'];
     phase: 'initial' | 'loop' | 'first-pass' | 'second-pass' | 'tighten' | 'finished';
     workingTip: 'A' | 'B'; length: number; focus: Point }
@@ -30,6 +32,7 @@ export type Frame = {
 
 export const actionNames: Record<Step['acao'], string> = {
   cruzar: 'Cruzar as pontas', passar_baixo: 'Passar por baixo', passar_cima: 'Passar por cima',
+  passar_em: 'Passar pelo punho', dar_volta: 'Contornar o armador', meia_volta: 'Dar meia-volta',
   enrolar: 'Enrolar a ponta', apertar: 'Apertar o nó', finalizar: 'Finalizar',
 }
 
@@ -73,11 +76,13 @@ export function knotStateAt(knot: Frame['knot'], fraction: number): Frame['knot'
 }
 
 export function stepName(step: Step, target?: Frame) {
+  if (target?.scenario) return target.scenario.stage
   return target?.knot ? target.knot.phase === 'tighten' && target.knot.id === 'double-overhand'
     ? 'Organizar e apertar' : target.knot.stage : actionNames[step.acao]
 }
 
 export function motionCaption(step: Step, target: Frame, fraction: number) {
+  if (target.scenario) return target.scenario.stage
   if (target.knot) return knotStateAt(target.knot, fraction)!.stage
   const reinforcement = target.reinforcement
   if (step.acao === 'enrolar' && reinforcement) {
@@ -102,6 +107,9 @@ export function describe(step: Step) {
     case 'passar_baixo': return `Leve a ${ponta} por baixo do cruzamento.`
     case 'passar_cima': return `Leve a ${ponta} por cima do cruzamento.`
     case 'enrolar': return `${step.valor} ${step.valor === 1 ? 'volta' : 'voltas'} com a ${ponta}.`
+    case 'passar_em': return 'Passe a corda pelo punho da rede.'
+    case 'dar_volta': return `Dê ${step.valor} voltas no armador.`
+    case 'meia_volta': return 'Passe a ponta de trabalho ao redor da parte firme.'
     case 'apertar': return 'Puxe as pontas para aproximar as voltas.'
     case 'finalizar': return String(step.valor)
   }

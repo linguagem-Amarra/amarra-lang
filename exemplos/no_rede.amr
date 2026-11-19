@@ -1,0 +1,8 @@
+no "Rede de dormir: volta redonda e duas meias-voltas" {
+    passar_em punho;
+    dar_volta gancho 2;
+    meia_volta parte_firme;
+    meia_volta parte_firme;
+    apertar;
+    finalizar "rede presa ao armador";
+}

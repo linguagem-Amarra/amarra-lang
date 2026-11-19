@@ -10,6 +10,7 @@ EXEMPLOS = (
     ("no_oito", "Nó em oito", "Nó de parada: contorne o ramo e passe pelo laço.", "04"),
     ("no_reforcado", "Reforço com voltas", "Cadarço com duas voltas adicionais.", "05"),
     ("no_windsor", "Windsor", "Explore a sequência do nó de gravata.", "06"),
+    ("no_rede", "Nó para rede de dormir", "Volta redonda e duas meias-voltas no armador.", "07"),
 )
 
 

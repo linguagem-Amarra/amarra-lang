@@ -128,7 +128,7 @@ class Interpretador:
                         self.bloco(c["corpo"])
                 elif item.classe == "Comando":
                     pontas = [p.campos["nome"] for p in c["pontas"]]
-                    if c["nome"] == "enrolar":
+                    if c["nome"] in {"enrolar", "dar_volta"}:
                         quantidade = self.quantidade(item, c["valor"])
                         for volta in range(quantidade):
                             self.registrar(item, pontas, volta=volta + 1, quantidade=quantidade)

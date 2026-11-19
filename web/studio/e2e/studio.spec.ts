@@ -71,6 +71,20 @@ test('nó em oito carrega a trajetória própria e chega à forma final', async 
   await expect(page.locator('.motion-caption')).toContainText('Nó em oito finalizado')
 })
 
+test('rede de dormir aparece no catálogo e conclui a cena no armador', async ({ page }) => {
+  test.setTimeout(90000)
+  await page.goto('/')
+  await page.getByRole('button', { name: /Ver todos os nós/ }).click()
+  await page.getByRole('searchbox', { name: 'Buscar nós' }).fill('rede')
+  await page.locator('.catalog-dialog').getByRole('button', { name: /Nó para rede de dormir/ }).click()
+  await expect(page.getByText('Rede de dormir · armador · volta redonda e duas meias-voltas')).toBeVisible()
+  await expect(page.getByText('6 movimentos prontos para visualizar.')).toBeVisible({ timeout: 60000 })
+  await expect(page.locator('.step')).toHaveCount(6)
+  await page.getByRole('slider', { name: 'Posição da animação' }).fill('6')
+  await expect(page.locator('.motion-caption')).toContainText('Rede presa ao armador')
+  await expect(page.locator('canvas')).toBeVisible()
+})
+
 test('duas passagens, organização e aperto são fases distintas e podem ser buscadas', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))

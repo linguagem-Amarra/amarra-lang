@@ -13,7 +13,8 @@ export default defineConfig({
   expect: { timeout: 10000 }, // Inclui a validação do cache no Worker antes de liberar os controles.
   outputDir: '../../.studio-cache/test-results', reporter: 'list',
   use: { baseURL, viewport: { width: 1440, height: 1080 },
+    ...(process.env.AMARRA_BROWSER_CHANNEL ? { channel: process.env.AMARRA_BROWSER_CHANNEL } : {}),
     launchOptions: { args: ['--use-angle=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] } },
-  webServer: { command: `"${python}" "${resolve('../../studio.py')}" --port ${port}`,
+  webServer: process.env.AMARRA_TEST_EXTERNAL === 'true' ? undefined : { command: `"${python}" "${resolve('../../studio.py')}" --port ${port}`,
     url: `${baseURL}/api/health`, reuseExistingServer: false, timeout: 30000 },
 })

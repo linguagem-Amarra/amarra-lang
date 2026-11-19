@@ -1,12 +1,57 @@
 import { Component, Suspense, useEffect, useMemo, useRef, type ReactNode, type RefObject } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Grid, OrbitControls } from '@react-three/drei'
-import { BufferAttribute, CanvasTexture, CatmullRomCurve3, Color, Group, Mesh, PerspectiveCamera, RepeatWrapping, TubeGeometry, Vector3 } from 'three'
+import { BufferAttribute, BufferGeometry, CanvasTexture, CatmullRomCurve3, Color, DoubleSide, Float32BufferAttribute, Group, Mesh, PerspectiveCamera, RepeatWrapping, TubeGeometry, Vector3 } from 'three'
 import type { Frame, Point } from './types'
 import { interpolateFrame, ROPE_RADIUS } from './geometry'
 import { transportedFrames } from './ropeSurface'
 import type { KnotAnimationEngine } from './animation/KnotAnimationEngine'
 import { knotStateAt } from './types'
+import { HAMMOCK_POST, HAMMOCK_PUNHO } from './knots/hammockKnot'
+
+function Hammock({ finished }: { finished: boolean }) {
+  const cloth = useMemo(() => {
+    const positions: number[] = [], indices: number[] = []
+    const columns = 40, rows = 12
+    for (let i = 0; i <= columns; i++) {
+      const u = i / columns, gather = .12 + .95 * Math.sin(Math.PI * u) ** .8
+      const x = -8.8 + 5.5 * u
+      const sag = -.82 * Math.sin(Math.PI * u)
+      for (let j = 0; j <= rows; j++) {
+        const v = j / rows * 2 - 1
+        positions.push(x, -.25 + sag + .22 * (v * v) * Math.sin(Math.PI * u), -.38 + v * gather)
+        if (i && j) {
+          const a = (i - 1) * (rows + 1) + j - 1, b = i * (rows + 1) + j - 1
+          indices.push(a, b, a + 1, b, b + 1, a + 1)
+        }
+      }
+    }
+    const mesh = new BufferGeometry()
+    mesh.setAttribute('position', new Float32BufferAttribute(positions, 3))
+    mesh.setIndex(indices)
+    mesh.computeVertexNormals()
+    return mesh
+  }, [])
+  useEffect(() => () => cloth.dispose(), [cloth])
+  return <group position={[0, -.15, 0]}>
+    <mesh geometry={cloth} castShadow receiveShadow><meshStandardMaterial color="#e0ae86" side={DoubleSide} roughness={.96} /></mesh>
+    {[-8.8, HAMMOCK_PUNHO[0]].map((x, i) => <group key={i} position={[x, -.25, -.38]}>
+      <mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[.19, .19, .42, 16]} /><meshStandardMaterial color="#c58259" roughness={.8} /></mesh>
+      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.19, .05, 12, 32]} /><meshStandardMaterial color="#d6b78b" /></mesh>
+    </group>)}
+    <mesh position={[HAMMOCK_POST[0], HAMMOCK_POST[1], -.2]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+      <cylinderGeometry args={[.5, .5, 2.2, 32]} />
+      <meshStandardMaterial color="#a9b1b0" metalness={.72} roughness={.3} />
+    </mesh>
+    <mesh position={[HAMMOCK_POST[0], HAMMOCK_POST[1], -1.32]} rotation={[Math.PI / 2, 0, 0]}>
+      <cylinderGeometry args={[.82, .82, .1, 32]} />
+      <meshStandardMaterial color="#77878a" metalness={.55} roughness={.42} />
+    </mesh>
+    {finished && <mesh position={[-8.88, -.25, -.38]} rotation={[0, 0, Math.PI / 2]}>
+      <torusGeometry args={[.2, .05, 12, 32]} /><meshStandardMaterial color="#dec7a2" />
+    </mesh>}
+  </group>
+}
 
 const RINGS = 480
 const SIDES = 16
@@ -77,18 +122,19 @@ function Rope({ frames, progress, engine, onPlayback, tipLabels }: { frames: Fra
   }, [])
   const bump = useMemo(braidTexture, [])
   const knot = frames[0].knot
-  const labels = knot?.labels ?? ['B', 'A']
+  const labels = knot?.labels ?? (frames[0].scenario?.kind === 'hammock' ? ['A', 'B'] : ['B', 'A'])
   useEffect(() => {
     const colors = geometry.getAttribute('color') as BufferAttribute
     const blue = new Color('#64bcd5'), orange = new Color('#e5a45e'), body = new Color('#d5bf97')
     for (let ring = 0; ring <= RINGS; ring++) {
       const u = ring / RINGS
       const color = knot ? body.clone().lerp(knot.workingTip === 'B' ? blue : orange, Math.max(0, Math.min(1, (u - .95) / .015)))
+        : frames[0].scenario?.kind === 'hammock' ? body.clone().lerp(blue, Math.max(0, Math.min(1, (u - .95) / .015)))
         : blue.clone().lerp(orange, Math.max(0, Math.min(1, (u - .485) / .03)))
       for (let j = 0; j <= SIDES; j++) colors.setXYZ(ring * (SIDES + 1) + j, color.r, color.g, color.b)
     }
     colors.needsUpdate = true
-  }, [geometry, knot?.id, knot?.workingTip])
+  }, [geometry, knot?.id, knot?.workingTip, frames])
   const up = useMemo(() => new Vector3(0, 1, 0), [])
   const labelPosition = useMemo(() => new Vector3(), [])
   useEffect(() => () => { geometry.dispose(); bump.dispose() }, [geometry, bump])
@@ -177,7 +223,8 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
   const desired = useRef(new Vector3())
   const target = useMemo(() => new Vector3(), [])
   const knot = frames[0].knot
-  const initialCenter = useMemo(() => knot ? new Vector3(
+  const hammock = frames[0].scenario?.kind === 'hammock'
+  const initialCenter = useMemo(() => hammock ? new Vector3(1.1, .2, 0) : knot ? new Vector3(
     (Math.min(...frames[0].points.map(p => p[0])) + Math.max(...frames[0].points.map(p => p[0]))) / 2,
     (Math.min(...frames[0].points.map(p => p[1])) + Math.max(...frames[0].points.map(p => p[1]))) / 2, 0) : new Vector3(0, -.3, 0), [frames])
   const firstReinforcement = useMemo(() => frames.findIndex(f => f.reinforcement), [frames])
@@ -197,8 +244,8 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
     const width = knot ? Math.max(...points.map(p => p[0])) - Math.min(...points.map(p => p[0])) : Math.max(...points.map(p => Math.abs(p[0]))) * 2
     const height = Math.max(...points.map(p => Math.abs(p[1]))) * 2 + 2
     const tangent = Math.tan(42 * Math.PI / 360)
-    return Math.max(height / (2 * tangent), width / (2 * tangent * size.width / size.height)) * 1.12
-  }, [frames, size.width, size.height])
+    return hammock ? Math.max(13, 12 / (2 * tangent * size.width / size.height)) : Math.max(height / (2 * tangent), width / (2 * tangent * size.width / size.height)) * 1.12
+  }, [frames, size.width, size.height, hammock])
 
   useEffect(() => {
     manual.current = false
@@ -211,6 +258,18 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
   useFrame((_, delta) => {
     if (manual.current) return
     const position = Math.max(0, Math.min(frames.length - 1, engine?.posePosition ?? progress))
+    if (hammock) {
+      const overview = !detail || position > frames.length - 2 ? 1 : 0
+      target.set(1.1 - 4.2 * overview, -.05 - .2 * overview, 0)
+      const distance = overview ? Math.max(fullDistance, 16) : 8.3
+      desired.current.set(target.x, target.y + (overview ? 5.5 : 1.15), target.z + distance)
+      const speed = 1 - Math.exp(-delta * 3)
+      camera.position.lerp(desired.current, speed)
+      controls.current?.target.lerp(target, speed)
+      camera.lookAt(controls.current?.target ?? target)
+      controls.current?.update()
+      return
+    }
     // Enquadra o laço antes da primeira passagem; a câmera fica estável nas duas.
     const focus = detail ? Math.min(1, Math.max(0, position / (knot ? .9 : 1.6))) : 0
     const tracking = detail && firstReinforcement > 0 ? Math.min(1, Math.max(0, position - firstReinforcement + 1)) : 0
@@ -238,6 +297,7 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
       shadow-camera-top={8} shadow-camera-bottom={-8} shadow-bias={-.0004} shadow-normalBias={.025} />
     <directionalLight position={[4, -1, 3]} intensity={1} color="#bddfff" />
     <Rope frames={frames} progress={progress} engine={engine} onPlayback={onPlayback} tipLabels={tipLabels} />
+    {hammock && <Hammock finished={progress >= frames.length - 1 || (engine?.posePosition ?? 0) >= frames.length - 1} />}
     <mesh position={[0, 0, floorDepth]}>
       <planeGeometry args={[100, 100]} />
       <meshStandardMaterial color="#233237" roughness={.94} metalness={0} />
@@ -259,7 +319,7 @@ export function RopeScene({ frames, progress, cameraKey, showGrid, detail = true
 }) {
   const firstLabel = useRef<HTMLSpanElement>(null), lastLabel = useRef<HTMLSpanElement>(null)
   const tipLabels = useMemo<TipLabels>(() => [firstLabel, lastLabel], [])
-  const labels = frames[0].knot?.labels ?? ['B', 'A']
+  const labels = frames[0].knot?.labels ?? (frames[0].scenario?.kind === 'hammock' ? ['A', 'B'] : ['B', 'A'])
   return <SceneBoundary><Suspense fallback={<div className="scene-fallback">Preparando a cena…</div>}>
     <div style={{ height: '100%', position: 'relative' }}>
     <Canvas shadows="soft" camera={{ position: [0, .85, 12], fov: 42 }} dpr={[1, 1.75]}

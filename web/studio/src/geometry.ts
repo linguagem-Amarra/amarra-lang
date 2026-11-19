@@ -202,7 +202,7 @@ export function interpolateFrame(frames: Frame[], progress: number): Frame {
     const result = frame(sampleMotion(target.motion, bounded - index))
     const knot = knotStateAt(target.knot, bounded - index)
     if (knot?.labels[0] === 'A') result.tips = [result.points[0], result.points[result.points.length - 1]]
-    return { ...result, knot, reinforcement: target.reinforcement ? { ...target.reinforcement,
+    return { ...result, knot, scenario: target.scenario, reinforcement: target.reinforcement ? { ...target.reinforcement,
       turns: mix(target.reinforcement.fromTurns, target.reinforcement.turns,
         windingProgress(bounded - index, target.reinforcement)),
     } : undefined }
