@@ -242,7 +242,10 @@ class Interpretador:
             if acao == "meia_volta" and pontas != ["parte_firme"]:
                 self.falhar(no, "A meia-volta deve envolver a parte_firme.")
         elif acao in ("passar_baixo", "passar_cima", "enrolar", "apertar"):
-            if not self.cruzamento and not (self.cenario and acao == "apertar"):
+            passagem_ancora = (self.cenario and acao == "passar_baixo"
+                                and pontas == ["ponta_trabalho"] and len(self.passos) == 2
+                                and self.passos[1]["acao"] == "dar_volta")
+            if not self.cruzamento and not (self.cenario and acao == "apertar") and not passagem_ancora:
                 self.falhar(no, "Use cruzar para estabelecer um cruzamento antes deste movimento.")
             if pontas and pontas[0] not in self.pontas:
                 self.falhar(no, f"Ponta '{pontas[0]}' desconhecida. Disponíveis: {', '.join(self.pontas)}.")

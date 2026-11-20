@@ -93,6 +93,24 @@ test('rede de dormir aparece no catálogo e conclui a cena no armador', async ({
   await expect(page.locator('canvas')).toBeVisible()
 })
 
+test('nó de âncora da rede passa sob a volta e mostra a ponta aparada', async ({ page }) => {
+  test.setTimeout(120000)
+  await page.goto('/')
+  await page.getByRole('button', { name: /Ver todos os nós/ }).click()
+  await page.getByRole('searchbox', { name: 'Buscar nós' }).fill('âncora')
+  await page.locator('.catalog-dialog').getByRole('button', { name: /Nó de âncora para rede/ }).click()
+  await expect(page.getByText('Rede de dormir · armador · nó de âncora')).toBeVisible()
+  await expect(page.getByText('6 movimentos prontos para visualizar.')).toBeVisible({ timeout: 90000 })
+  const timeline = page.getByRole('slider', { name: 'Posição da animação' })
+  await timeline.fill('2.8')
+  await expect(page.locator('.motion-caption')).toContainText('Passar sob a volta')
+  await page.locator('.scene').screenshot({ path: '../../.studio-cache/hammock-anchor-tuck.png' })
+  await timeline.fill('6')
+  await expect(page.locator('.motion-caption')).toContainText('Nó de âncora preso · excesso aparado')
+  await page.waitForTimeout(800)
+  await page.locator('.scene').screenshot({ path: '../../.studio-cache/hammock-anchor-overview.png' })
+})
+
 test('duas passagens, organização e aperto são fases distintas e podem ser buscadas', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))

@@ -69,12 +69,18 @@ editor, código e exemplos não dependem de serviços externos.
 - A abertura padrão e o cartão **Nó reforçado** carregam `exemplos/no_simples_duplo.amr`.
   A lateral mostra até três exemplos, incluindo o selecionado. **Ver todos os nós**
   abre a biblioteca com busca por nome e descrição. Ela também inclui nó simples,
-  nó simples triplo, nó em oito, reforço com voltas e Windsor. Cada item
+  nó simples triplo, nó em oito, reforço com voltas, Windsor e duas opções para
+  rede de dormir. Cada item
   abre um programa `.amr` válido com uma sequência própria de movimentos.
 - `exemplos/no_oito.amr` representa o [nó em oito simples, de parada](https://www.animatedknots.com/figure-8-knot).
   O Studio usa uma trajetória 3D própria com quatro cruzamentos alternados e
   folga entre os trechos da corda. A construção é cinemática e didática: não
   simula tensão ou atrito de uma corda real.
+- `exemplos/no_rede.amr` mostra a volta redonda com duas meias-voltas.
+  `exemplos/no_ancora_rede.amr` mostra o [nó de âncora](https://www.animatedknots.com/anchor-hitch-knot):
+  após duas voltas no armador, a ponta passa sob uma delas antes da meia-volta
+  final. As duas cenas são representações didáticas; não avaliam a resistência
+  do suporte, do punho ou da corda para sustentar uma pessoa.
 - Edite o programa e clique em **Compilar código** ou use **Ctrl + Enter**.
   A edição invalida o plano anterior até uma nova compilação.
 - Reproduza, pause, ajuste a velocidade, avance/retorne um passo ou arraste a
@@ -139,7 +145,7 @@ rejeite sua execução por incompatibilidade de tipos ou falta de cruzamento.
 ### API
 
 - `GET /api/health`: disponibilidade e versão do contrato.
-- `GET /api/exemplos`: lê os seis exemplos publicados diretamente do repositório.
+- `GET /api/exemplos`: lê os oito exemplos publicados diretamente do repositório.
 - `POST /api/compilar`: recebe `{"codigo": "...", "selecionado": 0}` e devolve
   o catálogo de definições, valores das variáveis e movimentos resolvidos.
   Inclui `animacao` quando a sequência corresponde ao nó cadastrado; programas
@@ -175,6 +181,8 @@ partir da entrada nem chamadas a shell no processamento das requisições.
   iteração; atribuições podem atualizar variáveis externas.
 - O primeiro `cruzar A B` estabelece as duas pontas disponíveis. Comandos seguintes
   usam essas pontas; passar, enrolar e apertar exigem um cruzamento anterior.
+  Na cena da rede, `passar_em punho` inicia a corda; após `dar_volta gancho 2`,
+  `passar_baixo ponta_trabalho` forma a passagem própria do nó de âncora.
 - `finalizar expressão` registra o resultado e encerra a execução da definição
   selecionada, inclusive quando aparece em um bloco aninhado.
 - Limites: 32.000 caracteres por entrada, 500 movimentos, 2.000 iterações totais

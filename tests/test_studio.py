@@ -24,9 +24,9 @@ def programa(corpo):
 
 
 class TestPlanoStudio(unittest.TestCase):
-    def test_catalogo_tem_sete_programas_validos_com_sequencias_distintas(self):
+    def test_catalogo_tem_oito_programas_validos_com_sequencias_distintas(self):
         exemplos = listar_exemplos(RAIZ)
-        self.assertEqual(len(exemplos), 7)
+        self.assertEqual(len(exemplos), 8)
         self.assertIn("no_oito", {exemplo["id"] for exemplo in exemplos})
         sequencias = set()
         for exemplo in exemplos:
@@ -117,7 +117,7 @@ class TestAPIStudio(unittest.TestCase):
     def test_health_e_exemplos_lidos_do_repositorio(self):
         self.assertEqual(self.client.get("/api/health").json()["status"], "ok")
         exemplos = self.client.get("/api/exemplos").json()
-        self.assertEqual(len(exemplos), 7)
+        self.assertEqual(len(exemplos), 8)
         for item in exemplos:
             self.assertEqual(item["codigo"], (RAIZ / "exemplos" / (item["id"] + ".amr")).read_text(encoding="utf-8"))
             resposta = self.client.post("/api/compilar", json={"codigo": item["codigo"]})
@@ -177,6 +177,17 @@ class TestAPIStudio(unittest.TestCase):
             resposta = self.client.post("/api/compilar", json={"codigo": alterado}).json()
             self.assertFalse(resposta["ok"])
             self.assertEqual(resposta["diagnosticos"][0]["fase"], "semantico")
+
+    def test_no_de_ancora_da_rede_passou_sob_a_volta(self):
+        codigo = (RAIZ / "exemplos/no_ancora_rede.amr").read_text(encoding="utf-8")
+        plano = self.client.post("/api/compilar", json={"codigo": codigo}).json()
+        self.assertTrue(plano["ok"], plano.get("diagnosticos"))
+        self.assertEqual(plano["animacao"]["id"], "hammock-anchor-hitch")
+        self.assertEqual([p["acao"] for p in plano["passos"]],
+                         ["passar_em", "dar_volta", "passar_baixo", "meia_volta", "apertar", "finalizar"])
+        resposta = self.client.post("/api/compilar", json={"codigo": codigo.replace(
+            "passar_baixo ponta_trabalho;", "passar_baixo parte_firme;")}).json()
+        self.assertFalse(resposta["ok"])
 
     def test_registro_considera_acoes_resolvidas_e_nao_nome(self):
         codigo = 'no "outro nome" { cruzar a b; repetir 2 { passar_baixo b; } apertar; }'

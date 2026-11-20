@@ -11,6 +11,7 @@ EXEMPLOS = (
     ("no_reforcado", "Reforço com voltas", "Cadarço com duas voltas adicionais.", "05"),
     ("no_windsor", "Windsor", "Explore a sequência do nó de gravata.", "06"),
     ("no_rede", "Nó para rede de dormir", "Volta redonda e duas meias-voltas no armador.", "07"),
+    ("no_ancora_rede", "Nó de âncora para rede", "Passe a ponta sob a volta antes da meia-volta final.", "08"),
 )
 
 

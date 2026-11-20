@@ -100,11 +100,12 @@ export function motionCaption(step: Step, target: Frame, fraction: number) {
   return actionNames[step.acao]
 }
 
-export function describe(step: Step) {
+export function describe(step: Step, target?: Frame) {
   const ponta = step.pontas[0]?.replaceAll('_', ' ')
   switch (step.acao) {
     case 'cruzar': return `${ponta} sobre ${step.pontas[1].replaceAll('_', ' ')}.`
-    case 'passar_baixo': return `Leve a ${ponta} por baixo do cruzamento.`
+    case 'passar_baixo': return target?.scenario?.kind === 'hammock'
+      ? 'Passe a ponta de trabalho sob a volta no armador.' : `Leve a ${ponta} por baixo do cruzamento.`
     case 'passar_cima': return `Leve a ${ponta} por cima do cruzamento.`
     case 'enrolar': return `${step.valor} ${step.valor === 1 ? 'volta' : 'voltas'} com a ${ponta}.`
     case 'passar_em': return 'Passe a corda pelo punho da rede.'

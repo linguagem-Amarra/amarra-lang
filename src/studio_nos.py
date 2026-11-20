@@ -4,6 +4,12 @@
 def reconhecer_no(plano):
     passos = plano["passos"]
     movimentos = passos[:-1] if passos and passos[-1]["acao"] == "finalizar" else passos
+    if [p["acao"] for p in movimentos] == ["passar_em", "dar_volta", "passar_baixo", "meia_volta", "apertar"]:
+        if (movimentos[0]["pontas"] == ["punho"] and movimentos[1]["pontas"] == ["gancho"]
+                and movimentos[1]["valor"] == 2 and movimentos[2]["pontas"] == ["ponta_trabalho"]
+                and movimentos[3]["pontas"] == ["parte_firme"]):
+            return {"id": "hammock-anchor-hitch", "nome": "Nó de âncora",
+                    "pontaTrabalho": "ponta_trabalho", "passagens": 2, "versao": 1}
     if [p["acao"] for p in movimentos] == ["passar_em", "dar_volta", "meia_volta", "meia_volta", "apertar"]:
         if (movimentos[0]["pontas"] == ["punho"] and movimentos[1]["pontas"] == ["gancho"]
                 and movimentos[1]["valor"] == 2 and all(p["pontas"] == ["parte_firme"] for p in movimentos[2:4])):
