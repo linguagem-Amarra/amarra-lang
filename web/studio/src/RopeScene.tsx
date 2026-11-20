@@ -7,19 +7,33 @@ import { interpolateFrame, ROPE_RADIUS } from './geometry'
 import { transportedFrames } from './ropeSurface'
 import type { KnotAnimationEngine } from './animation/KnotAnimationEngine'
 import { knotStateAt } from './types'
-import { HAMMOCK_POST, HAMMOCK_PUNHO } from './knots/hammockKnot'
+import { HAMMOCK_LEFT_POST, HAMMOCK_LEFT_PUNHO, HAMMOCK_POST, HAMMOCK_PUNHO } from './knots/hammockKnot'
+import { smoothMotion } from './types'
 
-function Hammock({ finished }: { finished: boolean }) {
+const hammockGold = '#b99a55'
+const hammockLight = '#ddc384'
+
+function Fiber({ points, radius = .024, color = hammockGold }: { points: Point[]; radius?: number; color?: string }) {
+  const curve = useMemo(() => new CatmullRomCurve3(points.map(p => new Vector3(...p)), false, 'centripetal'), [points])
+  return <mesh castShadow receiveShadow>
+    <tubeGeometry args={[curve, Math.max(20, points.length * 3), radius, 7, false]} />
+    <meshStandardMaterial color={color} roughness={.93} />
+  </mesh>
+}
+
+function Hammock() {
+  const left = HAMMOCK_LEFT_PUNHO[0], right = HAMMOCK_PUNHO[0]
+  const width = right - left
   const cloth = useMemo(() => {
     const positions: number[] = [], indices: number[] = []
-    const columns = 40, rows = 12
+    const columns = 96, rows = 24
     for (let i = 0; i <= columns; i++) {
-      const u = i / columns, gather = .12 + .95 * Math.sin(Math.PI * u) ** .8
-      const x = -8.8 + 5.5 * u
-      const sag = -.82 * Math.sin(Math.PI * u)
+      const u = i / columns, gather = Math.sin(Math.PI * u) ** .72
+      const x = left + width * u
+      const sag = -1.52 * Math.sin(Math.PI * u)
       for (let j = 0; j <= rows; j++) {
         const v = j / rows * 2 - 1
-        positions.push(x, -.25 + sag + .22 * (v * v) * Math.sin(Math.PI * u), -.38 + v * gather)
+        positions.push(x, -.25 + sag + .42 * v * v * gather, -.38 + v * (.08 + 1.43 * gather))
         if (i && j) {
           const a = (i - 1) * (rows + 1) + j - 1, b = i * (rows + 1) + j - 1
           indices.push(a, b, a + 1, b, b + 1, a + 1)
@@ -33,23 +47,79 @@ function Hammock({ finished }: { finished: boolean }) {
     return mesh
   }, [])
   useEffect(() => () => cloth.dispose(), [cloth])
+  const details = useMemo(() => {
+    const fibers: Point[][] = []
+    for (let j = -12; j <= 12; j++) {
+      const v = j / 12
+      const line: Point[] = []
+      for (let i = 0; i <= 80; i++) {
+        const u = i / 80, gather = Math.sin(Math.PI * u) ** .72
+        line.push([left + width * u, -.25 - 1.52 * Math.sin(Math.PI * u) + .42 * v * v * gather + .012,
+          -.38 + v * (.08 + 1.43 * gather)])
+      }
+      fibers.push(line)
+    }
+    for (let i = 2; i < 80; i += 3) {
+      const u = i / 80, gather = Math.sin(Math.PI * u) ** .72
+      fibers.push(Array.from({ length: 17 }, (_, j) => {
+        const v = j / 8 - 1
+        return [left + width * u, -.25 - 1.52 * Math.sin(Math.PI * u) + .42 * v * v * gather + .014,
+          -.38 + v * (.08 + 1.43 * gather)] as Point
+      }))
+    }
+    const gathering: Point[][] = []
+    for (const side of [0, 1]) for (let i = 0; i < 18; i++) {
+      const v = (i / 17) * 2 - 1
+      const base = side ? right : left
+      const direction = side ? -1 : 1
+      gathering.push(Array.from({ length: 14 }, (_, j) => {
+        const u = j / 13
+        return [base + direction * (.13 + 1.25 * u), -.25 - .18 * Math.sin(Math.PI * u) + .06 * v * v,
+          -.38 + v * (.095 + .32 * Math.sin(Math.PI * u))] as Point
+      }))
+    }
+    const bindings: Point[][] = []
+    for (const side of [0, 1]) {
+      const base = side ? right : left
+      const direction = side ? -1 : 1
+      bindings.push(Array.from({ length: 401 }, (_, i) => {
+        const u = i / 400, angle = u * Math.PI * 2 * 15
+        return [base + direction * (.22 + .78 * u), -.25 + (.14 + .055 * u) * Math.cos(angle),
+          -.38 + (.14 + .055 * u) * Math.sin(angle)] as Point
+      }))
+    }
+    const fixedRope: Point[] = [[left, -.25, -.38], [-13.05, -.25, -.38],
+      [-13.55, -.08, -.38], [-13.64, .5, -.38]]
+    for (let i = 0; i <= 120; i++) {
+      const u = i / 120, angle = Math.PI + u * Math.PI * 4.7
+      fixedRope.push([HAMMOCK_LEFT_POST[0] + .61 * Math.cos(angle),
+        HAMMOCK_LEFT_POST[1] + .61 * Math.sin(angle), -.38 + .8 * u])
+    }
+    fixedRope.push([-13.35, .62, .42], [-12.95, .27, .2], [-13.42, -.1, .08])
+    return { fibers, gathering, bindings, fixedRope }
+  }, [left, right, width])
   return <group position={[0, -.15, 0]}>
-    <mesh geometry={cloth} castShadow receiveShadow><meshStandardMaterial color="#e0ae86" side={DoubleSide} roughness={.96} /></mesh>
-    {[-8.8, HAMMOCK_PUNHO[0]].map((x, i) => <group key={i} position={[x, -.25, -.38]}>
-      <mesh rotation={[0, 0, Math.PI / 2]} castShadow><cylinderGeometry args={[.19, .19, .42, 16]} /><meshStandardMaterial color="#c58259" roughness={.8} /></mesh>
-      <mesh rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[.19, .05, 12, 32]} /><meshStandardMaterial color="#d6b78b" /></mesh>
+    <mesh geometry={cloth} castShadow receiveShadow><meshStandardMaterial color="#c5a66c" side={DoubleSide} roughness={1} /></mesh>
+    {details.fibers.map((points, i) => <Fiber key={`weave-${i}`} points={points} radius={i < 25 ? .016 : .012}
+      color={i % 3 ? hammockGold : hammockLight} />)}
+    {details.gathering.map((points, i) => <Fiber key={`gather-${i}`} points={points} radius={.028} color={i % 4 ? hammockGold : hammockLight} />)}
+    {details.bindings.map((points, i) => <Fiber key={`bind-${i}`} points={points} radius={.045} color={hammockLight} />)}
+    <Fiber points={details.fixedRope} radius={ROPE_RADIUS} color={hammockGold} />
+    {[left, right].map((x, i) => <group key={i} position={[x, -.25, -.38]}>
+      <mesh rotation={[0, Math.PI / 2, 0]} castShadow>
+        <torusGeometry args={[.23, .075, 12, 40]} /><meshStandardMaterial color={hammockGold} roughness={.94} />
+      </mesh>
     </group>)}
-    <mesh position={[HAMMOCK_POST[0], HAMMOCK_POST[1], -.2]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-      <cylinderGeometry args={[.5, .5, 2.2, 32]} />
-      <meshStandardMaterial color="#a9b1b0" metalness={.72} roughness={.3} />
-    </mesh>
-    <mesh position={[HAMMOCK_POST[0], HAMMOCK_POST[1], -1.32]} rotation={[Math.PI / 2, 0, 0]}>
-      <cylinderGeometry args={[.82, .82, .1, 32]} />
-      <meshStandardMaterial color="#77878a" metalness={.55} roughness={.42} />
-    </mesh>
-    {finished && <mesh position={[-8.88, -.25, -.38]} rotation={[0, 0, Math.PI / 2]}>
-      <torusGeometry args={[.2, .05, 12, 32]} /><meshStandardMaterial color="#dec7a2" />
-    </mesh>}
+    {[HAMMOCK_LEFT_POST, HAMMOCK_POST].map(([x, y], i) => <group key={i}>
+      <mesh position={[x, y, -.2]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <cylinderGeometry args={[.5, .5, 2.2, 32]} />
+        <meshStandardMaterial color="#9ca8a9" metalness={.58} roughness={.38} />
+      </mesh>
+      <mesh position={[x, y, -1.32]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[.82, .82, .1, 32]} />
+        <meshStandardMaterial color="#697a7d" metalness={.45} roughness={.48} />
+      </mesh>
+    </group>)}
   </group>
 }
 
@@ -224,7 +294,7 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
   const target = useMemo(() => new Vector3(), [])
   const knot = frames[0].knot
   const hammock = frames[0].scenario?.kind === 'hammock'
-  const initialCenter = useMemo(() => hammock ? new Vector3(1.1, .2, 0) : knot ? new Vector3(
+  const initialCenter = useMemo(() => hammock ? new Vector3(-.55, .15, 0) : knot ? new Vector3(
     (Math.min(...frames[0].points.map(p => p[0])) + Math.max(...frames[0].points.map(p => p[0]))) / 2,
     (Math.min(...frames[0].points.map(p => p[1])) + Math.max(...frames[0].points.map(p => p[1]))) / 2, 0) : new Vector3(0, -.3, 0), [frames])
   const firstReinforcement = useMemo(() => frames.findIndex(f => f.reinforcement), [frames])
@@ -244,12 +314,13 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
     const width = knot ? Math.max(...points.map(p => p[0])) - Math.min(...points.map(p => p[0])) : Math.max(...points.map(p => Math.abs(p[0]))) * 2
     const height = Math.max(...points.map(p => Math.abs(p[1]))) * 2 + 2
     const tangent = Math.tan(42 * Math.PI / 360)
-    return hammock ? Math.max(13, 12 / (2 * tangent * size.width / size.height)) : Math.max(height / (2 * tangent), width / (2 * tangent * size.width / size.height)) * 1.12
+    return hammock ? Math.max(13, 19.3 / (2 * tangent * size.width / size.height)) * 1.12
+      : Math.max(height / (2 * tangent), width / (2 * tangent * size.width / size.height)) * 1.12
   }, [frames, size.width, size.height, hammock])
 
   useEffect(() => {
     manual.current = false
-    camera.position.set(initialCenter.x, initialCenter.y + 1.15, fullDistance)
+    camera.position.set(initialCenter.x, initialCenter.y + 1.15, hammock && detail ? 9.4 : fullDistance)
     camera.lookAt(initialCenter)
     controls.current?.target.copy(initialCenter)
     controls.current?.update()
@@ -259,10 +330,11 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
     if (manual.current) return
     const position = Math.max(0, Math.min(frames.length - 1, engine?.posePosition ?? progress))
     if (hammock) {
-      const overview = !detail || position > frames.length - 2 ? 1 : 0
-      target.set(1.1 - 4.2 * overview, -.05 - .2 * overview, 0)
-      const distance = overview ? Math.max(fullDistance, 16) : 8.3
-      desired.current.set(target.x, target.y + (overview ? 5.5 : 1.15), target.z + distance)
+      const overview = !detail ? 1 : smoothMotion(position - (frames.at(-1)?.scenario?.finished ? frames.length - 2 : frames.length - 1))
+      target.set(-.55 + ((HAMMOCK_LEFT_POST[0] + HAMMOCK_POST[0]) / 2 + .55) * overview,
+        .15 - .55 * overview, 0)
+      const distance = 9.4 + (fullDistance - 9.4) * overview
+      desired.current.set(target.x, target.y + 1.15 + 3.1 * overview, target.z + distance)
       const speed = 1 - Math.exp(-delta * 3)
       camera.position.lerp(desired.current, speed)
       controls.current?.target.lerp(target, speed)
@@ -297,7 +369,7 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
       shadow-camera-top={8} shadow-camera-bottom={-8} shadow-bias={-.0004} shadow-normalBias={.025} />
     <directionalLight position={[4, -1, 3]} intensity={1} color="#bddfff" />
     <Rope frames={frames} progress={progress} engine={engine} onPlayback={onPlayback} tipLabels={tipLabels} />
-    {hammock && <Hammock finished={progress >= frames.length - 1 || (engine?.posePosition ?? 0) >= frames.length - 1} />}
+    {hammock && <Hammock />}
     <mesh position={[0, 0, floorDepth]}>
       <planeGeometry args={[100, 100]} />
       <meshStandardMaterial color="#233237" roughness={.94} metalness={0} />
@@ -309,7 +381,7 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
     {showGrid && <Grid position={[0, 0, floorDepth + .02]} rotation={[Math.PI / 2, 0, 0]}
       args={[30, 30]} cellSize={.5} cellThickness={.35} cellColor="#34484d"
       sectionSize={2.5} sectionThickness={.55} sectionColor="#52656a" fadeDistance={20} fadeStrength={2} />}
-    <OrbitControls ref={controls} makeDefault target={[0, -.3, 0]} minDistance={3.5} maxDistance={28}
+    <OrbitControls ref={controls} makeDefault target={[0, -.3, 0]} minDistance={3.5} maxDistance={hammock ? 60 : 28}
       enableDamping dampingFactor={.09} onStart={() => { manual.current = true }} />
   </>
 }

@@ -34,6 +34,12 @@ test('rede termina ligada ao armador e sem salto ao finalizar', () => {
     Math.hypot(x - HAMMOCK_POST[0], y - HAMMOCK_POST[1]) < .9)
   assert.ok(aroundPost.length > 30)
   assert.ok(aroundPost.every(([x, y]) => Math.hypot(x - HAMMOCK_POST[0], y - HAMMOCK_POST[1]) > .63))
+  const loosePost = frames[4].points.filter(([x, y]) =>
+    Math.hypot(x - HAMMOCK_POST[0], y - HAMMOCK_POST[1]) < .9)
+  const averageRadius = (points: typeof aroundPost) => points.reduce((sum, [x, y]) =>
+    sum + Math.hypot(x - HAMMOCK_POST[0], y - HAMMOCK_POST[1]), 0) / points.length
+  assert.ok(averageRadius(aroundPost) < averageRadius(loosePost) - .04, 'o aperto deve encostar as voltas ao armador')
+  assert.ok(Math.max(...frames[5].points.map(point => point[1])) < 2, 'a ponta livre não deve subir acima da rede')
 })
 
 test('animação da rede preserva comprimento, folga e raio de curvatura', () => {
