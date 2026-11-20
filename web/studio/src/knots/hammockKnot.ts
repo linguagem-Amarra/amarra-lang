@@ -52,12 +52,13 @@ const approachEnd = turnEnd + 56
 const hitchEnd = approachEnd + 288
 const guideLength = pathLength(path)
 export const HAMMOCK_ROPE_LENGTH = guideLength + 2.1
+export const HAMMOCK_FINISHED_ROPE_LENGTH = pathLength(guide(1)) + 1.35
 const marks = [0, standingEnd, turnEnd, approachEnd, approachEnd + 144, hitchEnd, path.length - 1]
 const cumulative = [0]
 for (let i = 1; i < path.length; i++) cumulative.push(cumulative[i - 1] + Math.hypot(...path[i].map((v, axis) => v - path[i - 1][axis])))
 const cuts = marks.map(index => cumulative[index] / guideLength)
 
-function pose(u: number, tightness = 0): Point[] {
+function pose(u: number, tightness = 0, trim = 0): Point[] {
   const currentPath = tightness ? guide(tightness) : path
   const distances = tightness ? [0] : cumulative
   if (tightness) for (let i = 1; i < currentPath.length; i++) {
@@ -73,13 +74,14 @@ function pose(u: number, tightness = 0): Point[] {
   const delta = target < 1e-7 ? [1, 0, 0] as Point : tip.map((value, axis) => value - before[axis]) as Point
   const norm = Math.hypot(...delta) || 1
   const axis = delta.map(v => v / norm) as Point
-  const remaining = HAMMOCK_ROPE_LENGTH - pathLength(prefix)
+  const visibleLength = HAMMOCK_ROPE_LENGTH + (HAMMOCK_FINISHED_ROPE_LENGTH - HAMMOCK_ROPE_LENGTH) * trim
+  const remaining = visibleLength - pathLength(prefix)
   const radial: Point = [0, tip[1] + .26, tip[2] + .38]
   const radialLength = Math.hypot(radial[1], radial[2]) || 1
   const push = (1 - tightness) * 1.5 * smoothMotion(Math.max(0, Math.min(1, (u - cuts[1]) / (cuts[2] - cuts[1]))))
   const tail = (extent: number): Point[] => Array.from({ length: 65 }, (_, i) => {
     const s = i / 64
-    const distance = ((1 - tightness) * extent + tightness * 2.7) * s
+    const distance = ((1 - tightness) * extent + tightness * (2.7 - 1.85 * trim)) * s
     return tip.map((value, coordinate) => value + axis[coordinate] * distance
       + radial[coordinate] / radialLength * push * distance * distance / (1 + distance)
       + (coordinate === 1 ? -tightness * extent * Math.sin(Math.PI * s) ** 2 : 0)
@@ -93,7 +95,7 @@ function pose(u: number, tightness = 0): Point[] {
   }
   let points = samplePath([...prefix, ...tail((low + high) / 2).slice(1)], SAMPLES)
   for (let pass = 0; pass < 4; pass++) {
-    const missing = HAMMOCK_ROPE_LENGTH - pathLength(points)
+    const missing = visibleLength - pathLength(points)
     if (Math.abs(missing) < .0001) break
     const last = points.length - 1
     const direction = points[last].map((value, coordinate) => value - points[last - 1][coordinate]) as Point
@@ -124,10 +126,12 @@ export function buildHammockFrames(plan: Plan): Frame[] {
     frames.push(next)
   }
   if (plan.passos.at(-1)?.acao === 'finalizar') {
-    const next = make(1, 'Rede presa aos dois armadores', true, 1)
-    next.points = frames[frames.length - 1].points
-    next.tips = frames[frames.length - 1].tips
+    const next = make(1, 'Excesso aparado · rede presa aos dois armadores', true, 1)
+    next.points = pose(1, 1, 1)
+    next.tips = [next.points[0], next.points[next.points.length - 1]]
     next.duration = 1.8
+    next.motion = bakeMotion(frames[frames.length - 1], next,
+      t => pose(1, 1, smoothMotion(t)), 96, undefined, 0)
     frames.push(next)
   }
   return frames

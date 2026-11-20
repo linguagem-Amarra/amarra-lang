@@ -87,7 +87,7 @@ test('rede de dormir aparece no catálogo e conclui a cena no armador', async ({
   await page.waitForTimeout(500)
   await page.locator('.scene').screenshot({ path: '../../.studio-cache/hammock-tight.png' })
   await page.getByRole('slider', { name: 'Posição da animação' }).fill('6')
-  await expect(page.locator('.motion-caption')).toContainText('Rede presa aos dois armadores')
+  await expect(page.locator('.motion-caption')).toContainText('Excesso aparado · rede presa aos dois armadores')
   await page.waitForTimeout(800)
   await page.locator('.scene').screenshot({ path: '../../.studio-cache/hammock-overview.png' })
   await expect(page.locator('canvas')).toBeVisible()
