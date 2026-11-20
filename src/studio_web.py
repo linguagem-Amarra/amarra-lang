@@ -12,7 +12,7 @@ def analisar(codigo, selecionado=0):
         plano = compilar(codigo, selecionado)
         animacao = reconhecer_no(plano)
         if plano.get("cenario") and animacao is None:
-            raise FalhaStudio("A rede exige a volta redonda com duas meias-voltas ou o nó de âncora: passar_em punho; dar_volta gancho 2; passar_baixo ponta_trabalho; meia_volta parte_firme; apertar;", plano["passos"][-1]["origem"], plano["nos"])
+            raise FalhaStudio("A rede exige a volta redonda com duas meias-voltas ou o lais de guia. Abra um dos exemplos da biblioteca para ver a sequência completa.", plano["passos"][-1]["origem"], plano["nos"])
         if animacao is not None:
             plano["animacao"] = animacao
         return plano

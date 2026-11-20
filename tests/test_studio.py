@@ -178,15 +178,16 @@ class TestAPIStudio(unittest.TestCase):
             self.assertFalse(resposta["ok"])
             self.assertEqual(resposta["diagnosticos"][0]["fase"], "semantico")
 
-    def test_no_de_ancora_da_rede_passou_sob_a_volta(self):
-        codigo = (RAIZ / "exemplos/no_ancora_rede.amr").read_text(encoding="utf-8")
+    def test_lais_de_guia_da_rede_forma_alca_fixa(self):
+        codigo = (RAIZ / "exemplos/lais_de_guia_rede.amr").read_text(encoding="utf-8")
         plano = self.client.post("/api/compilar", json={"codigo": codigo}).json()
         self.assertTrue(plano["ok"], plano.get("diagnosticos"))
-        self.assertEqual(plano["animacao"]["id"], "hammock-anchor-hitch")
+        self.assertEqual(plano["animacao"]["id"], "hammock-bowline")
         self.assertEqual([p["acao"] for p in plano["passos"]],
-                         ["passar_em", "dar_volta", "passar_baixo", "meia_volta", "apertar", "finalizar"])
+                         ["passar_em", "cruzar", "dar_volta", "passar_em",
+                          "meia_volta", "passar_em", "apertar", "finalizar"])
         resposta = self.client.post("/api/compilar", json={"codigo": codigo.replace(
-            "passar_baixo ponta_trabalho;", "passar_baixo parte_firme;")}).json()
+            "passar_em laco;", "passar_em punho;", 1)}).json()
         self.assertFalse(resposta["ok"])
 
     def test_registro_considera_acoes_resolvidas_e_nao_nome(self):

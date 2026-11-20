@@ -1,13 +1,17 @@
 import type { Plan } from '../types'
 import { buildDoubleOverhandFrames } from './doubleOverhand'
 import { buildFigureEightFrames } from './figureEight'
-import { buildAnchorHitchFrames, buildHammockFrames } from './hammockKnot'
+import { buildHammockFrames } from './hammockKnot'
+import { buildBowlineFrames } from './hammockBowline'
 
-export function matchesAnchorHitch(plan: Plan): boolean {
+export function matchesBowline(plan: Plan): boolean {
   const steps = plan.passos[plan.passos.length - 1]?.acao === 'finalizar' ? plan.passos.slice(0, -1) : plan.passos
-  return plan.cenario?.tipo === 'rede' && steps.map(step => step.acao).join(',') === 'passar_em,dar_volta,passar_baixo,meia_volta,apertar'
-    && steps[0].pontas[0] === 'punho' && steps[1].pontas[0] === 'gancho' && steps[1].valor === 2
-    && steps[2].pontas[0] === 'ponta_trabalho' && steps[3].pontas[0] === 'parte_firme'
+  return plan.cenario?.tipo === 'rede' && steps.map(step => step.acao).join(',') === 'passar_em,cruzar,dar_volta,passar_em,meia_volta,passar_em,apertar'
+    && steps[0].pontas[0] === 'punho'
+    && steps[1].pontas.join(',') === 'parte_firme,ponta_trabalho'
+    && steps[2].pontas[0] === 'gancho' && steps[2].valor === 1
+    && steps[3].pontas[0] === 'laco' && steps[4].pontas[0] === 'parte_firme'
+    && steps[5].pontas[0] === 'laco'
 }
 
 export function matchesHammock(plan: Plan): boolean {
@@ -35,8 +39,8 @@ const definitions = [{ id: 'double-overhand', name: 'Nó simples duplo', matches
   build: buildDoubleOverhandFrames }, { id: 'figure-eight', name: 'Nó em oito', matches: matchesFigureEight,
   build: buildFigureEightFrames }, { id: 'hammock-round-turn', name: 'Volta redonda e duas meias-voltas',
   matches: matchesHammock, build: buildHammockFrames },
-  { id: 'hammock-anchor-hitch', name: 'Nó de âncora', matches: matchesAnchorHitch,
-    build: buildAnchorHitchFrames }]
+  { id: 'hammock-bowline', name: 'Lais de guia', matches: matchesBowline,
+    build: buildBowlineFrames }]
 
 export function registeredKnot(plan: Plan) {
   return definitions.find(definition => (!plan.animacao || plan.animacao.id === definition.id) && definition.matches(plan))

@@ -93,22 +93,22 @@ test('rede de dormir aparece no catálogo e conclui a cena no armador', async ({
   await expect(page.locator('canvas')).toBeVisible()
 })
 
-test('nó de âncora da rede passa sob a volta e mostra a ponta aparada', async ({ page }) => {
+test('lais de guia da rede forma a alça fixa e mostra a ponta aparada', async ({ page }) => {
   test.setTimeout(120000)
   await page.goto('/')
   await page.getByRole('button', { name: /Ver todos os nós/ }).click()
-  await page.getByRole('searchbox', { name: 'Buscar nós' }).fill('âncora')
-  await page.locator('.catalog-dialog').getByRole('button', { name: /Nó de âncora para rede/ }).click()
-  await expect(page.getByText('Rede de dormir · armador · nó de âncora')).toBeVisible()
-  await expect(page.getByText('6 movimentos prontos para visualizar.')).toBeVisible({ timeout: 90000 })
+  await page.getByRole('searchbox', { name: 'Buscar nós' }).fill('lais de guia')
+  await page.locator('.catalog-dialog').getByRole('button', { name: /Lais de guia para rede/ }).click()
+  await expect(page.getByText('Rede de dormir · armador · lais de guia')).toBeVisible()
+  await expect(page.getByText('8 movimentos prontos para visualizar.')).toBeVisible({ timeout: 90000 })
   const timeline = page.getByRole('slider', { name: 'Posição da animação' })
-  await timeline.fill('2.8')
-  await expect(page.locator('.motion-caption')).toContainText('Passar sob a volta')
-  await page.locator('.scene').screenshot({ path: '../../.studio-cache/hammock-anchor-tuck.png' })
-  await timeline.fill('6')
-  await expect(page.locator('.motion-caption')).toContainText('Nó de âncora preso · excesso aparado')
+  await timeline.fill('4.5')
+  await expect(page.locator('.motion-caption')).toContainText('Contornar a parte firme')
+  await page.locator('.scene').screenshot({ path: '../../.studio-cache/hammock-bowline-collar.png' })
+  await timeline.fill('8')
+  await expect(page.locator('.motion-caption')).toContainText('Lais de guia preso · excesso aparado')
   await page.waitForTimeout(800)
-  await page.locator('.scene').screenshot({ path: '../../.studio-cache/hammock-anchor-overview.png' })
+  await page.locator('.scene').screenshot({ path: '../../.studio-cache/hammock-bowline-overview.png' })
 })
 
 test('duas passagens, organização e aperto são fases distintas e podem ser buscadas', async ({ page }) => {

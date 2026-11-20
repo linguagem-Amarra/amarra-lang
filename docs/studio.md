@@ -77,9 +77,9 @@ editor, código e exemplos não dependem de serviços externos.
   folga entre os trechos da corda. A construção é cinemática e didática: não
   simula tensão ou atrito de uma corda real.
 - `exemplos/no_rede.amr` mostra a volta redonda com duas meias-voltas.
-  `exemplos/no_ancora_rede.amr` mostra o [nó de âncora](https://www.animatedknots.com/anchor-hitch-knot):
-  após duas voltas no armador, a ponta passa sob uma delas antes da meia-volta
-  final. As duas cenas são representações didáticas; não avaliam a resistência
+  `exemplos/lais_de_guia_rede.amr` mostra o [lais de guia](https://www.animatedknots.com/bowline-knot):
+  a ponta forma uma alça fixa ao redor do armador, passa pelo laço pequeno,
+  contorna a parte firme e retorna pelo laço. As duas cenas são representações didáticas; não avaliam a resistência
   do suporte, do punho ou da corda para sustentar uma pessoa.
 - Edite o programa e clique em **Compilar código** ou use **Ctrl + Enter**.
   A edição invalida o plano anterior até uma nova compilação.
@@ -181,8 +181,9 @@ partir da entrada nem chamadas a shell no processamento das requisições.
   iteração; atribuições podem atualizar variáveis externas.
 - O primeiro `cruzar A B` estabelece as duas pontas disponíveis. Comandos seguintes
   usam essas pontas; passar, enrolar e apertar exigem um cruzamento anterior.
-  Na cena da rede, `passar_em punho` inicia a corda; após `dar_volta gancho 2`,
-  `passar_baixo ponta_trabalho` forma a passagem própria do nó de âncora.
+  Na cena da rede, `passar_em punho` inicia a corda. O lais de guia usa
+  `cruzar parte_firme ponta_trabalho` para formar o laço pequeno e
+  `passar_em laco` para as duas passagens da ponta de trabalho.
 - `finalizar expressão` registra o resultado e encerra a execução da definição
   selecionada, inclusive quando aparece em um bloco aninhado.
 - Limites: 32.000 caracteres por entrada, 500 movimentos, 2.000 iterações totais

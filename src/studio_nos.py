@@ -4,11 +4,15 @@
 def reconhecer_no(plano):
     passos = plano["passos"]
     movimentos = passos[:-1] if passos and passos[-1]["acao"] == "finalizar" else passos
-    if [p["acao"] for p in movimentos] == ["passar_em", "dar_volta", "passar_baixo", "meia_volta", "apertar"]:
-        if (movimentos[0]["pontas"] == ["punho"] and movimentos[1]["pontas"] == ["gancho"]
-                and movimentos[1]["valor"] == 2 and movimentos[2]["pontas"] == ["ponta_trabalho"]
-                and movimentos[3]["pontas"] == ["parte_firme"]):
-            return {"id": "hammock-anchor-hitch", "nome": "Nó de âncora",
+    if [p["acao"] for p in movimentos] == ["passar_em", "cruzar", "dar_volta", "passar_em",
+                                                "meia_volta", "passar_em", "apertar"]:
+        if (movimentos[0]["pontas"] == ["punho"]
+                and movimentos[1]["pontas"] == ["parte_firme", "ponta_trabalho"]
+                and movimentos[2]["pontas"] == ["gancho"] and movimentos[2]["valor"] == 1
+                and movimentos[3]["pontas"] == ["laco"]
+                and movimentos[4]["pontas"] == ["parte_firme"]
+                and movimentos[5]["pontas"] == ["laco"]):
+            return {"id": "hammock-bowline", "nome": "Lais de guia",
                     "pontaTrabalho": "ponta_trabalho", "passagens": 2, "versao": 1}
     if [p["acao"] for p in movimentos] == ["passar_em", "dar_volta", "meia_volta", "meia_volta", "apertar"]:
         if (movimentos[0]["pontas"] == ["punho"] and movimentos[1]["pontas"] == ["gancho"]

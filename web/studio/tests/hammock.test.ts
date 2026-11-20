@@ -5,8 +5,9 @@ import { validateKnotMotion } from '../src/animation/validateKnotMotion'
 import { minimumRopeSeparation } from '../src/animation/RopeValidation'
 import { pathLength } from '../src/ropeWinding'
 import { sampleMotion } from '../src/ropeMotion'
-import { matchesAnchorHitch, matchesHammock, registeredKnot } from '../src/knots/knotRegistry'
-import { ANCHOR_FINISHED_ROPE_LENGTH, ANCHOR_ROPE_LENGTH, HAMMOCK_FINISHED_ROPE_LENGTH, HAMMOCK_POST, HAMMOCK_ROPE_LENGTH } from '../src/knots/hammockKnot'
+import { matchesBowline, matchesHammock, registeredKnot } from '../src/knots/knotRegistry'
+import { BOWLINE_FINISHED_ROPE_LENGTH, BOWLINE_ROPE_LENGTH } from '../src/knots/hammockBowline'
+import { HAMMOCK_FINISHED_ROPE_LENGTH, HAMMOCK_POST, HAMMOCK_ROPE_LENGTH } from '../src/knots/hammockKnot'
 import type { Plan } from '../src/types'
 
 function hammockPlan(): Plan {
@@ -20,10 +21,15 @@ function hammockPlan(): Plan {
     })) }
 }
 
-function anchorPlan(): Plan {
+function bowlinePlan(): Plan {
   const plan = hammockPlan()
-  plan.passos[2].acao = 'passar_baixo'
-  plan.passos[2].pontas = ['ponta_trabalho']
+  const actions: Plan['passos'][number]['acao'][] = ['passar_em', 'cruzar', 'dar_volta',
+    'passar_em', 'meia_volta', 'passar_em', 'apertar', 'finalizar']
+  plan.passos = actions.map((acao, id) => ({ ...plan.passos[0], id, acao,
+    pontas: id === 0 ? ['punho'] : id === 1 ? ['parte_firme', 'ponta_trabalho']
+      : id === 2 ? ['gancho'] : id === 3 || id === 5 ? ['laco']
+        : id === 4 ? ['parte_firme'] : [],
+    valor: id === 2 ? 1 : null }))
   return plan
 }
 
@@ -35,20 +41,21 @@ test('registro da rede exige suporte, duas voltas e duas meias-voltas', () => {
   assert.equal(matchesHammock(plan), false)
 })
 
-test('nó de âncora exige a passagem sob a volta e tem trajetória própria', () => {
-  const plan = anchorPlan()
-  assert.ok(matchesAnchorHitch(plan))
-  assert.equal(registeredKnot(plan)?.id, 'hammock-anchor-hitch')
-  const anchor = buildFrames(plan), round = buildFrames(hammockPlan())
-  assert.equal(anchor.length, 7)
-  const underTurn = (points: typeof anchor[3]['points']) => Math.min(...points
-    .filter(point => point[0] > 1.3 && point[0] < 2.35).map(point => point[2]))
-  assert.ok(underTurn(anchor[3].points) < underTurn(round[3].points) - .5)
-  const result = validateKnotMotion(anchor.slice(0, 6), ROPE_RADIUS, ANCHOR_ROPE_LENGTH)
-  assert.ok(result.minimumSeparation > 2 * ROPE_RADIUS)
-  assert.ok(Math.max(...anchor[5].points.filter(point => point[0] > 1.3 && point[0] < 3.2)
-    .map(point => point[1])) < 2, 'a passagem deve se acomodar junto ao armador')
-  assert.ok(Math.abs(pathLength(anchor[6].points) - ANCHOR_FINISHED_ROPE_LENGTH) < .005)
+test('lais de guia forma uma alça fixa com uma só volta no armador', () => {
+  const plan = bowlinePlan()
+  assert.ok(matchesBowline(plan))
+  assert.equal(registeredKnot(plan)?.id, 'hammock-bowline')
+  const bowline = buildFrames(plan), round = buildFrames(hammockPlan())
+  assert.equal(bowline.length, 9)
+  assert.ok(Math.abs(pathLength(bowline[8].points) - BOWLINE_FINISHED_ROPE_LENGTH) < .005)
+  const nearPost = (points: typeof bowline[7]['points']) => points.filter(([x, y]) =>
+    Math.hypot(x - HAMMOCK_POST[0], y - HAMMOCK_POST[1]) < 1.2)
+  assert.ok(nearPost(bowline[7].points).length < nearPost(round[5].points).length * .8)
+  assert.ok(bowline[7].points.some(([x, y]) => x < -.3 && y > .15),
+    'o laço pequeno deve ficar visível junto à parte firme')
+  assert.ok(Math.abs(pathLength(bowline[7].points) - BOWLINE_ROPE_LENGTH) < .005)
+  assert.ok(minimumRopeSeparation(bowline[7].points, ROPE_RADIUS * 3.75) > 2 * ROPE_RADIUS)
+  assert.ok(bowline.slice(1).every(frame => frame.motion), 'cada passagem deve ter movimento próprio')
 })
 
 test('rede termina ligada ao armador com a ponta livre aparada', () => {

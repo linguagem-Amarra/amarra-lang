@@ -220,7 +220,9 @@ class Interpretador:
         acao, pontas = no["acao"], no["pontas"]
         valor = self.avaliar(no["valor"]) if no["valor"] is not None else None
         if acao == "cruzar":
-            if self.cenario:
+            laco_rede = (self.cenario and len(self.passos) == 1
+                         and pontas == ["parte_firme", "ponta_trabalho"])
+            if self.cenario and not laco_rede:
                 self.falhar(no, "A cena da rede usa o suporte fixo; não misture com cruzar.")
             if pontas[0] == pontas[1]:
                 self.falhar(no, "Cruze duas pontas diferentes.")
@@ -230,22 +232,22 @@ class Interpretador:
                 self.falhar(no, "A cena contém uma corda com duas pontas: " + ", ".join(self.pontas) + ".")
             self.cruzamento = True
         elif acao == "passar_em":
-            if pontas != ["punho"] or self.passos or self.pontas is not None:
+            retorno_laco = (self.cenario and pontas == ["laco"] and self.cruzamento
+                            and len(self.passos) in (3, 5))
+            if not retorno_laco and (pontas != ["punho"] or self.passos or self.pontas is not None):
                 self.falhar(no, "Comece a rede com passar_em punho; como primeiro movimento.")
-            self.cenario = {"tipo": "rede"}
-            self.pontas = ["parte_firme", "ponta_trabalho"]
+            if not retorno_laco:
+                self.cenario = {"tipo": "rede"}
+                self.pontas = ["parte_firme", "ponta_trabalho"]
         elif acao in ("dar_volta", "meia_volta"):
             if not self.cenario:
                 self.falhar(no, "Use passar_em punho; antes de trabalhar no suporte da rede.")
-            if acao == "dar_volta" and (pontas != ["gancho"] or type(valor) is not int or valor != 2):
-                self.falhar(no, "Use dar_volta gancho 2; para formar a volta redonda.")
+            if acao == "dar_volta" and (pontas != ["gancho"] or type(valor) is not int or valor not in (1, 2)):
+                self.falhar(no, "Use dar_volta gancho 1; para o lais de guia ou gancho 2; para a volta redonda.")
             if acao == "meia_volta" and pontas != ["parte_firme"]:
                 self.falhar(no, "A meia-volta deve envolver a parte_firme.")
         elif acao in ("passar_baixo", "passar_cima", "enrolar", "apertar"):
-            passagem_ancora = (self.cenario and acao == "passar_baixo"
-                                and pontas == ["ponta_trabalho"] and len(self.passos) == 2
-                                and self.passos[1]["acao"] == "dar_volta")
-            if not self.cruzamento and not (self.cenario and acao == "apertar") and not passagem_ancora:
+            if not self.cruzamento and not (self.cenario and acao == "apertar"):
                 self.falhar(no, "Use cruzar para estabelecer um cruzamento antes deste movimento.")
             if pontas and pontas[0] not in self.pontas:
                 self.falhar(no, f"Ponta '{pontas[0]}' desconhecida. Disponíveis: {', '.join(self.pontas)}.")
