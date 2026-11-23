@@ -10,7 +10,15 @@ import { registeredKnot } from './knots/knotRegistry'
 import { compileInBrowser } from './staticCompiler'
 
 const staticSite = import.meta.env.VITE_STUDIO_STATIC === 'true'
+const sceneLabels: Record<string, string> = {
+  'shoelace-bow': 'Tênis-jacaré · laço de duas alças',
+  'hammock-bowline': 'Rede de dormir · armador · lais de guia',
+  'hammock-round-turn': 'Rede de dormir · armador · volta redonda e duas meias-voltas',
+  'double-overhand': 'Nó simples duplo · duas passagens · uma corda',
+  'figure-eight': 'Nó em oito · nó de parada · uma corda',
+}
 const knotIcons: Record<string, string> = {
+  laco_tenis_jacare: 'M16 39Q26 34 40 23C20 -1 4 11 15 20Q23 27 40 23C58 -2 77 8 68 19Q60 27 40 23Q49 33 67 38',
   no_simples: 'M6 34C18 36 35 3 49 11S45 47 30 36 38 5 73 15',
   no_simples_duplo: 'M4 34C22 41 28 5 42 10S27 46 42 39 52 6 63 15 64 36 76 30',
   no_simples_triplo: 'M3 35C17 40 24 6 36 11S23 44 37 38 41 8 52 11 48 43 60 37 63 15 77 21',
@@ -285,7 +293,7 @@ export default function App() {
         </section>
 
         <section className="visualizer-panel" aria-label="Visualizador de nós"><div className="panel-header"><div className="panel-title"><ScanLine size={16} /><span>Visualização 3D</span></div><div className="scene-tools"><button className={`icon-button ${grid ? 'on' : ''}`} aria-label="Mostrar grade" aria-pressed={grid} title="Mostrar ou ocultar grade" onClick={() => setGrid(!grid)}><Grid2X2 size={15} /></button><button className="icon-button" aria-label="Restaurar câmera" title="Restaurar câmera" onClick={() => setCameraKey(k => k + 1)}><RotateCcw size={15} /></button>{document.fullscreenEnabled && <button className="icon-button" aria-label="Tela cheia" title="Tela cheia" onClick={() => { if (document.fullscreenElement) void document.exitFullscreen(); else void scene.current?.requestFullscreen() }}><Maximize2 size={15} /></button>}</div></div>
-            <div className="scene" ref={scene}><div className="scene-caption"><span className="eyebrow">{plan ? 'SEU NÓ, EM MOVIMENTO' : 'VISUALIZADOR'}</span><h2>{plan?.nome ?? 'Uma ideia começa aqui.'}</h2><span className="scene-model-label">{definition?.id === 'hammock-bowline' ? 'Rede de dormir · armador · lais de guia' : definition?.id === 'hammock-round-turn' ? 'Rede de dormir · armador · volta redonda e duas meias-voltas' : definition?.id === 'double-overhand' ? 'Nó simples duplo · duas passagens · uma corda' : definition?.id === 'figure-eight' ? 'Nó em oito · nó de parada · uma corda' : 'Corda contínua · pontas A e B'}</span></div>
+            <div className="scene" ref={scene}><div className="scene-caption"><span className="eyebrow">{plan ? 'SEU NÓ, EM MOVIMENTO' : 'VISUALIZADOR'}</span><h2>{plan?.nome ?? 'Uma ideia começa aqui.'}</h2><span className="scene-model-label">{sceneLabels[definition?.id ?? ''] ?? 'Corda contínua · pontas A e B'}</span></div>
             <div className="scene-view-switch" role="group" aria-label="Enquadramento da corda"><button aria-pressed={!detail} onClick={() => setDetail(false)}>Visão geral</button><button aria-pressed={detail} onClick={() => setDetail(true)}>Foco no nó</button></div>
             <RopeScene engine={engine} onPlayback={publishPlayback} frames={frames} progress={progress} cameraKey={cameraKey} showGrid={grid} detail={detail} />
             {plan && !geometryReady && <div className="scene-preparing" role="status">{geometryError || 'Preparando trajetória contínua…'}</div>}

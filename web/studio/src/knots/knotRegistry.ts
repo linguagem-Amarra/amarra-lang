@@ -3,6 +3,7 @@ import { buildDoubleOverhandFrames } from './doubleOverhand'
 import { buildFigureEightFrames } from './figureEight'
 import { buildHammockFrames } from './hammockKnot'
 import { buildBowlineFrames } from './hammockBowline'
+import { buildShoelaceFrames, matchesShoelace } from './shoelaceBow'
 
 export function matchesBowline(plan: Plan): boolean {
   const steps = plan.passos[plan.passos.length - 1]?.acao === 'finalizar' ? plan.passos.slice(0, -1) : plan.passos
@@ -40,7 +41,8 @@ const definitions = [{ id: 'double-overhand', name: 'Nó simples duplo', matches
   build: buildFigureEightFrames }, { id: 'hammock-round-turn', name: 'Volta redonda e duas meias-voltas',
   matches: matchesHammock, build: buildHammockFrames },
   { id: 'hammock-bowline', name: 'Lais de guia', matches: matchesBowline,
-    build: buildBowlineFrames }]
+    build: buildBowlineFrames },
+  { id: 'shoelace-bow', name: 'Laço de cadarço', matches: matchesShoelace, build: buildShoelaceFrames }]
 
 export function registeredKnot(plan: Plan) {
   return definitions.find(definition => (!plan.animacao || plan.animacao.id === definition.id) && definition.matches(plan))

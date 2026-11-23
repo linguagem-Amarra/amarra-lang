@@ -9,6 +9,7 @@ import type { KnotAnimationEngine } from './animation/KnotAnimationEngine'
 import { knotStateAt } from './types'
 import { HAMMOCK_LEFT_POST, HAMMOCK_LEFT_PUNHO, HAMMOCK_POST, HAMMOCK_PUNHO } from './knots/hammockKnot'
 import { smoothMotion } from './types'
+import { CrocodileShoe } from './CrocodileShoe'
 
 const hammockGold = '#b99a55'
 const hammockLight = '#ddc384'
@@ -192,6 +193,7 @@ function Rope({ frames, progress, engine, onPlayback, tipLabels }: { frames: Fra
   }, [])
   const bump = useMemo(braidTexture, [])
   const knot = frames[0].knot
+  const radius = frames[0].scenario?.kind === 'shoelace' ? .059 : ROPE_RADIUS
   const labels = knot?.labels ?? (frames[0].scenario?.kind === 'hammock' ? ['A', 'B'] : ['B', 'A'])
   useEffect(() => {
     const colors = geometry.getAttribute('color') as BufferAttribute
@@ -245,7 +247,7 @@ function Rope({ frames, progress, engine, onPlayback, tipLabels }: { frames: Fra
         const nz = cosine * axes.normals[i].z + sine * axes.binormals[i].z
         const index = i * (SIDES + 1) + j
         normals.setXYZ(index, nx, ny, nz)
-        positions.setXYZ(index, points[i].x + nx * ROPE_RADIUS, points[i].y + ny * ROPE_RADIUS, points[i].z + nz * ROPE_RADIUS)
+        positions.setXYZ(index, points[i].x + nx * radius, points[i].y + ny * radius, points[i].z + nz * radius)
       }
     }
     positions.needsUpdate = normals.needsUpdate = true
@@ -277,7 +279,7 @@ function Rope({ frames, progress, engine, onPlayback, tipLabels }: { frames: Fra
     </mesh>
     {[firstTip, lastTip].map((ref, i) => <group ref={ref} key={i}>
       <mesh position={[0, .06, 0]} castShadow>
-        <cylinderGeometry args={[ROPE_RADIUS * .88, ROPE_RADIUS * .96, .25, 20]} />
+        <cylinderGeometry args={[radius * .88, radius * .96, radius * 2.1, 20]} />
         <meshStandardMaterial color={labels[i] === 'B' ? '#bdd8df' : '#e4c096'} roughness={.35} metalness={.65} />
       </mesh>
     </group>)}
@@ -294,12 +296,14 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
   const target = useMemo(() => new Vector3(), [])
   const knot = frames[0].knot
   const hammock = frames[0].scenario?.kind === 'hammock'
+  const shoe = frames[0].scenario?.kind === 'shoelace'
   const initialCenter = useMemo(() => hammock ? new Vector3(-.55, .15, 0) : knot ? new Vector3(
     (Math.min(...frames[0].points.map(p => p[0])) + Math.max(...frames[0].points.map(p => p[0]))) / 2,
     (Math.min(...frames[0].points.map(p => p[1])) + Math.max(...frames[0].points.map(p => p[1]))) / 2, 0) : new Vector3(0, -.3, 0), [frames])
   const firstReinforcement = useMemo(() => frames.findIndex(f => f.reinforcement), [frames])
   const reinforcementFocus = useMemo(() => [...frames].reverse().find(f => f.reinforcement)?.reinforcement?.focus, [frames])
   const floorDepth = useMemo(() => {
+    if (shoe) return -.9
     let depth = -1.15
     for (const frame of frames) {
       for (const p of frame.points) depth = Math.min(depth, p[2] - .8)
@@ -314,6 +318,7 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
     const width = knot ? Math.max(...points.map(p => p[0])) - Math.min(...points.map(p => p[0])) : Math.max(...points.map(p => Math.abs(p[0]))) * 2
     const height = Math.max(...points.map(p => Math.abs(p[1]))) * 2 + 2
     const tangent = Math.tan(42 * Math.PI / 360)
+    if (shoe) return Math.max(9.6, 10.8 / (2 * tangent * size.width / size.height))
     return hammock ? Math.max(13, 19.3 / (2 * tangent * size.width / size.height)) * 1.12
       : Math.max(height / (2 * tangent), width / (2 * tangent * size.width / size.height)) * 1.12
   }, [frames, size.width, size.height, hammock])
@@ -321,6 +326,7 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
   useEffect(() => {
     manual.current = false
     camera.position.set(initialCenter.x, initialCenter.y + 1.15, hammock && detail ? 9.4 : fullDistance)
+    if (shoe) camera.position.set(.24 * fullDistance, .65 * fullDistance, .72 * fullDistance)
     camera.lookAt(initialCenter)
     controls.current?.target.copy(initialCenter)
     controls.current?.update()
@@ -329,6 +335,17 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
   useFrame((_, delta) => {
     if (manual.current) return
     const position = Math.max(0, Math.min(frames.length - 1, engine?.posePosition ?? progress))
+    if (shoe) {
+      const focus = detail ? smoothMotion(position) * (1 - smoothMotion(position - frames.length + 2)) : 0
+      const distance = fullDistance + (Math.max(5.9, fullDistance * .58) - fullDistance) * focus
+      target.set(-.25 - .60 * focus, .23 + .85 * focus, 0)
+      desired.current.set(.24 * distance, (.65 + .20 * focus) * distance, (.72 - .18 * focus) * distance).add(target)
+      const speed = 1 - Math.exp(-delta * 4)
+      camera.position.lerp(desired.current, speed)
+      controls.current?.target.lerp(target, speed)
+      controls.current?.update()
+      return
+    }
     if (hammock) {
       const overview = !detail ? 1 : smoothMotion(position - (frames.at(-1)?.scenario?.finished ? frames.length - 2 : frames.length - 1))
       target.set(-.55 + ((HAMMOCK_LEFT_POST[0] + HAMMOCK_POST[0]) / 2 + .55) * overview,
@@ -370,6 +387,8 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
     <directionalLight position={[4, -1, 3]} intensity={1} color="#bddfff" />
     <Rope frames={frames} progress={progress} engine={engine} onPlayback={onPlayback} tipLabels={tipLabels} />
     {hammock && <Hammock />}
+    {shoe && <CrocodileShoe />}
+    <group rotation={[shoe ? -Math.PI / 2 : 0, 0, 0]}>
     <mesh position={[0, 0, floorDepth]}>
       <planeGeometry args={[100, 100]} />
       <meshStandardMaterial color="#233237" roughness={.94} metalness={0} />
@@ -381,6 +400,7 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
     {showGrid && <Grid position={[0, 0, floorDepth + .02]} rotation={[Math.PI / 2, 0, 0]}
       args={[30, 30]} cellSize={.5} cellThickness={.35} cellColor="#34484d"
       sectionSize={2.5} sectionThickness={.55} sectionColor="#52656a" fadeDistance={20} fadeStrength={2} />}
+    </group>
     <OrbitControls ref={controls} makeDefault target={[0, -.3, 0]} minDistance={3.5} maxDistance={hammock ? 60 : 28}
       enableDamping dampingFactor={.09} onStart={() => { manual.current = true }} />
   </>

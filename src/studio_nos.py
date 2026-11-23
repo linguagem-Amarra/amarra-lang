@@ -4,6 +4,15 @@
 def reconhecer_no(plano):
     passos = plano["passos"]
     movimentos = passos[:-1] if passos and passos[-1]["acao"] == "finalizar" else passos
+    if [p["acao"] for p in movimentos] == ["cruzar", "passar_baixo", "apertar", "enrolar",
+                                           "enrolar", "cruzar", "passar_baixo", "apertar"]:
+        a, b = movimentos[0]["pontas"]
+        if (movimentos[1]["pontas"] == movimentos[3]["pontas"] == [a]
+                and movimentos[4]["pontas"] == movimentos[6]["pontas"] == [b]
+                and movimentos[3]["valor"] == movimentos[4]["valor"] == 1
+                and movimentos[5]["pontas"] == [b, a]):
+            return {"id": "shoelace-bow", "nome": "Laço de cadarço", "pontaTrabalho": b,
+                    "passagens": 2, "versao": 1}
     if [p["acao"] for p in movimentos] == ["passar_em", "cruzar", "dar_volta", "passar_em",
                                                 "meia_volta", "passar_em", "apertar"]:
         if (movimentos[0]["pontas"] == ["punho"]

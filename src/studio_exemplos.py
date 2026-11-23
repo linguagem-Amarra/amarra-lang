@@ -12,6 +12,7 @@ EXEMPLOS = (
     ("no_windsor", "Windsor", "Explore a sequência do nó de gravata.", "06"),
     ("no_rede", "Nó para rede de dormir", "Volta redonda e duas meias-voltas no armador.", "07"),
     ("lais_de_guia_rede", "Lais de guia para rede", "Forme uma alça fixa ao redor do armador.", "08"),
+    ("laco_tenis_jacare", "Laço do tênis-jacaré", "Amarre o cadarço do jacaré com duas alças.", "09"),
 )
 
 

@@ -70,7 +70,7 @@ editor, código e exemplos não dependem de serviços externos.
   A lateral mostra até três exemplos, incluindo o selecionado. **Ver todos os nós**
   abre a biblioteca com busca por nome e descrição. Ela também inclui nó simples,
   nó simples triplo, nó em oito, reforço com voltas, Windsor e duas opções para
-  rede de dormir. Cada item
+  rede de dormir, além do laço do tênis-jacaré. Cada item
   abre um programa `.amr` válido com uma sequência própria de movimentos.
 - `exemplos/no_oito.amr` representa o [nó em oito simples, de parada](https://www.animatedknots.com/figure-8-knot).
   O Studio usa uma trajetória 3D própria com quatro cruzamentos alternados e
@@ -81,6 +81,9 @@ editor, código e exemplos não dependem de serviços externos.
   a ponta forma uma alça fixa ao redor do armador, passa pelo laço pequeno,
   contorna a parte firme e retorna pelo laço. As duas cenas são representações didáticas; não avaliam a resistência
   do suporte, do punho ou da corda para sustentar uma pessoa.
+- No exemplo `exemplos/laco_tenis_jacare.amr`, acompanhe as pontas A e B desde os
+  ilhoses até o laço de duas alças. Use **Visão geral** para girar o tênis inteiro
+  ou **Foco no nó** para observar a passagem de uma alça sob a outra.
 - Edite o programa e clique em **Compilar código** ou use **Ctrl + Enter**.
   A edição invalida o plano anterior até uma nova compilação.
 - Reproduza, pause, ajuste a velocidade, avance/retorne um passo ou arraste a
@@ -145,7 +148,7 @@ rejeite sua execução por incompatibilidade de tipos ou falta de cruzamento.
 ### API
 
 - `GET /api/health`: disponibilidade e versão do contrato.
-- `GET /api/exemplos`: lê os oito exemplos publicados diretamente do repositório.
+- `GET /api/exemplos` lê os exemplos publicados diretamente do repositório.
 - `POST /api/compilar`: recebe `{"codigo": "...", "selecionado": 0}` e devolve
   o catálogo de definições, valores das variáveis e movimentos resolvidos.
   Inclui `animacao` quando a sequência corresponde ao nó cadastrado; programas

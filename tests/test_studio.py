@@ -24,9 +24,9 @@ def programa(corpo):
 
 
 class TestPlanoStudio(unittest.TestCase):
-    def test_catalogo_tem_oito_programas_validos_com_sequencias_distintas(self):
+    def test_catalogo_tem_nove_programas_validos_com_sequencias_distintas(self):
         exemplos = listar_exemplos(RAIZ)
-        self.assertEqual(len(exemplos), 8)
+        self.assertEqual(len(exemplos), 9)
         self.assertIn("no_oito", {exemplo["id"] for exemplo in exemplos})
         sequencias = set()
         for exemplo in exemplos:
@@ -48,6 +48,12 @@ class TestPlanoStudio(unittest.TestCase):
                 self.assertEqual(plano["passos"][0]["origem"]["coluna"], 4)
                 self.assertEqual(plano["passos"][-1]["acao"], "finalizar")
                 self.assertEqual(plano["passos"][-1]["valor"], "windsor pronto" if nome == "no_windsor" else "no reforcado pronto" if nome == "no_reforcado" else "no pronto")
+
+    def test_laco_de_cadarco_depende_das_duas_alcas_e_do_cruzamento_inverso(self):
+        codigo = (RAIZ / "exemplos/laco_tenis_jacare.amr").read_text(encoding="utf-8")
+        self.assertEqual(analisar(codigo)["animacao"]["id"], "shoelace-bow")
+        alterado = codigo.replace("passar_baixo cadarco_esquerdo", "passar_baixo cadarco_direito")
+        self.assertNotIn("animacao", analisar(alterado))
 
     def test_precedencia_atribuicao_e_repeticao_resolvem_os_valores(self):
         plano = compilar(programa("inteiro n = 1 + 2 * 2; n = n - 2; cruzar a b; repetir n { enrolar a n; }"))
@@ -117,7 +123,7 @@ class TestAPIStudio(unittest.TestCase):
     def test_health_e_exemplos_lidos_do_repositorio(self):
         self.assertEqual(self.client.get("/api/health").json()["status"], "ok")
         exemplos = self.client.get("/api/exemplos").json()
-        self.assertEqual(len(exemplos), 8)
+        self.assertEqual(len(exemplos), 9)
         for item in exemplos:
             self.assertEqual(item["codigo"], (RAIZ / "exemplos" / (item["id"] + ".amr")).read_text(encoding="utf-8"))
             resposta = self.client.post("/api/compilar", json={"codigo": item["codigo"]})

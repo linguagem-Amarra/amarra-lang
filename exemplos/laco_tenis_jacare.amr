@@ -1,0 +1,13 @@
+no "Laço do tênis-jacaré" {
+    cruzar cadarco_direito cadarco_esquerdo;
+    passar_baixo cadarco_direito;
+    apertar;
+
+    // Dobre cada ponta para formar duas alças.
+    enrolar cadarco_direito 1;
+    enrolar cadarco_esquerdo 1;
+    cruzar cadarco_esquerdo cadarco_direito;
+    passar_baixo cadarco_esquerdo;
+    apertar;
+    finalizar "Tênis amarrado!";
+}

@@ -21,7 +21,7 @@ export type Reinforcement = {
   tip: 'A' | 'B'; fromTurns: number; turns: number; tension: number; approach?: boolean; approachEnd?: number; focus?: Point
 }
 export type Frame = {
-  scenario?: { kind: 'hammock'; stage: string; finished: boolean }
+  scenario?: { kind: 'hammock' | 'shoelace'; stage: string; finished: boolean; instruction?: string }
   knot?: { id: string; stage: string; passes: number; tightness: number; labels: ['A' | 'B', 'A' | 'B'];
     phase: 'initial' | 'loop' | 'first-pass' | 'second-pass' | 'tighten' | 'finished';
     workingTip: 'A' | 'B'; length: number; focus: Point }
@@ -101,6 +101,7 @@ export function motionCaption(step: Step, target: Frame, fraction: number) {
 }
 
 export function describe(step: Step, target?: Frame) {
+  if (target?.scenario?.instruction) return target.scenario.instruction
   const ponta = step.pontas[0]?.replaceAll('_', ' ')
   switch (step.acao) {
     case 'cruzar': return target?.scenario?.kind === 'hammock'

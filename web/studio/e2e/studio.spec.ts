@@ -59,6 +59,26 @@ test('nó simples duplo e Windsor usam movimentos reais do código', async ({ pa
   await expect(page.locator('.variable')).toContainText('150')
 })
 
+test('tênis-jacaré forma duas alças sobre a língua do tênis', async ({ page }) => {
+  test.setTimeout(90000)
+  await page.goto('/')
+  await page.getByRole('button', { name: /Ver todos os nós/ }).click()
+  await page.getByRole('searchbox', { name: 'Buscar nós' }).fill('jacare')
+  await page.locator('.catalog-dialog').getByRole('button', { name: /Laço do tênis-jacaré/ }).click()
+  await expect(page.getByText('Tênis-jacaré · laço de duas alças')).toBeVisible()
+  await expect(page.getByText('9 movimentos prontos para visualizar.')).toBeVisible()
+  const timeline = page.getByRole('slider', { name: 'Posição da animação' })
+  await page.getByRole('button', { name: 'Reproduzir animação', exact: true }).click()
+  await expect.poll(async () => Number(await timeline.inputValue())).toBeGreaterThan(0)
+  await page.getByRole('button', { name: 'Pausar animação', exact: true }).click()
+  await timeline.fill('6.5')
+  await expect(page.locator('.motion-caption')).toContainText('Passar a alça B por baixo')
+  await timeline.fill('9')
+  await expect(page.locator('.motion-caption')).toContainText('Tênis amarrado')
+  await page.getByRole('button', { name: 'Visão geral', exact: true }).click()
+  await page.locator('.scene').screenshot({ path: '../../.studio-cache/tenis-jacare.png' })
+})
+
 test('nó em oito carrega a trajetória própria e chega à forma final', async ({ page }) => {
   test.setTimeout(45000)
   await page.goto('/')
