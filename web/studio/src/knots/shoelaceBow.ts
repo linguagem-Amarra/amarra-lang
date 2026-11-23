@@ -92,22 +92,25 @@ function bight(base: Point, side: number, time: number): Point[] {
   const thread = phase(time, 6.06, 6.91), tight = phase(time, 7.08, 7.88)
   // O eixo da segunda meia-volta é a alça A dobrada. B a envolve no
   // sentido inverso ao primeiro nó, levando os dois ramos da dobra juntos.
-  const span = mix(.28, .22, tight), r = mix(.27, .245, tight)
-  const centerH = mix(.53, .42, tight), centerY = -.49
+  const span = mix(.28, .15, tight)
+  const centerH = mix(.53, .29, tight), centerY = -.49
+  // Sob tração, B se acomoda ao perfil das duas pernas de A lado a lado.
+  const radiusAlong = mix(.27, .22, tight), radiusUp = mix(.27, .165, tight)
+  const spacingA = mix(.077, .052, tight), spacingB = mix(.072, .056, tight)
   const rail = (u: number, edge: number): Point => {
     const angle = -TAU * thread * smoothMotion(u)
     const x = side * span * (2 * u - 1)
-    if (side > 0) return [x, centerY + edge * .077, centerH]
-    const radius = r + edge * .072
-    return [x, centerY + radius * Math.sin(angle), centerH + radius * Math.cos(angle)]
+    if (side > 0) return [x, centerY + edge * spacingA, centerH]
+    return [x, centerY + (radiusAlong + edge * spacingB) * Math.sin(angle),
+      centerH + (radiusUp + edge * spacingB) * Math.cos(angle)]
   }
   const guide: Point[] = [base]
   for (let i = 0; i <= 20; i++) guide.push(rail(i / 20, -1))
   const exit = rail(1, 0), front = rail(1, -1), back = rail(1, 1)
   // A folga da dobra alimenta a volta. Puxar as alças recupera largura
   // quando o miolo se acomoda sobre a língua.
-  const reach = side > 0 ? mix(1.10, 1.23, tight) : 1.08 - .61 * thread + .68 * tight - .50 * Math.sin(Math.PI * thread)
-  const width = side > 0 ? .34 : .29 - .12 * thread + .15 * tight
+  const reach = side > 0 ? mix(1.10, 1.55, tight) : 1.08 - .61 * thread + 1.04 * tight - .50 * Math.sin(Math.PI * thread)
+  const width = side > 0 ? mix(.34, .25, tight) : .29 - .12 * thread + .09 * tight
   for (let i = 1; i < 40; i++) {
     const theta = i / 40 * Math.PI, s = Math.sin(theta), c = Math.cos(theta)
     guide.push([exit[0] + side * reach * s, exit[1] + c * (front[1] - back[1]) / 2 - c * width * s + .22 * s,

@@ -39,3 +39,18 @@ test('A entra sob B pela ponteira; B passa dobrada enquanto a alça A fica parad
   const extent = (p: Point[]) => Math.max(...p.map(v => v[2])) - Math.min(...p.map(v => v[2]))
   assert.ok(extent(frames[8].points.slice(0, left)) > extent(frames[7].points.slice(0, left)))
 })
+
+test('o último aperto baixa o miolo e puxa as duas alças para fora', () => {
+  function coreHeight(points: Point[]) {
+    const center = points.filter(([x, , z]) => x < -1.03 && Math.abs(z) < .15)
+    return Math.max(...center.map(([x, y]) => y - 1.02 + .36 * (x + .86)))
+  }
+  const before = frames[7].points, after = frames[8].points
+  const halfway = coreHeight(interpolateFrame(frames, 7.5).points)
+  assert.ok(coreHeight(before) > halfway && halfway > coreHeight(after))
+  assert.ok(coreHeight(after) < .65 * coreHeight(before))
+  for (const side of [-1, 1]) {
+    const reach = (points: Point[]) => Math.max(...points.map(p => side * p[2]))
+    assert.ok(reach(after) > reach(before) + .25)
+  }
+})
