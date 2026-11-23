@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowDownToLine, ArrowLeft, ArrowRight, Braces, Check, CheckCircle2, ChevronDown,
-  CircleHelp, Code2, FileCode2, FolderOpen, Grid2X2, Maximize2, Pause, Play, RotateCcw,
+  CircleHelp, Code2, FileCode2, FolderOpen, Grid2X2, Maximize2, Minimize2, ChevronUp, Pause, Play, RotateCcw,
   ScanLine, Search, Terminal, X, XCircle } from 'lucide-react'
 import { RopeScene } from './RopeScene'
 import { initialFrame } from './geometry'
@@ -88,7 +88,10 @@ export default function App() {
   const request = useRef(0)
   const textarea = useRef<HTMLTextAreaElement>(null)
   const file = useRef<HTMLInputElement>(null)
-  const scene = useRef<HTMLDivElement>(null)
+  const workspace = useRef<HTMLDivElement>(null)
+  const codeScroll = useRef<HTMLDivElement>(null)
+  const [fullscreen, setFullscreen] = useState(false)
+  const [editorCollapsed, setEditorCollapsed] = useState(false)
   const help = useRef<HTMLDialogElement>(null)
   const knotCatalog = useRef<HTMLDialogElement>(null)
   const catalogSearch = useRef<HTMLInputElement>(null)
@@ -100,6 +103,26 @@ export default function App() {
   const geometryError = geometry.plan === plan ? geometry.error : ''
   const activeIndex = Math.min(Math.floor(progress), count - 1)
   const active = plan?.passos[activeIndex]
+  const activeLine = active?.origem.linha
+  useEffect(() => {
+    const syncFullscreen = () => {
+      const open = document.fullscreenElement === workspace.current
+      setFullscreen(open)
+      if (open) setEditorCollapsed(false)
+    }
+    document.addEventListener('fullscreenchange', syncFullscreen)
+    return () => document.removeEventListener('fullscreenchange', syncFullscreen)
+  }, [])
+  useEffect(() => {
+    const scroll = codeScroll.current
+    if (!fullscreen || editorCollapsed || !scroll || !activeLine) return
+    const line = scroll.querySelector<HTMLElement>('.code-line.current')
+    if (!line) return
+    const row = line.getBoundingClientRect(), viewport = scroll.getBoundingClientRect()
+    if (row.top < viewport.top || row.bottom > viewport.bottom) {
+      scroll.scrollTop += row.top - viewport.top - (scroll.clientHeight - row.height) / 2
+    }
+  }, [fullscreen, editorCollapsed, activeLine])
   const definition = plan ? registeredKnot(plan) : undefined
   const lines = code.split('\n')
   const featuredExamples = useMemo(() => {
@@ -245,7 +268,7 @@ export default function App() {
       <div className="page-heading"><div><div className="eyebrow">LINGUAGEM EM MOVIMENTO</div><h1>Cada comando, <span>um novo laço.</span></h1>
         <p>Escreva, execute e descubra como um nó ganha forma.</p></div><div className="heading-note"><span className="tiny-knot">⌘</span><span>Da lógica ao gesto.<br /><strong>Um passo de cada vez.</strong></span></div></div>
 
-      <div className="studio-layout">
+      <div className="studio-layout" ref={workspace}>
         <aside className="library"><div className="section-label"><span>EXPLORAR NÓS</span><span>{String(examples.length).padStart(2, '0')}</span></div>
           <nav aria-label="Nós em destaque">{featuredExamples.map(item => <button key={item.id} className={`example-card ${exampleId === item.id ? 'selected' : ''}`} onClick={() => load(item)}>
             <div className="example-top"><span className="example-number">{item.numero}</span><span className="knot-icon"><svg viewBox="0 0 80 48" fill="none" aria-hidden="true"><path d={knotIcons[item.id]} stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" /></svg></span>{exampleId === item.id && <span className="selected-dot" />}</div>
@@ -255,7 +278,14 @@ export default function App() {
           <div className="library-bottom"><Braces size={22} /><p>Pequenas instruções.<br /><strong>Infinitas possibilidades.</strong></p><span>Feito com Amarra + ANTLR4</span></div>
         </aside>
 
-        <section className="editor-panel" aria-label="Editor Amarra"><div className="panel-header"><div className="panel-title"><Code2 size={16} /><span>Editor</span></div><span className="file-type">.amr</span></div>
+        <section className={`editor-panel${fullscreen && editorCollapsed ? ' is-collapsed' : ''}`} aria-label="Editor Amarra">
+          <div className="panel-header"><div className="panel-title"><Code2 size={16} /><span>Editor</span></div>
+            {fullscreen ? <><span className="fullscreen-filename" title={fileName}>{fileName}</span>
+              <button className="icon-button" aria-label={editorCollapsed ? 'Expandir editor' : 'Recolher editor'}
+                aria-controls="studio-code" aria-expanded={!editorCollapsed} onClick={() => setEditorCollapsed(value => !value)}>
+                {editorCollapsed ? <ChevronDown size={15} /> : <ChevronUp size={15} />}
+              </button></> : <span className="file-type">.amr</span>}
+          </div>
           <div className="file-bar"><span><FileCode2 size={14} />{fileName}{dirty && <i title="Alterações ainda não compiladas" />}</span><div>
             <button className="icon-button" title="Abrir arquivo .amr" aria-label="Abrir arquivo Amarra" onClick={() => file.current?.click()}><FolderOpen size={16} /></button>
             <button className="icon-button" title="Baixar código .amr" aria-label="Baixar código Amarra" onClick={download} disabled={!code}><ArrowDownToLine size={16} /></button>
@@ -270,7 +300,7 @@ export default function App() {
             event.target.value = ''
           }} />
           <div className="editor-tabs"><button className={view === 'code' ? 'active' : ''} onClick={() => setView('code')}>Código</button><button className={view === 'variables' ? 'active' : ''} onClick={() => setView('variables')}>Variáveis <span>{Object.keys(plan?.variaveis ?? {}).length}</span></button></div>
-          {view === 'code' ? <div className="code-scroll"><div className="line-numbers" aria-hidden="true">{lines.map((_, i) => <div key={i} className={active?.origem.linha === i + 1 ? 'current' : ''}>{String(i + 1).padStart(2, '0')}</div>)}</div>
+          {fullscreen || view === 'code' ? <div id="studio-code" ref={codeScroll} className="code-scroll"><div className="line-numbers" aria-hidden="true">{lines.map((_, i) => <div key={i} className={active?.origem.linha === i + 1 ? 'current' : ''}>{String(i + 1).padStart(2, '0')}</div>)}</div>
             <div className="code-area" style={{ minWidth: `${Math.max(43, ...lines.map(l => l.length + 2))}ch` }}>
               <pre aria-hidden="true">{lines.map((line, i) => <div className={`code-line ${active?.origem.linha === i + 1 ? 'current' : ''} ${diagnostics.some(d => d.linha === i + 1) ? 'has-error' : ''}`} key={i}><Highlight line={line || ' '} /></div>)}</pre>
               <textarea ref={textarea} aria-label="Código Amarra" value={code} onChange={event => edit(event.target.value)} spellCheck={false} autoCapitalize="off" autoCorrect="off" wrap="off" maxLength={32000}
@@ -284,7 +314,7 @@ export default function App() {
                 }} />
             </div></div> : <div className="variables-view">{plan && Object.keys(plan.variaveis).length ? Object.entries(plan.variaveis).map(([name, item]) => <div className="variable" key={name}><code>{name}</code><span>{item.tipo}</span><strong>{String(item.valor)}</strong></div>) : <p>{plan ? 'Este programa não declara variáveis.' : 'Compile o código para inspecionar as variáveis.'}</p>}</div>}
           <div className="editor-status"><span><span className="status-dot" />Amarra</span><span>UTF-8 <span className="status-separator">|</span> {lines.length} linhas</span></div>
-          <div className="compile-bar"><span><kbd>Ctrl</kbd> + <kbd>Enter</kbd></span><button className="primary-button" onClick={() => void compile(code, selected)} disabled={busy || !code.trim()}><Play size={14} fill="currentColor" />{busy ? 'Compilando…' : 'Compilar código'}</button></div>
+          <div className={`compile-bar${dirty || busy || diagnostics.length || networkError ? ' needs-compile' : ''}`}><span><kbd>Ctrl</kbd> + <kbd>Enter</kbd></span><button className="primary-button" onClick={() => void compile(code, selected)} disabled={busy || !code.trim()}><Play size={14} fill="currentColor" />{busy ? 'Compilando…' : 'Compilar código'}</button></div>
           <div className={`diagnostic-panel ${diagnostics.length || networkError || geometryError ? 'error' : ''}`} role="status" aria-live="polite"><div className="diagnostic-heading"><Terminal size={14} /><span>SAÍDA DO COMPILADOR</span></div>
             {networkError || geometryError ? <div className="diagnostic-message"><XCircle size={16} /><span>{networkError || geometryError}</span><button onClick={() => void (code ? compile(code, selected) : loadExamples())}>Tentar novamente</button></div>
               : diagnostics.length ? diagnostics.map((error, i) => <button className="error-item" key={i} onClick={() => jumpToLine(error.linha, error.coluna)}><XCircle size={15} /><span><strong>L{error.linha}:{error.coluna + 1} · {error.fase}</strong>{error.mensagem}</span></button>)
@@ -292,8 +322,8 @@ export default function App() {
           </div>
         </section>
 
-        <section className="visualizer-panel" aria-label="Visualizador de nós"><div className="panel-header"><div className="panel-title"><ScanLine size={16} /><span>Visualização 3D</span></div><div className="scene-tools"><button className={`icon-button ${grid ? 'on' : ''}`} aria-label="Mostrar grade" aria-pressed={grid} title="Mostrar ou ocultar grade" onClick={() => setGrid(!grid)}><Grid2X2 size={15} /></button><button className="icon-button" aria-label="Restaurar câmera" title="Restaurar câmera" onClick={() => setCameraKey(k => k + 1)}><RotateCcw size={15} /></button>{document.fullscreenEnabled && <button className="icon-button" aria-label="Tela cheia" title="Tela cheia" onClick={() => { if (document.fullscreenElement) void document.exitFullscreen(); else void scene.current?.requestFullscreen() }}><Maximize2 size={15} /></button>}</div></div>
-            <div className="scene" ref={scene}><div className="scene-caption"><span className="eyebrow">{plan ? 'SEU NÓ, EM MOVIMENTO' : 'VISUALIZADOR'}</span><h2>{plan?.nome ?? 'Uma ideia começa aqui.'}</h2><span className="scene-model-label">{sceneLabels[definition?.id ?? ''] ?? 'Corda contínua · pontas A e B'}</span></div>
+        <section className="visualizer-panel" aria-label="Visualizador de nós"><div className="panel-header"><div className="panel-title"><ScanLine size={16} /><span>Visualização 3D</span></div><div className="scene-tools"><button className={`icon-button ${grid ? 'on' : ''}`} aria-label="Mostrar grade" aria-pressed={grid} title="Mostrar ou ocultar grade" onClick={() => setGrid(!grid)}><Grid2X2 size={15} /></button><button className="icon-button" aria-label="Restaurar câmera" title="Restaurar câmera" onClick={() => setCameraKey(k => k + 1)}><RotateCcw size={15} /></button>{document.fullscreenEnabled && <button className="icon-button" aria-label={fullscreen ? 'Sair da tela cheia' : 'Tela cheia'} title={fullscreen ? 'Sair da tela cheia' : 'Tela cheia'} onClick={() => { if (fullscreen) void document.exitFullscreen(); else void workspace.current?.requestFullscreen() }}>{fullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}</button>}</div></div>
+            <div className="scene"><div className="scene-caption"><span className="eyebrow">{plan ? 'SEU NÓ, EM MOVIMENTO' : 'VISUALIZADOR'}</span><h2>{plan?.nome ?? 'Uma ideia começa aqui.'}</h2><span className="scene-model-label">{sceneLabels[definition?.id ?? ''] ?? 'Corda contínua · pontas A e B'}</span></div>
             <div className="scene-view-switch" role="group" aria-label="Enquadramento da corda"><button aria-pressed={!detail} onClick={() => setDetail(false)}>Visão geral</button><button aria-pressed={detail} onClick={() => setDetail(true)}>Foco no nó</button></div>
             <RopeScene engine={engine} onPlayback={publishPlayback} frames={frames} progress={progress} cameraKey={cameraKey} showGrid={grid} detail={detail} />
             {plan && !geometryReady && <div className="scene-preparing" role="status">{geometryError || 'Preparando trajetória contínua…'}</div>}

@@ -92,7 +92,9 @@ editor, código e exemplos não dependem de serviços externos.
   também seleciona sua posição no código.
 - Arraste a cena para girar a câmera e use a roda para aproximar. A barra da cena
   permite alternar a grade, restaurar a câmera e entrar em tela cheia quando
-  suportada pelo navegador.
+  suportada pelo navegador. Em tela cheia, o editor destaca a linha do movimento
+  atual e rola o código para mantê-la visível. Use a seta no cabeçalho do editor
+  para recolhê-lo ou abri-lo durante a reprodução.
 - Abra arquivos locais e baixe o código atual usando os controles do editor.
   Alterações ficam na memória da página até serem baixadas; não há salvamento
   automático no repositório.

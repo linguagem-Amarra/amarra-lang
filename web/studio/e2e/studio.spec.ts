@@ -18,6 +18,42 @@ test('produção mantém o Studio fora da página e identifica as duas extremida
   await expect(page.locator('.rope-label-overlay .tip-blue')).toHaveText('B')
 })
 
+for (const mobile of [false, true]) {
+  test(`editor acompanha o código em tela cheia ${mobile ? 'no celular' : 'no desktop'}`, async ({ page }) => {
+    test.setTimeout(90000)
+    if (mobile) await page.setViewportSize({ width: 390, height: 844 })
+    await page.goto('/')
+    const editor = page.getByRole('textbox', { name: 'Código Amarra' })
+    await expect(editor).not.toHaveValue('')
+    await page.getByRole('button', { name: 'Tela cheia', exact: true }).click()
+    await expect(page.locator(':fullscreen .editor-panel')).toBeVisible()
+    const source = 'no "Tela cheia" {\n    cruzar a b;\n' + '\n'.repeat(24) + '    finalizar "pronto";\n}'
+    await editor.fill(source)
+    await page.getByRole('button', { name: 'Compilar código' }).click()
+    const play = page.getByRole('button', { name: 'Reproduzir animação', exact: true })
+    await expect(play).toBeEnabled()
+    await play.click()
+    const current = page.locator('.code-line.current')
+    await expect(current).toContainText('finalizar')
+    await expect.poll(() => current.evaluate(line => {
+      const row = line.getBoundingClientRect(), box = line.closest('.code-scroll')!.getBoundingClientRect()
+      return row.top >= box.top && row.bottom <= box.bottom
+    })).toBe(true)
+    const panel = (await page.locator('.editor-panel').boundingBox())!
+    const canvas = (await page.locator('canvas').boundingBox())!
+    if (mobile) expect(panel.y).toBeGreaterThanOrEqual(canvas.y + canvas.height - 1)
+    else expect(panel.x).toBeGreaterThan(canvas.x + canvas.width / 2)
+    await page.screenshot({ path: `../../.studio-cache/editor-tela-cheia-${mobile ? 'celular' : 'desktop'}.png` })
+    await page.getByRole('button', { name: 'Recolher editor' }).click()
+    await expect(editor).toBeHidden()
+    await page.getByRole('button', { name: 'Expandir editor' }).click()
+    await expect(editor).toHaveValue(source)
+    await page.getByRole('button', { name: 'Sair da tela cheia' }).click()
+    await expect(page.locator(':fullscreen')).toHaveCount(0)
+    await expect(editor).toHaveValue(source)
+  })
+}
+
 test('compilador real, corda 3D, reprodução, busca e reinício', async ({ page }) => {
   const errors: string[] = []
   page.on('pageerror', error => errors.push(error.message))
