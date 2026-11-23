@@ -10,6 +10,7 @@ import { knotStateAt } from './types'
 import { HAMMOCK_LEFT_POST, HAMMOCK_LEFT_PUNHO, HAMMOCK_POST, HAMMOCK_PUNHO } from './knots/hammockKnot'
 import { smoothMotion } from './types'
 import { CrocodileShoe } from './CrocodileShoe'
+import { eyeletFractions } from './knots/shoelaceBow'
 
 const hammockGold = '#b99a55'
 const hammockLight = '#ddc384'
@@ -193,16 +194,20 @@ function Rope({ frames, progress, engine, onPlayback, tipLabels }: { frames: Fra
   }, [])
   const bump = useMemo(braidTexture, [])
   const knot = frames[0].knot
-  const radius = frames[0].scenario?.kind === 'shoelace' ? .059 : ROPE_RADIUS
+  const shoe = frames[0].scenario?.kind === 'shoelace'
+  const radius = shoe ? .048 : ROPE_RADIUS
   const labels = knot?.labels ?? (frames[0].scenario?.kind === 'hammock' ? ['A', 'B'] : ['B', 'A'])
   useEffect(() => {
     const colors = geometry.getAttribute('color') as BufferAttribute
     const blue = new Color('#64bcd5'), orange = new Color('#e5a45e'), body = new Color('#d5bf97')
+    const fixedLace = new Color('#717e70')
     for (let ring = 0; ring <= RINGS; ring++) {
       const u = ring / RINGS
       const color = knot ? body.clone().lerp(knot.workingTip === 'B' ? blue : orange, Math.max(0, Math.min(1, (u - .95) / .015)))
         : frames[0].scenario?.kind === 'hammock' ? body.clone().lerp(blue, Math.max(0, Math.min(1, (u - .95) / .015)))
         : blue.clone().lerp(orange, Math.max(0, Math.min(1, (u - .485) / .03)))
+      if (shoe) color.lerp(fixedLace, smoothMotion((u - eyeletFractions[0]) / .018)
+        * smoothMotion((eyeletFractions[1] - u) / .018))
       for (let j = 0; j <= SIDES; j++) colors.setXYZ(ring * (SIDES + 1) + j, color.r, color.g, color.b)
     }
     colors.needsUpdate = true
@@ -336,13 +341,20 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
     if (manual.current) return
     const position = Math.max(0, Math.min(frames.length - 1, engine?.posePosition ?? progress))
     if (shoe) {
-      const focus = detail ? smoothMotion(position) * (1 - smoothMotion(position - frames.length + 2)) : 0
-      const distance = fullDistance + (Math.max(5.9, fullDistance * .58) - fullDistance) * focus
-      target.set(-.25 - .60 * focus, .23 + .85 * focus, 0)
-      desired.current.set(.24 * distance, (.65 + .20 * focus) * distance, (.72 - .18 * focus) * distance).add(target)
-      const speed = 1 - Math.exp(-delta * 4)
-      camera.position.lerp(desired.current, speed)
-      controls.current?.target.lerp(target, speed)
+      // Do calcanhar, a largura do laço coincide com a horizontal da tela.
+      // A aproximação termina antes da passagem de B e permanece no aperto.
+      if (detail) {
+        const zoom = smoothMotion((position - 2.9) / 2)
+        const width = 9.8 - 4.1 * zoom
+        const distance = Math.max(5.6, width * size.height / (2 * Math.tan(42 * Math.PI / 360) * size.width))
+        target.set(-.74, .92 + .24 * zoom, 0)
+        desired.current.set(-.52, .85, .035).multiplyScalar(distance).add(target)
+      } else {
+        target.set(-.25, .23, 0)
+        desired.current.set(.24, .65, .72).multiplyScalar(fullDistance).add(target)
+      }
+      camera.position.copy(desired.current)
+      controls.current?.target.copy(target)
       controls.current?.update()
       return
     }

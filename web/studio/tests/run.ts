@@ -2,6 +2,7 @@
 import './doubleOverhand.test'
 import './figureEight.test'
 import './hammock.test'
+import './shoelace.test'
 import './engine.test'
 import './geometry.test'
 import './theatre.test'
