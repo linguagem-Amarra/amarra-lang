@@ -1,15 +1,22 @@
 <a name="inicio"></a>
 
-**Amarra Studio:** interface 3D em [`web/studio/`](web/studio/), com editor React e integração com o compilador existente.
-A demonstração padrão é o [nó simples duplo](exemplos/no_simples_duplo.amr): duas passagens pelo mesmo laço antes do aperto.
-Execute localmente com a API Python; consulte [instalação, arquitetura e limites do visualizador](docs/studio.md).
+# Amarra · Entrega final E5
+
+Escreva em português os passos de um nó e acompanhe a execução em 3D. **[Abrir o Amarra Studio no navegador](https://linguagem-amarra.github.io/amarra-lang/)**
+
+### Demonstração da E5
+
+1. Abra **Ver todos os nós** e selecione **Laço do tênis-jacaré**, um dos nove exemplos do catálogo.
+2. Acione **Reproduzir animação** e entre em **Tela cheia**. Acompanhe no editor os dois comandos `apertar` e observe o que acontece com o cadarço antes e depois de formar as alças.
+3. Para mostrar a análise do compilador, copie o [programa do tênis-jacaré](exemplos/laco_tenis_jacare.amr) na [interface clássica](https://linguagem-amarra.github.io/amarra-lang/classico/) e examine os tokens, a árvore sintática abstrata (AST) e os símbolos.
+
+Para executar o Studio localmente com a API Python, siga o [guia de instalação](docs/studio.md). Os testes do compilador e da animação rodam a cada publicação e podem ser consultados no [histórico do GitHub Actions](https://github.com/linguagem-Amarra/amarra-lang/actions/workflows/publicar-interface.yml).
 
 <p align="center">
   <img src="docs/assets/amarra/capa.svg" alt="Amarra — cada comando, um passo. Cada passo, um nó. Linguagem de domínio específico para descrever nós." width="100%">
 </p>
 
 <p align="center">
-  <img src="docs/assets/amarra/badge-e4.svg" alt="E4: AST e análise semântica" height="30">
   <img src="docs/assets/amarra/badge-python.svg" alt="Python 3.8 ou superior" height="30">
   <img src="docs/assets/amarra/badge-antlr.svg" alt="ANTLR 4.13.2" height="30">
   <img src="docs/assets/amarra/badge-amr.svg" alt="Extensão dos programas: .amr" height="30">
@@ -42,12 +49,10 @@ O projeto aproxima o estudo de compiladores de uma atividade cotidiana: **transf
 
 | O domínio | A implementação | A entrega atual |
 | :--- | :--- | :--- |
-| Sequências de ações para montar nós. | Python e código gerado pelo ANTLR. | **Início da E4:** AST e análise semântica, além das análises léxica e sintática. |
+| Sequências de ações para montar nós. | Python e código gerado pelo ANTLR. | **E5** integra o compilador ao editor e à animação passo a passo no Studio 3D. |
 
 > **Escopo atual** — O projeto reconhece tokens, valida a sintaxe, constrói a AST e verifica nomes, escopos e tipos. A interface web executa o programa e apresenta um roteiro visual de duas pontas, começando pela base do cadarço. A simulação física e a certificação dos nós permanecem fora do escopo.
 
-**Validação atual:** 244 testes Python passaram na execução de 04/11/2026,
-além da verificação dos estados visuais em JavaScript e dos testes no navegador.
 A coleção sintática possui **72 entradas: 20 válidas, 48 com erro sintático
 e 4 com erro léxico**. A nova coleção semântica possui **62 entradas: 23 válidas
 e 39 inválidas**. Consulte o [relatório semântico](docs/validacao-semantica.md)
@@ -602,9 +607,15 @@ associatividade, consumo até `EOF`, saída no terminal e os tokens dos exemplos
 originais da E2. Também verificam `senao`, regras isoladas, consumo de tokens no
 rastro e preservação da árvore ao observar a pilha. A saída deve terminar com `OK`.
 
-São **244 testes descobertos pelo `unittest`**: 132 anteriores, 15 de AST,
-62 de [`tests/casos_semanticos.json`](tests/casos_semanticos.json) e 15 de
-API/terminal semântico e 20 de execução/interface. As coleções sintática e semântica registram cada
+Para verificar também a interface, execute na raiz do projeto:
+
+```powershell
+node tests/test_movimentos.mjs
+npm --prefix web/studio ci
+npm --prefix web/studio test
+```
+
+As coleções sintática e [semântica](tests/casos_semanticos.json) registram cada
 entrada como um teste independente, com ID e descrição na saída.
 Um teste de entrada inválida passa quando o analisador rejeita o código na fase
 esperada; erro léxico não substitui erro sintático.
@@ -713,13 +724,14 @@ Os comandos da tabela são para PowerShell. No Linux/macOS, substitua `.\.venv\S
 
 <a name="evolucao"></a>
 
-## 07 · O próximo passo da Amarra
+## 07 · Evolução até a entrega final
 
 | Etapa | Foco | Situação |
 | :---: | :--- | :--- |
 | **E2** | Especificação da linguagem e analisador léxico. | Implementada; o comando `src/lexico.py` continua disponível. |
 | **E3** | Analisador sintático, árvore, diagnósticos e depuração. | Conceitos das Aulas 10, 11, 12 e 13 aplicados e documentados. |
 | **E4** | AST, análise semântica e execução. | **AST, símbolos, tipos, interpretador e interface visual implementados. Diagrama didático inicial de duas pontas.** |
+| **E5** | Demonstração integrada da linguagem. | Studio 3D publicado com nove exemplos, reprodução por etapa e editor em tela cheia. |
 
 A entrega E2 corresponde a **1,5 ponto na Avaliação de Grau 1**. A evolução do trabalho do grupo está registrada no [diário do projeto](DIARIO.md).
 
