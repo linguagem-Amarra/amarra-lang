@@ -32,7 +32,7 @@ const knotIcons: Record<string, string> = {
 function Brand({ small = false }: { small?: boolean }) {
   return <div className={`brand ${small ? 'brand-small' : ''}`}><svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
     <path d="M8 30C4 20 13 6 22 9c9 3 10 20 3 23C15 36 6 17 13 12c7-5 22 5 20 14" stroke="currentColor" strokeWidth="3.7" strokeLinecap="round" />
-    <path d="m9 28 2 4m21-9-1 5" stroke="#101513" strokeWidth="6" /><path d="m9 28 2 4m21-9-1 5" stroke="currentColor" strokeWidth="3.7" strokeLinecap="round" />
+    <path d="m9 28 2 4m21-9-1 5" stroke="var(--bg)" strokeWidth="6" /><path d="m9 28 2 4m21-9-1 5" stroke="currentColor" strokeWidth="3.7" strokeLinecap="round" />
   </svg><span>amarra<span className="brand-studio">studio</span></span></div>
 }
 

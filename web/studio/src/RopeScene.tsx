@@ -183,7 +183,7 @@ function Rope({ frames, progress, engine, onPlayback, tipLabels }: { frames: Fra
   const axesRef = useRef<ReturnType<typeof transportedFrames>>(undefined)
   const geometry = useMemo(() => {
     const geometry = new TubeGeometry(makeCurve(frames[0].points), RINGS, ROPE_RADIUS, SIDES, false)
-    const blue = new Color('#64bcd5'), orange = new Color('#e5a45e')
+    const blue = new Color('#64bcd5'), orange = new Color('#e5ab6e')
     const colors = new Float32Array((RINGS + 1) * (SIDES + 1) * 3)
     for (let ring = 0; ring <= RINGS; ring++) {
       const color = blue.clone().lerp(orange, Math.max(0, Math.min(1, (ring / RINGS - .485) / .03)))
@@ -199,7 +199,7 @@ function Rope({ frames, progress, engine, onPlayback, tipLabels }: { frames: Fra
   const labels = knot?.labels ?? (frames[0].scenario?.kind === 'hammock' ? ['A', 'B'] : ['B', 'A'])
   useEffect(() => {
     const colors = geometry.getAttribute('color') as BufferAttribute
-    const blue = new Color('#64bcd5'), orange = new Color('#e5a45e'), body = new Color('#d5bf97')
+    const blue = new Color('#64bcd5'), orange = new Color('#e5ab6e'), body = new Color('#e6b784')
     const fixedLace = new Color('#717e70')
     for (let ring = 0; ring <= RINGS; ring++) {
       const u = ring / RINGS
@@ -390,7 +390,7 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
   })
 
   return <>
-    <color attach="background" args={['#192429']} />
+    <color attach="background" args={['#0d1c17']} />
     <ambientLight intensity={.65} />
     <hemisphereLight args={['#e6f1ff', '#7b6550', 1.5]} />
     <directionalLight position={[-3, 5, 7]} intensity={3} color="#fff2db" castShadow
@@ -403,15 +403,15 @@ function Stage({ frames, progress, cameraKey, detail, showGrid, engine, onPlayba
     <group rotation={[shoe ? -Math.PI / 2 : 0, 0, 0]}>
     <mesh position={[0, 0, floorDepth]}>
       <planeGeometry args={[100, 100]} />
-      <meshStandardMaterial color="#233237" roughness={.94} metalness={0} />
+      <meshStandardMaterial color="#203429" roughness={.94} metalness={0} />
     </mesh>
     <mesh position={[0, 0, floorDepth + .01]} receiveShadow>
       <planeGeometry args={[100, 100]} />
       <shadowMaterial transparent opacity={.22} />
     </mesh>
     {showGrid && <Grid position={[0, 0, floorDepth + .02]} rotation={[Math.PI / 2, 0, 0]}
-      args={[30, 30]} cellSize={.5} cellThickness={.35} cellColor="#34484d"
-      sectionSize={2.5} sectionThickness={.55} sectionColor="#52656a" fadeDistance={20} fadeStrength={2} />}
+      args={[30, 30]} cellSize={.5} cellThickness={.35} cellColor="#385441"
+      sectionSize={2.5} sectionThickness={.55} sectionColor="#526e59" fadeDistance={20} fadeStrength={2} />}
     </group>
     <OrbitControls ref={controls} makeDefault target={[0, -.3, 0]} minDistance={3.5} maxDistance={hammock ? 60 : 28}
       enableDamping dampingFactor={.09} onStart={() => { manual.current = true }} />
