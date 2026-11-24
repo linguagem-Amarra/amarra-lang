@@ -260,7 +260,7 @@ export default function App() {
 
   return <div className="app-shell">
     <header className="topbar"><Brand /><span className="topbar-divider" /><span className="workspace-name">Seu ateliê de nós</span>
-      <div className="topbar-right"><span className="local-badge"><span /> Ambiente local</span>
+      <div className="topbar-right">
         <button className="text-button" onClick={() => help.current?.showModal()}><CircleHelp size={16} /> Como usar</button></div>
     </header>
 
