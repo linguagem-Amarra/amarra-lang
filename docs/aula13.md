@@ -16,7 +16,8 @@ de 21/10/2026. Os números abaixo são os números impressos nos slides.
 | Gerar com `-visitor` | 33–34 | [gerar.py](../gerar.py) agora sempre gera `AmarraParserVisitor.py`. |
 
 O material anuncia a construção da AST para o Encontro 14. Esta atualização
-prepara essa etapa, mantendo o escopo atual de análise léxica e sintática.
+preparou essa etapa, mantendo naquele momento o escopo de análise léxica e sintática.
+Em 04/11/2026, a [Aula 14](aula14.md) acrescentou a AST e a análise semântica.
 A apresentação de um parser escrito à mão serve para explicar o funcionamento;
 não foi necessário substituir o parser gerado pelo ANTLR.
 
@@ -147,9 +148,10 @@ Parênteses usados para agrupamento não precisam ser nós da AST, pois seu efei
 já está na organização dos filhos. A quantidade de nós da árvore concreta
 depende da gramática; os números mostrados nos slides não são uma contagem da Amarra.
 
-Essa figura explica o conceito. A saída atual de `src/sintatico.py` continua
-sendo uma árvore concreta. Ainda não há uma AST completa da linguagem nem
-verificação de tipos, tabela de símbolos ou execução dos movimentos.
+Essa figura explica o conceito. A saída de `src/sintatico.py` continua sendo
+uma árvore concreta. A [etapa da Aula 14](aula14.md) acrescentou os comandos
+de AST e de verificação de nomes, escopos e tipos. A execução dos movimentos
+permanece como etapa futura.
 
 ## Listener e visitor
 

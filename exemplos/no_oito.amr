@@ -1,0 +1,8 @@
+// No em oito simples, usado como no de parada.
+no "no em oito" {
+    cruzar parte_firme ponta_trabalho;
+    passar_baixo ponta_trabalho;
+    passar_cima ponta_trabalho;
+    apertar;
+    finalizar "no em oito pronto";
+}

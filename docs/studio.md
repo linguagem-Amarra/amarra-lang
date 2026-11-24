@@ -17,6 +17,13 @@ Na raiz do repositório:
 Abra **http://127.0.0.1:8000**. Para outra porta: `studio.py --port 8001`.
 O servidor escuta somente em `127.0.0.1`. Não publica o projeto.
 
+## GitHub Pages
+
+O workflow `publicar-interface.yml` constrói uma versão estática do Studio 3D
+na raiz do site. Nessa versão, o compilador Python roda em um Web Worker com
+Pyodide; a API FastAPI é usada apenas no servidor local. A interface 2D fica
+em `/classico/`. Para reproduzir o build estático, use o comando do README.
+
 ## Preparar uma nova instalação
 
 Requisitos: Python 3.10 ou superior, Node.js compatível com Vite 7 (20.19+ ou
@@ -27,10 +34,10 @@ dependências originais; as dependências adicionais estão em `requirements-stu
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements-studio.txt
 .venv/bin/python gerar.py
-cd frontend
+cd web/studio
 npm ci
 npm run build
-cd ..
+cd ../..
 .venv/bin/python studio.py
 ```
 
@@ -50,7 +57,7 @@ Para desenvolvimento com atualização automática, execute dois terminais:
 
 ```bash
 # Terminal 2
-cd frontend
+cd web/studio
 npm run dev
 ```
 
@@ -60,8 +67,23 @@ editor, código e exemplos não dependem de serviços externos.
 ## Uso
 
 - A abertura padrão e o cartão **Nó reforçado** carregam `exemplos/no_simples_duplo.amr`.
-  Nó simples e Windsor continuam disponíveis. O exemplo original `no_reforcado.amr`
-  foi preservado e pode ser aberto pelo editor.
+  A lateral mostra até três exemplos, incluindo o selecionado. **Ver todos os nós**
+  abre a biblioteca com busca por nome e descrição. Ela também inclui nó simples,
+  nó simples triplo, nó em oito, reforço com voltas, Windsor e duas opções para
+  rede de dormir, além do laço do tênis-jacaré. Cada item
+  abre um programa `.amr` válido com uma sequência própria de movimentos.
+- `exemplos/no_oito.amr` representa o [nó em oito simples, de parada](https://www.animatedknots.com/figure-8-knot).
+  O Studio usa uma trajetória 3D própria com quatro cruzamentos alternados e
+  folga entre os trechos da corda. A construção é cinemática e didática: não
+  simula tensão ou atrito de uma corda real.
+- `exemplos/no_rede.amr` mostra a volta redonda com duas meias-voltas.
+  `exemplos/lais_de_guia_rede.amr` mostra o [lais de guia](https://www.animatedknots.com/bowline-knot):
+  a ponta forma uma alça fixa ao redor do armador, passa pelo laço pequeno,
+  contorna a parte firme e retorna pelo laço. As duas cenas são representações didáticas; não avaliam a resistência
+  do suporte, do punho ou da corda para sustentar uma pessoa.
+- No exemplo `exemplos/laco_tenis_jacare.amr`, acompanhe as pontas A e B desde os
+  ilhoses até o laço de duas alças. Use **Visão geral** para girar o tênis inteiro
+  ou **Foco no nó** para observar a passagem de uma alça sob a outra.
 - Edite o programa e clique em **Compilar código** ou use **Ctrl + Enter**.
   A edição invalida o plano anterior até uma nova compilação.
 - Reproduza, pause, ajuste a velocidade, avance/retorne um passo ou arraste a
@@ -70,7 +92,9 @@ editor, código e exemplos não dependem de serviços externos.
   também seleciona sua posição no código.
 - Arraste a cena para girar a câmera e use a roda para aproximar. A barra da cena
   permite alternar a grade, restaurar a câmera e entrar em tela cheia quando
-  suportada pelo navegador.
+  suportada pelo navegador. Em tela cheia, o editor destaca a linha do movimento
+  atual e rola o código para mantê-la visível. Use a seta no cabeçalho do editor
+  para recolhê-lo ou abri-lo durante a reprodução.
 - Abra arquivos locais e baixe o código atual usando os controles do editor.
   Alterações ficam na memória da página até serem baixadas; não há salvamento
   automático no repositório.
@@ -83,7 +107,7 @@ editor, código e exemplos não dependem de serviços externos.
 ## Arquitetura
 
 ```text
-frontend/                         React + TypeScript + Vite
+web/studio/                         React + TypeScript + Vite
   src/App.tsx                     Editor, diagnósticos, arquivos e reprodução
   src/types.ts                    Contrato do plano e descrições dos movimentos
   src/geometry.ts                 Despacho por registro e interpolação determinística
@@ -126,12 +150,12 @@ rejeite sua execução por incompatibilidade de tipos ou falta de cruzamento.
 ### API
 
 - `GET /api/health`: disponibilidade e versão do contrato.
-- `GET /api/exemplos`: lê os três exemplos diretamente do repositório.
+- `GET /api/exemplos` lê os exemplos publicados diretamente do repositório.
 - `POST /api/compilar`: recebe `{"codigo": "...", "selecionado": 0}` e devolve
   o catálogo de definições, valores das variáveis e movimentos resolvidos.
   Inclui `animacao` quando a sequência corresponde ao nó cadastrado; programas
   válidos sem correspondência continuam usando o modelo livre.
-- `GET /`: entrega `frontend/dist/index.html`; os assets ficam em `/assets`.
+- `GET /`: entrega `web/studio/dist/index.html`; os assets ficam em `/assets`.
 - `/docs`: documentação OpenAPI da API.
 
 O contrato tem `versao: 1`. Um movimento contém `id`, `acao`, `pontas`, `valor`,
@@ -162,6 +186,9 @@ partir da entrada nem chamadas a shell no processamento das requisições.
   iteração; atribuições podem atualizar variáveis externas.
 - O primeiro `cruzar A B` estabelece as duas pontas disponíveis. Comandos seguintes
   usam essas pontas; passar, enrolar e apertar exigem um cruzamento anterior.
+  Na cena da rede, `passar_em punho` inicia a corda. O lais de guia usa
+  `cruzar parte_firme ponta_trabalho` para formar o laço pequeno e
+  `passar_em laco` para as duas passagens da ponta de trabalho.
 - `finalizar expressão` registra o resultado e encerra a execução da definição
   selecionada, inclusive quando aparece em um bloco aninhado.
 - Limites: 32.000 caracteres por entrada, 500 movimentos, 2.000 iterações totais
@@ -249,7 +276,7 @@ seu peer exige Fiber 8. O Core é conectado diretamente ao motor existente.
 Não foi adicionado Rapier nem outra versão de three-mesh-bvh; o BVH 0.8.3
 permanece apenas como dependência indireta do Drei.
 
-O estado `frontend/src/knots/doubleOverhand.theatre.json` define cinco parâmetros:
+O estado `web/studio/src/knots/doubleOverhand.theatre.json` define cinco parâmetros:
 `loop`, `firstPass`, `secondPass`, `dressing` e `tightening`. Suas curvas controlam
 o avanço pela trajetória aprovada, mantendo uma única linha central. As curvas
 Theatre iniciais são lineares; a suavização geométrica já existe no cache e não
@@ -271,7 +298,7 @@ o controlador. Não são utilizadas APIs experimentais de escrita de keyframes.
 Com a API Python iniciada, execute:
 
 ```bash
-cd frontend
+cd web/studio
 npm run dev
 ```
 
@@ -284,7 +311,7 @@ editado. Os controles do Amarra continuam disponíveis; a interface do Studio po
 ser escondida com seu atalho Alt/Option + barra invertida.
 
 Exporte o estado pelo menu do projeto no Theatre e substitua
-`frontend/src/knots/doubleOverhand.theatre.json`. Recarregue a página para preparar
+`web/studio/src/knots/doubleOverhand.theatre.json`. Recarregue a página para preparar
 e validar a definição atualizada. Cada etapa deve começar em 0, terminar em 1,
 avançar continuamente sem overshoot e respeitar a ordem das etapas. Deixe tempo
 positivo para finalizar. Exportações com etapas sobrepostas, valores fora do
@@ -382,12 +409,12 @@ pelo Git; não substituem a geometria em tempo real da aplicação.
 .venv/bin/python -m unittest discover -s tests
 
 # Geometria, motor e build
-cd frontend
+cd web/studio
 npm test
 npm run build
 
 # Chromium: servidor exclusivo na porta 8010
-PLAYWRIGHT_BROWSERS_PATH=../.studio-cache/browsers npx playwright install chromium
+PLAYWRIGHT_BROWSERS_PATH=../../.studio-cache/browsers npx playwright install chromium
 npm run test:e2e
 # Outra porta: AMARRA_TEST_PORT=8011 npm run test:e2e
 ```
@@ -398,22 +425,22 @@ dos testes E3 com as dependências originais.
 
 ## Arquivos desta alteração
 
-- Geometria e identificação: `frontend/src/knots/doubleOverhand.ts`,
-  `frontend/src/knots/knotRegistry.ts`, `frontend/src/geometry.ts`, `frontend/src/types.ts`.
-- Reprodução e validação: `frontend/src/animation/KnotAnimationEngine.ts`,
-  `frontend/src/animation/RopeValidation.ts`, `frontend/src/animation/TheatreKnotController.ts`,
-  `frontend/src/animation/theatreStudio.ts`, `frontend/src/animation/validateKnotMotion.ts`.
-- Autoria: `frontend/src/knots/doubleOverhandTimeline.ts`,
-  `frontend/src/knots/doubleOverhand.theatre.json`.
-- Renderização e integração do cache: `frontend/src/ropeSurface.ts`,
-  `frontend/src/geometry.worker.ts`, `frontend/src/main.tsx`, `frontend/index.html`.
-- Interface existente: `frontend/src/App.tsx`, `frontend/src/RopeScene.tsx`,
-  `frontend/src/style.css`.
+- Geometria e identificação: `web/studio/src/knots/doubleOverhand.ts`,
+  `web/studio/src/knots/knotRegistry.ts`, `web/studio/src/geometry.ts`, `web/studio/src/types.ts`.
+- Reprodução e validação: `web/studio/src/animation/KnotAnimationEngine.ts`,
+  `web/studio/src/animation/RopeValidation.ts`, `web/studio/src/animation/TheatreKnotController.ts`,
+  `web/studio/src/animation/theatreStudio.ts`, `web/studio/src/animation/validateKnotMotion.ts`.
+- Autoria: `web/studio/src/knots/doubleOverhandTimeline.ts`,
+  `web/studio/src/knots/doubleOverhand.theatre.json`.
+- Renderização e integração do cache: `web/studio/src/ropeSurface.ts`,
+  `web/studio/src/geometry.worker.ts`, `web/studio/src/main.tsx`, `web/studio/index.html`.
+- Interface existente: `web/studio/src/App.tsx`, `web/studio/src/RopeScene.tsx`,
+  `web/studio/src/style.css`.
 - Integração: `src/studio_nos.py`, `src/studio_api.py`, `exemplos/no_simples_duplo.amr`.
-- Verificação: `frontend/tests/doubleOverhand.test.ts`, `frontend/tests/engine.test.ts`,
-  `frontend/tests/run.ts`, `frontend/e2e/studio.spec.ts`, `frontend/playwright.config.ts`,
-  `frontend/package.json`, `frontend/package-lock.json`, `frontend/vite.config.ts`,
-  `frontend/tests/theatre.test.ts`, `frontend/tests/validation.test.ts`, `tests/test_studio.py`.
+- Verificação: `web/studio/tests/doubleOverhand.test.ts`, `web/studio/tests/engine.test.ts`,
+  `web/studio/tests/run.ts`, `web/studio/e2e/studio.spec.ts`, `web/studio/playwright.config.ts`,
+  `web/studio/package.json`, `web/studio/package-lock.json`, `web/studio/vite.config.ts`,
+  `web/studio/tests/theatre.test.ts`, `web/studio/tests/validation.test.ts`, `tests/test_studio.py`.
 - Documentação: `docs/studio.md`, `README.md`.
 
 As gramáticas, o compilador original e `exemplos/no_reforcado.amr` não foram alterados.

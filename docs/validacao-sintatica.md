@@ -3,7 +3,9 @@
 Data da execução: **20/10/2026**.
 
 Este relatório preserva o resultado da revisão de 20/10. A atualização da
-[Aula 13, em 21/10](aula13.md), acrescenta 24 testes e leva a suíte atual a 132.
+[Aula 13, em 21/10](aula13.md), acrescentou 24 testes e levou a suíte a 132.
+A [validação da Aula 14, em 04/11](validacao-semantica.md), registra o total
+atual de 224 testes, incluindo a AST e as regras semânticas.
 
 O analisador sintático da Amarra foi gerado novamente e validado com
 **108 testes automatizados: todos passaram, sem falhas ou erros**. Este documento

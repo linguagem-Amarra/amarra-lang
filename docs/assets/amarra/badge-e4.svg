@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="30" viewBox="0 0 180 30" role="img" aria-label="E4: AST E SEMÂNTICA">
+<title>E4: AST E SEMÂNTICA</title>
+<defs><clipPath id="pill"><rect width="180" height="30" rx="7"/></clipPath></defs>
+<g clip-path="url(#pill)">
+<rect width="180" height="30" fill="#FBE5CE"/>
+<rect x="38" width="142" height="30" fill="#B8420C"/>
+</g>
+<g font-family="Arial, sans-serif" font-size="11" font-weight="700" text-anchor="middle" dominant-baseline="central">
+<text x="19" y="15" fill="#6B3A20" letter-spacing=".5">E4</text>
+<text x="109" y="15" fill="#FFFFFF">AST E SEMÂNTICA</text>
+</g>
+</svg>

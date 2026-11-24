@@ -1,0 +1,14 @@
+// Duas voltas adicionais: altere o valor e compare o roteiro.
+no "cadarco com reforco" {
+    inteiro voltas = 2;
+
+    cruzar ponta_direita ponta_esquerda;
+    passar_baixo ponta_direita;
+
+    repetir voltas {
+        enrolar ponta_direita 1;
+    }
+
+    apertar;
+    finalizar "No pronto!";
+}

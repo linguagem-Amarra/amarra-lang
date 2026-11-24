@@ -10,8 +10,8 @@ def main():
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     raiz = Path(__file__).resolve().parent
-    if not (raiz / "frontend/dist/index.html").exists():
-        sys.exit("Interface ausente. Execute npm install e npm run build em frontend/.")
+    if not (raiz / "web/studio/dist/index.html").exists():
+        sys.exit("Interface ausente. Execute npm install e npm run build em web/studio/.")
     if not (raiz / "gerado/AmarraParserVisitor.py").exists():
         sys.exit("Analisadores ausentes. Execute python gerar.py primeiro.")
     try:

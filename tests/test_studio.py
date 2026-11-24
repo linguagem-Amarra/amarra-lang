@@ -12,6 +12,8 @@ from fastapi.testclient import TestClient
 from src.studio_api import app
 from src.studio_plano import FalhaStudio, compilar
 from src.studio_nos import reconhecer_no
+from src.studio_exemplos import listar_exemplos
+from src.studio_web import analisar
 
 
 RAIZ = Path(__file__).resolve().parent.parent
@@ -22,6 +24,21 @@ def programa(corpo):
 
 
 class TestPlanoStudio(unittest.TestCase):
+    def test_catalogo_tem_nove_programas_validos_com_sequencias_distintas(self):
+        exemplos = listar_exemplos(RAIZ)
+        self.assertEqual(len(exemplos), 9)
+        self.assertIn("no_oito", {exemplo["id"] for exemplo in exemplos})
+        sequencias = set()
+        for exemplo in exemplos:
+            with self.subTest(exemplo=exemplo["id"]):
+                plano = analisar(exemplo["codigo"])
+                self.assertTrue(plano["ok"], plano.get("diagnosticos"))
+                self.assertGreater(len(plano["passos"]), 0)
+                self.assertEqual(plano["passos"][-1]["acao"], "finalizar")
+                sequencias.add(tuple((passo["acao"], passo["valor"] if passo["acao"] == "enrolar" else None)
+                                    for passo in plano["passos"]))
+        self.assertEqual(len(sequencias), len(exemplos))
+
     def test_exemplos_originais_e_origem_dos_movimentos(self):
         for nome, quantidade in [("no_simples", 4), ("no_reforcado", 7), ("no_windsor", 6)]:
             with self.subTest(nome=nome):
@@ -31,6 +48,12 @@ class TestPlanoStudio(unittest.TestCase):
                 self.assertEqual(plano["passos"][0]["origem"]["coluna"], 4)
                 self.assertEqual(plano["passos"][-1]["acao"], "finalizar")
                 self.assertEqual(plano["passos"][-1]["valor"], "windsor pronto" if nome == "no_windsor" else "no reforcado pronto" if nome == "no_reforcado" else "no pronto")
+
+    def test_laco_de_cadarco_depende_das_duas_alcas_e_do_cruzamento_inverso(self):
+        codigo = (RAIZ / "exemplos/laco_tenis_jacare.amr").read_text(encoding="utf-8")
+        self.assertEqual(analisar(codigo)["animacao"]["id"], "shoelace-bow")
+        alterado = codigo.replace("passar_baixo cadarco_esquerdo", "passar_baixo cadarco_direito")
+        self.assertNotIn("animacao", analisar(alterado))
 
     def test_precedencia_atribuicao_e_repeticao_resolvem_os_valores(self):
         plano = compilar(programa("inteiro n = 1 + 2 * 2; n = n - 2; cruzar a b; repetir n { enrolar a n; }"))
@@ -100,7 +123,7 @@ class TestAPIStudio(unittest.TestCase):
     def test_health_e_exemplos_lidos_do_repositorio(self):
         self.assertEqual(self.client.get("/api/health").json()["status"], "ok")
         exemplos = self.client.get("/api/exemplos").json()
-        self.assertEqual(len(exemplos), 3)
+        self.assertEqual(len(exemplos), 9)
         for item in exemplos:
             self.assertEqual(item["codigo"], (RAIZ / "exemplos" / (item["id"] + ".amr")).read_text(encoding="utf-8"))
             resposta = self.client.post("/api/compilar", json={"codigo": item["codigo"]})
@@ -137,6 +160,41 @@ class TestAPIStudio(unittest.TestCase):
         self.assertEqual(len(plano["passos"]), 5)
         self.assertEqual(plano["animacao"]["id"], "double-overhand")
         self.assertEqual(plano["animacao"]["pontaTrabalho"], "ponta_trabalho")
+
+    def test_no_em_oito_tem_animacao_propria(self):
+        codigo = (RAIZ / "exemplos/no_oito.amr").read_text(encoding="utf-8")
+        plano = self.client.post("/api/compilar", json={"codigo": codigo}).json()
+        self.assertTrue(plano["ok"])
+        self.assertEqual(plano["animacao"]["id"], "figure-eight")
+        self.assertEqual(plano["animacao"]["pontaTrabalho"], "ponta_trabalho")
+        self.assertEqual(plano["animacao"]["passagens"], 1)
+
+    def test_rede_de_dormir_reconhece_suporte_e_duas_meias_voltas(self):
+        codigo = (RAIZ / "exemplos/no_rede.amr").read_text(encoding="utf-8")
+        plano = self.client.post("/api/compilar", json={"codigo": codigo}).json()
+        self.assertTrue(plano["ok"], plano.get("diagnosticos"))
+        self.assertEqual(plano["cenario"], {"tipo": "rede"})
+        self.assertEqual(plano["animacao"]["id"], "hammock-round-turn")
+        self.assertEqual([p["acao"] for p in plano["passos"]],
+                         ["passar_em", "dar_volta", "meia_volta", "meia_volta", "apertar", "finalizar"])
+        for alterado in [codigo.replace("gancho 2", "gancho 1"),
+                         codigo.replace("meia_volta parte_firme;", "meia_volta gancho;", 1),
+                         codigo.replace("    meia_volta parte_firme;\n", "", 1)]:
+            resposta = self.client.post("/api/compilar", json={"codigo": alterado}).json()
+            self.assertFalse(resposta["ok"])
+            self.assertEqual(resposta["diagnosticos"][0]["fase"], "semantico")
+
+    def test_lais_de_guia_da_rede_forma_alca_fixa(self):
+        codigo = (RAIZ / "exemplos/lais_de_guia_rede.amr").read_text(encoding="utf-8")
+        plano = self.client.post("/api/compilar", json={"codigo": codigo}).json()
+        self.assertTrue(plano["ok"], plano.get("diagnosticos"))
+        self.assertEqual(plano["animacao"]["id"], "hammock-bowline")
+        self.assertEqual([p["acao"] for p in plano["passos"]],
+                         ["passar_em", "cruzar", "dar_volta", "passar_em",
+                          "meia_volta", "passar_em", "apertar", "finalizar"])
+        resposta = self.client.post("/api/compilar", json={"codigo": codigo.replace(
+            "passar_em laco;", "passar_em punho;", 1)}).json()
+        self.assertFalse(resposta["ok"])
 
     def test_registro_considera_acoes_resolvidas_e_nao_nome(self):
         codigo = 'no "outro nome" { cruzar a b; repetir 2 { passar_baixo b; } apertar; }'

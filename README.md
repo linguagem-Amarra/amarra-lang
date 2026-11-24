@@ -1,15 +1,22 @@
 <a name="inicio"></a>
 
-**Amarra Studio:** editor React com animação 3D e integração com o compilador existente.
-A demonstração padrão é o [nó simples duplo](exemplos/no_simples_duplo.amr): duas passagens pelo mesmo laço antes do aperto.
-Consulte [como executar localmente, arquitetura e limites do visualizador](docs/studio.md).
+# Amarra · Entrega final E5
+
+Escreva em português os passos de um nó e acompanhe a execução em 3D. **[Abrir o Amarra Studio no navegador](https://linguagem-amarra.github.io/amarra-lang/)**
+
+### Demonstração da E5
+
+1. Abra **Ver todos os nós** e selecione **Laço do tênis-jacaré**, um dos nove exemplos do catálogo.
+2. Acione **Reproduzir animação** e entre em **Tela cheia**. Acompanhe no editor os dois comandos `apertar` e observe o que acontece com o cadarço antes e depois de formar as alças.
+3. Para mostrar a análise do compilador, copie o [programa do tênis-jacaré](exemplos/laco_tenis_jacare.amr) na [interface clássica](https://linguagem-amarra.github.io/amarra-lang/classico/) e examine os tokens, a árvore sintática abstrata (AST) e os símbolos.
+
+Para executar o Studio localmente com a API Python, siga o [guia de instalação](docs/studio.md). Os testes do compilador e da animação rodam a cada publicação e podem ser consultados no [histórico do GitHub Actions](https://github.com/linguagem-Amarra/amarra-lang/actions/workflows/publicar-interface.yml).
 
 <p align="center">
   <img src="docs/assets/amarra/capa.svg" alt="Amarra — cada comando, um passo. Cada passo, um nó. Linguagem de domínio específico para descrever nós." width="100%">
 </p>
 
 <p align="center">
-  <img src="docs/assets/amarra/badge-e3.svg" alt="Fase E3: análise sintática" height="30">
   <img src="docs/assets/amarra/badge-python.svg" alt="Python 3.8 ou superior" height="30">
   <img src="docs/assets/amarra/badge-antlr.svg" alt="ANTLR 4.13.2" height="30">
   <img src="docs/assets/amarra/badge-amr.svg" alt="Extensão dos programas: .amr" height="30">
@@ -19,11 +26,13 @@ Consulte [como executar localmente, arquitetura e limites do visualizador](docs/
   <a href="#linguagem">A linguagem</a> &nbsp;·&nbsp;
   <a href="#exemplo">Exemplo</a> &nbsp;·&nbsp;
   <a href="#executar">Como executar</a> &nbsp;·&nbsp;
+  <a href="docs/interface-visual.md">Interface visual</a> &nbsp;·&nbsp;
   <a href="docs/aula10.md">Aula 10</a> &nbsp;·&nbsp;
   <a href="docs/aula11.md">Aula 11</a> &nbsp;·&nbsp;
   <a href="docs/aula12.md">Aula 12</a> &nbsp;·&nbsp;
   <a href="docs/aula13.md">Aula 13</a> &nbsp;·&nbsp;
-  <a href="docs/validacao-sintatica.md">Relatório de testes</a> &nbsp;·&nbsp;
+  <a href="docs/aula14.md">Aula 14</a> &nbsp;·&nbsp;
+  <a href="docs/validacao-semantica.md">Relatório de testes</a> &nbsp;·&nbsp;
   <a href="#estrutura">Estrutura</a> &nbsp;·&nbsp;
   <a href="#evolucao">Evolução</a>
 </p>
@@ -40,17 +49,47 @@ O projeto aproxima o estudo de compiladores de uma atividade cotidiana: **transf
 
 | O domínio | A implementação | A entrega atual |
 | :--- | :--- | :--- |
-| Sequências de ações para montar nós. | Python e código gerado pelo ANTLR. | **E3:** análise léxica, análise sintática e árvore sintática. |
+| Sequências de ações para montar nós. | Python e código gerado pelo ANTLR. | **E5** integra o compilador ao editor e à animação passo a passo no Studio 3D. |
 
-> **Escopo atual (E3)** — O projeto reconhece tokens, valida a estrutura do programa e produz uma árvore sintática concreta. A análise de tipos e nomes, a validação dos movimentos e a execução ficam para E4.
+> **Escopo atual** — O projeto reconhece tokens, valida a sintaxe, constrói a AST e verifica nomes, escopos e tipos. A interface web executa o programa e apresenta um roteiro visual de duas pontas, começando pela base do cadarço. A simulação física e a certificação dos nós permanecem fora do escopo.
 
-**Validação atual:** 132 testes automatizados passaram na execução de 21/10/2026.
-A coleção de 72 entradas identificadas contém **20 válidas, 48 com erro sintático
-e 4 com erro léxico**. A [Aula 13](docs/aula13.md) acrescenta 24 testes de
-diagnósticos, recuperação e visitor aos 108 testes do
-[relatório de validação de 20/10](docs/validacao-sintatica.md).
+A coleção sintática possui **72 entradas: 20 válidas, 48 com erro sintático
+e 4 com erro léxico**. A nova coleção semântica possui **62 entradas: 23 válidas
+e 39 inválidas**. Consulte o [relatório semântico](docs/validacao-semantica.md)
+e o [relatório histórico da sintaxe](docs/validacao-sintatica.md).
 
 <a name="exemplo"></a>
+
+### Use pelo navegador
+
+**[Abrir a Amarra online](https://linguagem-amarra.github.io/amarra-lang/)**
+
+A página principal abre o [Studio 3D](docs/studio.md): edite o código, escolha um
+exemplo e acompanhe os movimentos da corda. Na primeira abertura, aguarde o
+carregamento do compilador Python no navegador. O
+[catálogo do Studio](docs/studio.md) inclui o laço de cadarço do tênis-jacaré em 3D.
+A [interface clássica 2D](docs/interface-visual.md) continua em
+[**/classico/**](https://linguagem-amarra.github.io/amarra-lang/classico/),
+com tokens, AST e símbolos.
+
+O exemplo [cadarco_visual.amr](exemplos/cadarco_visual.amr) gera seis etapas;
+trocar `voltas = 2` por `voltas = 3` produz sete. O desenho representa a base
+do cadarço, antes das alças do laço completo.
+
+Para testar a publicação estática localmente, após a instalação e geração abaixo:
+
+```powershell
+cd web/studio
+$env:VITE_STUDIO_STATIC='true'
+npm ci
+npm run build
+cd ../..
+.\.venv\Scripts\python.exe scripts/construir_web.py
+.\.venv\Scripts\python.exe -m http.server 8000 --bind 127.0.0.1 --directory dist
+```
+
+Abra `http://127.0.0.1:8000/`. A publicação no GitHub Pages usa o workflow
+`.github/workflows/publicar-interface.yml`, descrito no guia da interface.
 
 ## 02 · Um primeiro nó, em código
 
@@ -125,7 +164,20 @@ testes existentes.
 
 Veja a [Aula 13 aplicada à Amarra](docs/aula13.md) para reproduzir o exemplo com
 vários erros e entender a diferença entre árvore concreta, AST, listener e visitor.
-A construção da AST completa é apresentada no material como assunto da Aula 14.
+A construção da AST é implementada na etapa da Aula 14, descrita a seguir.
+
+### O que foi acrescentado a partir da Aula 14
+
+| Conceito da aula | Aplicação no projeto |
+| :--- | :--- |
+| Construção da AST | `src/construtor_ast.py` usa o visitor para produzir nós da Amarra, preservando a precedência e retirando pontuação. |
+| Tabela de símbolos | Registra nome, tipo, posição e escopo de cada declaração. |
+| Nomes não declarados e repetidos | `src/semantico.py` verifica referências, destinos de atribuições e duplicidade no mesmo bloco. |
+| Regras semânticas | Verifica tipos de atribuições, operadores, condições e argumentos de comandos. |
+
+A [Aula 14 aplicada à Amarra](docs/aula14.md) explica a AST e as decisões de
+tipos e escopos. O comando sintático continua útil para examinar a estrutura;
+o comando semântico executa as fases anteriores e verifica também nomes e tipos.
 
 <a name="executar"></a>
 
@@ -179,6 +231,12 @@ py -m venv .venv
 .\.venv\Scripts\python.exe src/sintatico.py exemplos/no_simples.amr
 ```
 
+**5. Valide a semântica e veja a AST e os símbolos.**
+
+```powershell
+.\.venv\Scripts\python.exe src/semantico.py exemplos/escopos.amr --ast --simbolos
+```
+
 </details>
 
 <details>
@@ -209,6 +267,12 @@ python3 -m venv .venv
 .venv/bin/python src/sintatico.py exemplos/no_simples.amr
 ```
 
+**5. Valide a semântica e veja a AST e os símbolos.**
+
+```bash
+.venv/bin/python src/semantico.py exemplos/escopos.amr --ast --simbolos
+```
+
 </details>
 
 Não é necessário ativar o ambiente: os comandos usam diretamente o Python de `.venv/`. Se a pasta já existir, execute apenas a instalação das dependências e as etapas seguintes.
@@ -236,9 +300,9 @@ O parser reutiliza os tokens do lexer com a opção
 `tokenVocab = AmarraLexer`.
 
 O visitor é gerado pela opção `-visitor` e fornece métodos como `visitPrograma`,
-`visitDeclaracao` e `visitAditiva`. Ele é uma classe base para as próximas etapas;
-as ações da linguagem ainda precisam ser implementadas. A geração pode terminar
-sem imprimir mensagem. Não edite os arquivos de `gerado/`, pois serão recriados.
+`visitDeclaracao` e `visitAditiva`. `src/construtor_ast.py` herda dessa classe
+para construir a AST. A geração pode terminar sem imprimir mensagem.
+Não edite os arquivos de `gerado/`, pois serão recriados.
 
 O projeto utiliza **ANTLR 4.13.2**, conforme registrado em `requirements.txt`. O script seleciona a versão do gerador a partir do runtime instalado para manter ambos compatíveis.
 
@@ -483,6 +547,45 @@ done
 
 </details>
 
+### AST e análise semântica (Aula 14)
+
+Depois da instalação e geração, execute na raiz do projeto:
+
+```powershell
+# Mostrar somente a AST
+.\.venv\Scripts\python.exe src/construtor_ast.py exemplos/escopos.amr
+
+# Validar nomes, escopos e tipos, mostrando a tabela de símbolos
+.\.venv\Scripts\python.exe src/semantico.py exemplos/escopos.amr --simbolos
+
+# Exemplo da aula: z recebe uma expressão, mas não foi declarado
+.\.venv\Scripts\python.exe src/semantico.py exemplos/invalidos/semantica/variavel_nao_declarada.amr
+
+# Mostrar vários erros semânticos independentes
+.\.venv\Scripts\python.exe src/semantico.py exemplos/invalidos/semantica/multiplos_erros.amr
+```
+
+No Linux/macOS, substitua o executável por `.venv/bin/python`. Para obter a AST
+em JSON, use `src/construtor_ast.py` com `--formato json`. Esse comando também
+aceita `--regra expr` ou `--regra bloco` para fragmentos. A análise semântica
+exige um programa completo e aceita `--ast` para exibir a árvore após o sucesso.
+
+O programa válido imprime `Analise semantica concluida sem erros.`. O exemplo
+da aula produz `Erro semantico na linha 5, coluna 4 [S001]`, indicando que `z`
+não foi declarado. O exemplo com vários erros produz cinco diagnósticos.
+Ambos os arquivos inválidos têm sintaxe válida; a rejeição é semântica.
+
+As regras verificam declarações anteriores, duplicidade no mesmo bloco e tipos
+compatíveis. Condições exigem booleano; `repetir` e `enrolar` exigem inteiro;
+`finalizar` exige texto. Há promoção de inteiro para real e `/` sempre produz
+real. Os nomes das pontas são referências simbólicas dos movimentos, separadas
+das variáveis. As regras completas e limites estão na [especificação](docs/especificacao.md#9-regras-semânticas-e-início-da-e4).
+
+Erros léxicos ou sintáticos impedem a construção da AST e a análise semântica.
+`--recuperar` permite coletar erros sintáticos antes de encerrar. Os erros
+semânticos independentes são reunidos por padrão, com linha, coluna e código.
+Em erro, o comando retorna 1 e não apresenta AST ou tabela de sucesso.
+
 ### Verificar os testes automatizados
 
 Depois de gerar os analisadores, execute na raiz do projeto:
@@ -504,13 +607,20 @@ associatividade, consumo até `EOF`, saída no terminal e os tokens dos exemplos
 originais da E2. Também verificam `senao`, regras isoladas, consumo de tokens no
 rastro e preservação da árvore ao observar a pilha. A saída deve terminar com `OK`.
 
-São **132 testes descobertos pelo `unittest`**: 36 das Aulas 10 e 11, 72 casos
-de [`tests/casos_sintaticos.json`](tests/casos_sintaticos.json) e 24 da Aula 13. Cada
-entrada dessa coleção vira um teste independente, com ID e descrição na saída.
+Para verificar também a interface, execute na raiz do projeto:
+
+```powershell
+node tests/test_movimentos.mjs
+npm --prefix web/studio ci
+npm --prefix web/studio test
+```
+
+As coleções sintática e [semântica](tests/casos_semanticos.json) registram cada
+entrada como um teste independente, com ID e descrição na saída.
 Um teste de entrada inválida passa quando o analisador rejeita o código na fase
 esperada; erro léxico não substitui erro sintático.
 
-Para executar somente a coleção adicional:
+Para executar somente a coleção sintática:
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p test_casos_sintaticos.py -v
@@ -519,6 +629,15 @@ Para executar somente a coleção adicional:
 No Linux/macOS, substitua o executável por `.venv/bin/python`. Para investigar um
 único caso, acrescente `-k S16`, por exemplo. O [relatório de validação](docs/validacao-sintatica.md)
 explica os IDs, os critérios de aprovação e os limites da análise.
+
+Para executar somente a nova análise semântica, incluindo a coleção de 62 casos:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s tests -p test_semantico.py -v
+```
+
+Para a AST, troque o padrão por `test_ast.py`. O [relatório semântico](docs/validacao-semantica.md)
+apresenta a matriz de casos e o resultado da execução completa.
 
 <a name="estrutura"></a>
 
@@ -536,6 +655,14 @@ explica os IDs, os critérios de aprovação e os limites da análise.
 | `gerado/` | Recebe os arquivos gerados pelo ANTLR; não editar nem versionar. |
 | [`src/lexico.py`](src/lexico.py) | Lê um arquivo `.amr` e apresenta os tokens reconhecidos. |
 | [`src/sintatico.py`](src/sintatico.py) | Valida a sintaxe e apresenta a árvore ou o primeiro erro. |
+| [`src/arvore_abstrata.py`](src/arvore_abstrata.py) | Define os nós da AST, seu percurso e sua representação. |
+| [`src/construtor_ast.py`](src/construtor_ast.py) | Constrói a AST com o visitor e a exibe como texto ou JSON. |
+| [`src/semantico.py`](src/semantico.py) | Verifica nomes, escopos e tipos; exibe os diagnósticos e a tabela de símbolos. |
+| [`src/interpretador.py`](src/interpretador.py) | Executa a AST validada e produz etapas com os valores das variáveis. |
+| [`src/interface_web.py`](src/interface_web.py) | Expõe o resultado da análise e execução como JSON para o navegador. |
+| [`web/`](web/) | Editor, worker Python, player e desenho das cordas. |
+| [`scripts/construir_web.py`](scripts/construir_web.py) | Empacota os arquivos estáticos e o compilador para publicação. |
+| [`docs/interface-visual.md`](docs/interface-visual.md) | Explica uso, arquitetura, testes, limites e publicação da interface. |
 | [`src/diagnosticos.py`](src/diagnosticos.py) | Formata erros com posição, símbolos esperados e entrada encontrada. |
 | [`src/recuperacao.py`](src/recuperacao.py) | Implementa a recuperação opcional em modo pânico sobre o parser gerado. |
 | [`src/rastreamento.py`](src/rastreamento.py) | Observa os contextos do parser em entradas, saídas e consumo de tokens. |
@@ -544,20 +671,27 @@ explica os IDs, os critérios de aprovação e os limites da análise.
 | [`exemplos/no_windsor.amr`](exemplos/no_windsor.amr) | Demonstra um programa válido que usa o tipo real. |
 | [`exemplos/expressoes.amr`](exemplos/expressoes.amr) | Demonstra precedência, parênteses, lógica e blocos aninhados. |
 | [`exemplos/condicional_senao.amr`](exemplos/condicional_senao.amr) | Demonstra condicionais com `senao` e aninhamento. |
+| [`exemplos/escopos.amr`](exemplos/escopos.amr) | Demonstra tipos, referências a variáveis e sombreamento em um bloco interno. |
 | [`exemplos/fragmentos/`](exemplos/fragmentos/) | Contém expressão e bloco isolados para testar com `--regra`. |
 | [`exemplos/invalidos/`](exemplos/invalidos/) | Reúne programas com erros propositais. |
 | [`exemplos/invalidos/sintaxe/`](exemplos/invalidos/sintaxe/) | Demonstra erros de estrutura com tokens válidos. |
+| [`exemplos/invalidos/semantica/`](exemplos/invalidos/semantica/) | Demonstra nomes ausentes, duplicidade, tipos incompatíveis e uso fora do escopo. |
 | [`tests/test_sintatico.py`](tests/test_sintatico.py) | Verifica árvores, precedência, diagnósticos e execução no terminal. |
 | [`tests/test_condicionais_regras_rastreamento.py`](tests/test_condicionais_regras_rastreamento.py) | Verifica `senao`, regras isoladas e o rastreamento do parser. |
 | [`tests/test_diagnosticos_recuperacao_visitor.py`](tests/test_diagnosticos_recuperacao_visitor.py) | Verifica diagnósticos, recuperação, terminal e visitor. |
 | [`tests/casos_sintaticos.json`](tests/casos_sintaticos.json) | Reúne 72 entradas com ID, descrição, regra inicial e resultado esperado. |
 | [`tests/test_casos_sintaticos.py`](tests/test_casos_sintaticos.py) | Executa cada caso da coleção como um teste independente. |
+| [`tests/test_ast.py`](tests/test_ast.py) | Verifica a estrutura abstrata, os campos, as posições e a CLI. |
+| [`tests/test_semantico.py`](tests/test_semantico.py) | Executa os casos semânticos e verifica a API, os exemplos e a CLI. |
+| [`tests/casos_semanticos.json`](tests/casos_semanticos.json) | Reúne 62 entradas com sintaxe válida e resultado semântico esperado. |
 | [`docs/validacao-sintatica.md`](docs/validacao-sintatica.md) | Registra as alterações, os resultados e a matriz de validação da E3. |
+| [`docs/validacao-semantica.md`](docs/validacao-semantica.md) | Registra a validação da AST e das regras semânticas, com a nova matriz de casos. |
 | [`docs/especificacao.md`](docs/especificacao.md) | Documenta a especificação completa da linguagem. |
 | [`docs/aula10.md`](docs/aula10.md) | Relaciona os conceitos da aula com a implementação da Amarra. |
 | [`docs/aula11.md`](docs/aula11.md) | Explica a pilha do parser, os padrões de regras e a depuração. |
 | [`docs/aula12.md`](docs/aula12.md) | Relaciona FIRST, FOLLOW, precedência e alternativas opcionais com o parser existente. |
 | [`docs/aula13.md`](docs/aula13.md) | Explica os diagnósticos, o modo pânico e a preparação para AST. |
+| [`docs/aula14.md`](docs/aula14.md) | Relaciona a AST, o visitor e a tabela de símbolos com as regras semânticas implementadas. |
 | [`docs/assets/amarra/`](docs/assets/amarra/) | Guarda a capa, os selos e os demais elementos visuais deste README. |
 | [`DIARIO.md`](DIARIO.md) | Registra cada sessão de trabalho do grupo. |
 
@@ -577,6 +711,7 @@ explica os IDs, os critérios de aprovação e os limites da análise.
 | `Lexer nao gerado` | A geração não foi concluída. | Execute `.\.venv\Scripts\python.exe gerar.py` e confira a primeira mensagem de erro. |
 | `Analisadores nao gerados` | O parser ainda não foi gerado, por exemplo após atualizar da E2. | Execute `.\.venv\Scripts\python.exe gerar.py` novamente. |
 | `Erro sintatico` | Os tokens não seguem uma regra da gramática. | Confira a linha e a coluna indicadas, os argumentos dos comandos, os `;` e o fechamento de chaves e parênteses. |
+| `Erro semantico` | A sintaxe é válida, mas há problema de nome, escopo ou tipo. | Consulte o código `S001`–`S005` e a posição; declare a variável antes do uso e confira os tipos na especificação. |
 | `esperava fim da entrada (EOF)` ao testar um fragmento | Sobraram tokens depois da regra selecionada. | Confira `--regra`: `expr` e `comando` não incluem `;`, enquanto `instrucao` inclui o terminador dos comandos. |
 | `AmarraParserVisitor` não foi encontrado | Os arquivos foram gerados antes da opção `-visitor` ser incorporada ao script. | Execute `gerar.py` novamente com o Python de `.venv`. |
 | `senao` é rejeitado após atualizar o projeto | O lexer ou o parser gerado ainda corresponde à versão anterior. | Execute `gerar.py` novamente e confira se o `senao` acompanha um bloco de `se`. |
@@ -589,13 +724,14 @@ Os comandos da tabela são para PowerShell. No Linux/macOS, substitua `.\.venv\S
 
 <a name="evolucao"></a>
 
-## 07 · O próximo passo da Amarra
+## 07 · Evolução até a entrega final
 
 | Etapa | Foco | Situação |
 | :---: | :--- | :--- |
 | **E2** | Especificação da linguagem e analisador léxico. | Implementada; o comando `src/lexico.py` continua disponível. |
-| **E3** | Analisador sintático, árvore, diagnósticos e depuração. | **Fase atual: conceitos das Aulas 10, 11, 12 e 13 aplicados e documentados.** |
-| **E4** | Análise semântica e execução. | Fase futura. |
+| **E3** | Analisador sintático, árvore, diagnósticos e depuração. | Conceitos das Aulas 10, 11, 12 e 13 aplicados e documentados. |
+| **E4** | AST, análise semântica e execução. | **AST, símbolos, tipos, interpretador e interface visual implementados. Diagrama didático inicial de duas pontas.** |
+| **E5** | Demonstração integrada da linguagem. | Studio 3D publicado com nove exemplos, reprodução por etapa e editor em tela cheia. |
 
 A entrega E2 corresponde a **1,5 ponto na Avaliação de Grau 1**. A evolução do trabalho do grupo está registrada no [diário do projeto](DIARIO.md).
 

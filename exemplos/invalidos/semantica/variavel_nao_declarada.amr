@@ -1,0 +1,6 @@
+// Exemplo da Aula 14 adaptado ao bloco no da Amarra.
+no "nome ausente" {
+    inteiro x = 10;
+    inteiro y = 20;
+    z = x + y * 2;
+}

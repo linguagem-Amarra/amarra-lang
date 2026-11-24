@@ -1,0 +1,10 @@
+no "Rede de dormir: lais de guia" {
+    passar_em punho;
+    cruzar parte_firme ponta_trabalho;
+    dar_volta gancho 1;
+    passar_em laco;
+    meia_volta parte_firme;
+    passar_em laco;
+    apertar;
+    finalizar "alça fixa ao redor do armador";
+}

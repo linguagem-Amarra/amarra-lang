@@ -1,0 +1,3 @@
+no "tipo incompativel" {
+    inteiro voltas = "duas";
+}

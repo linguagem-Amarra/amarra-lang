@@ -1,0 +1,9 @@
+no "erros semanticos" {
+    inteiro voltas = "duas";
+    inteiro voltas = 3;
+    z = 1;
+    se 2 {
+        apertar;
+    }
+    finalizar verdadeiro;
+}

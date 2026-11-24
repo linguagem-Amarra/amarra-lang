@@ -1,0 +1,9 @@
+// No simples triplo: tres passagens da mesma ponta pelo laco.
+no "no simples triplo" {
+    cruzar parte_firme ponta_trabalho;
+    repetir 3 {
+        passar_baixo ponta_trabalho;
+    }
+    apertar;
+    finalizar "no simples triplo pronto";
+}

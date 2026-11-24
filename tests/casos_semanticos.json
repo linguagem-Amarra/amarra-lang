@@ -1,0 +1,453 @@
+[
+  {
+    "id": "SV01",
+    "descricao": "Quatro tipos declarados",
+    "codigo": "no \"teste\" { inteiro a = 1; real b = 2.5; texto c = \"ok\"; booleano d = verdadeiro; }",
+    "erros": []
+  },
+  {
+    "id": "SV02",
+    "descricao": "Atribuicao usa declaracao anterior",
+    "codigo": "no \"teste\" { inteiro a = 1; a = a + 2; }",
+    "erros": []
+  },
+  {
+    "id": "SV03",
+    "descricao": "Promocao de inteiro para real",
+    "codigo": "no \"teste\" { real x = 2; x = 3 + 0.5; }",
+    "erros": []
+  },
+  {
+    "id": "SV04",
+    "descricao": "Divisao produz real",
+    "codigo": "no \"teste\" { real x = 8 / 2; }",
+    "erros": []
+  },
+  {
+    "id": "SV05",
+    "descricao": "Operacoes numericas e sinal",
+    "codigo": "no \"teste\" { inteiro x = -(2 + 3) * 4 - 1; }",
+    "erros": []
+  },
+  {
+    "id": "SV06",
+    "descricao": "Logica e precedencia",
+    "codigo": "no \"teste\" { booleano x = verdadeiro e falso ou verdadeiro; }",
+    "erros": []
+  },
+  {
+    "id": "SV07",
+    "descricao": "Comparacoes numericas mistas",
+    "codigo": "no \"teste\" { booleano x = 2 < 2.5 e 4.0 > 1 e 2 == 2.0; }",
+    "erros": []
+  },
+  {
+    "id": "SV08",
+    "descricao": "Igualdade entre textos",
+    "codigo": "no \"teste\" { booleano x = \"a\" == \"b\"; }",
+    "erros": []
+  },
+  {
+    "id": "SV09",
+    "descricao": "Igualdade entre booleanos",
+    "codigo": "no \"teste\" { booleano x = verdadeiro == falso; }",
+    "erros": []
+  },
+  {
+    "id": "SV10",
+    "descricao": "Sombreamento em bloco interno",
+    "codigo": "no \"teste\" { inteiro x = 1; se verdadeiro { texto x = \"interno\"; finalizar x; } x = 2; }",
+    "erros": []
+  },
+  {
+    "id": "SV11",
+    "descricao": "Mesmo nome em blocos irmaos",
+    "codigo": "no \"teste\" { se verdadeiro { inteiro x = 1; } senao { texto x = \"dois\"; } }",
+    "erros": []
+  },
+  {
+    "id": "SV12",
+    "descricao": "Atribuicao consulta escopo externo",
+    "codigo": "no \"teste\" { inteiro x = 1; repetir 2 { x = x + 1; } }",
+    "erros": []
+  },
+  {
+    "id": "SV13",
+    "descricao": "Declaracao dentro da repeticao",
+    "codigo": "no \"teste\" { repetir 2 { inteiro x = 1; enrolar ponta x; } }",
+    "erros": []
+  },
+  {
+    "id": "SV14",
+    "descricao": "Bloco vazio e permitido",
+    "codigo": "no \"teste\" {  }",
+    "erros": []
+  },
+  {
+    "id": "SV15",
+    "descricao": "Pontas simbolicas independem de variaveis",
+    "codigo": "no \"teste\" { cruzar direita esquerda; passar_baixo direita; passar_cima esquerda; enrolar direita 2; apertar; finalizar \"ok\"; }",
+    "erros": []
+  },
+  {
+    "id": "SV16",
+    "descricao": "Quantidade inteira em expressao",
+    "codigo": "no \"teste\" { inteiro x = 2; repetir x + 1 { enrolar ponta x * 2; } }",
+    "erros": []
+  },
+  {
+    "id": "SV17",
+    "descricao": "Condicional booleano com dois ramos",
+    "codigo": "no \"teste\" { booleano x = verdadeiro; se x { apertar; } senao { passar_cima ponta; } }",
+    "erros": []
+  },
+  {
+    "id": "SV18",
+    "descricao": "Atribuicao promove inteiro",
+    "codigo": "no \"teste\" { real x = 1.5; x = 2; }",
+    "erros": []
+  },
+  {
+    "id": "SV19",
+    "descricao": "Inicializador ve declaracao externa",
+    "codigo": "no \"teste\" { inteiro x = 1; se verdadeiro { inteiro x = x + 1; enrolar ponta x; } }",
+    "erros": []
+  },
+  {
+    "id": "SV20",
+    "descricao": "Comentarios e texto Unicode",
+    "codigo": "no \"teste\" { // comentario\ntexto mensagem = \"nó pronto\"; finalizar mensagem; }",
+    "erros": []
+  },
+  {
+    "id": "SV21",
+    "descricao": "Ponta nao conflita com nome de variavel",
+    "codigo": "no \"teste\" { inteiro ponta = 2; enrolar ponta ponta; }",
+    "erros": []
+  },
+  {
+    "id": "SV22",
+    "descricao": "Semantica estatica nao executa divisoes",
+    "codigo": "no \"teste\" { real x = 1 / 0; }",
+    "erros": []
+  },
+  {
+    "id": "SI01",
+    "descricao": "Destino da atribuicao nao declarado",
+    "codigo": "no \"teste\" { z = 1; }",
+    "erros": [
+      "S001"
+    ]
+  },
+  {
+    "id": "SI02",
+    "descricao": "Referencia nao declarada na expressao",
+    "codigo": "no \"teste\" { inteiro x = ausente; }",
+    "erros": [
+      "S001"
+    ]
+  },
+  {
+    "id": "SI03",
+    "descricao": "Uso antes da declaracao",
+    "codigo": "no \"teste\" { x = 1; inteiro x = 2; }",
+    "erros": [
+      "S001"
+    ]
+  },
+  {
+    "id": "SI04",
+    "descricao": "Autorreferencia sem declaracao anterior",
+    "codigo": "no \"teste\" { inteiro x = x + 1; }",
+    "erros": [
+      "S001"
+    ]
+  },
+  {
+    "id": "SI05",
+    "descricao": "Declaracao repetida no mesmo bloco",
+    "codigo": "no \"teste\" { inteiro x = 1; inteiro x = 2; }",
+    "erros": [
+      "S002"
+    ]
+  },
+  {
+    "id": "SI06",
+    "descricao": "Redeclaracao interna repetida",
+    "codigo": "no \"teste\" { se verdadeiro { inteiro x = 1; texto x = \"dois\"; } }",
+    "erros": [
+      "S002"
+    ]
+  },
+  {
+    "id": "SI07",
+    "descricao": "Texto atribuido a inteiro",
+    "codigo": "no \"teste\" { inteiro x = \"duas\"; }",
+    "erros": [
+      "S003"
+    ]
+  },
+  {
+    "id": "SI08",
+    "descricao": "Real atribuido a inteiro",
+    "codigo": "no \"teste\" { inteiro x = 2.0; }",
+    "erros": [
+      "S003"
+    ]
+  },
+  {
+    "id": "SI09",
+    "descricao": "Numero atribuido a texto",
+    "codigo": "no \"teste\" { texto x = 2; }",
+    "erros": [
+      "S003"
+    ]
+  },
+  {
+    "id": "SI10",
+    "descricao": "Booleano atribuido a real",
+    "codigo": "no \"teste\" { real x = verdadeiro; }",
+    "erros": [
+      "S003"
+    ]
+  },
+  {
+    "id": "SI11",
+    "descricao": "Inteiro atribuido a booleano",
+    "codigo": "no \"teste\" { booleano x = 1; }",
+    "erros": [
+      "S003"
+    ]
+  },
+  {
+    "id": "SI12",
+    "descricao": "Atribuicao altera tipo declarado",
+    "codigo": "no \"teste\" { inteiro x = 1; x = \"dois\"; }",
+    "erros": [
+      "S003"
+    ]
+  },
+  {
+    "id": "SI13",
+    "descricao": "Soma de textos nao e concatenacao",
+    "codigo": "no \"teste\" { texto x = \"a\" + \"b\"; }",
+    "erros": [
+      "S005"
+    ]
+  },
+  {
+    "id": "SI14",
+    "descricao": "Multiplicacao com booleano",
+    "codigo": "no \"teste\" { inteiro x = verdadeiro * 2; }",
+    "erros": [
+      "S005"
+    ]
+  },
+  {
+    "id": "SI15",
+    "descricao": "Sinal negativo em booleano",
+    "codigo": "no \"teste\" { booleano x = -verdadeiro; }",
+    "erros": [
+      "S005"
+    ]
+  },
+  {
+    "id": "SI16",
+    "descricao": "Comparacao de ordem entre textos",
+    "codigo": "no \"teste\" { booleano x = \"a\" < \"b\"; }",
+    "erros": [
+      "S005"
+    ]
+  },
+  {
+    "id": "SI17",
+    "descricao": "Igualdade de tipos incompativeis",
+    "codigo": "no \"teste\" { booleano x = 1 == \"1\"; }",
+    "erros": [
+      "S005"
+    ]
+  },
+  {
+    "id": "SI18",
+    "descricao": "Conjuncao com numero",
+    "codigo": "no \"teste\" { booleano x = verdadeiro e 1; }",
+    "erros": [
+      "S005"
+    ]
+  },
+  {
+    "id": "SI19",
+    "descricao": "Disjuncao com numero",
+    "codigo": "no \"teste\" { booleano x = 1 ou falso; }",
+    "erros": [
+      "S005"
+    ]
+  },
+  {
+    "id": "SI20",
+    "descricao": "Condicao numerica",
+    "codigo": "no \"teste\" { se 1 { apertar; } }",
+    "erros": [
+      "S004"
+    ]
+  },
+  {
+    "id": "SI21",
+    "descricao": "Repeticao com real",
+    "codigo": "no \"teste\" { repetir 2.5 { apertar; } }",
+    "erros": [
+      "S004"
+    ]
+  },
+  {
+    "id": "SI22",
+    "descricao": "Repeticao com booleano",
+    "codigo": "no \"teste\" { repetir verdadeiro {} }",
+    "erros": [
+      "S004"
+    ]
+  },
+  {
+    "id": "SI23",
+    "descricao": "Enrolar com real",
+    "codigo": "no \"teste\" { enrolar ponta 1.5; }",
+    "erros": [
+      "S004"
+    ]
+  },
+  {
+    "id": "SI24",
+    "descricao": "Finalizar com numero",
+    "codigo": "no \"teste\" { finalizar 2; }",
+    "erros": [
+      "S004"
+    ]
+  },
+  {
+    "id": "SI25",
+    "descricao": "Variavel ausente no comando",
+    "codigo": "no \"teste\" { enrolar ponta voltas; }",
+    "erros": [
+      "S001"
+    ]
+  },
+  {
+    "id": "SI26",
+    "descricao": "Variavel do se nao vaza",
+    "codigo": "no \"teste\" { se verdadeiro { inteiro x = 1; } x = 2; }",
+    "erros": [
+      "S001"
+    ]
+  },
+  {
+    "id": "SI27",
+    "descricao": "Variavel do repetir nao vaza",
+    "codigo": "no \"teste\" { repetir 2 { inteiro x = 1; } inteiro y = x; }",
+    "erros": [
+      "S001"
+    ]
+  },
+  {
+    "id": "SI28",
+    "descricao": "Senao nao enxerga declaracao do entao",
+    "codigo": "no \"teste\" { se verdadeiro { inteiro x = 1; } senao { x = 2; } }",
+    "erros": [
+      "S001"
+    ]
+  },
+  {
+    "id": "SI29",
+    "descricao": "Ambos operandos ausentes sem cascata",
+    "codigo": "no \"teste\" { inteiro x = a + b; }",
+    "erros": [
+      "S001",
+      "S001"
+    ]
+  },
+  {
+    "id": "SI30",
+    "descricao": "Divisao exige destino real",
+    "codigo": "no \"teste\" { inteiro x = 4 / 2; }",
+    "erros": [
+      "S003"
+    ]
+  },
+  {
+    "id": "SI31",
+    "descricao": "Nomes diferenciam maiusculas",
+    "codigo": "no \"teste\" { inteiro voltas = 2; enrolar ponta Voltas; }",
+    "erros": [
+      "S001"
+    ]
+  },
+  {
+    "id": "SI32",
+    "descricao": "Subtracao com texto",
+    "codigo": "no \"teste\" { inteiro x = 1 - \"a\"; }",
+    "erros": [
+      "S005"
+    ]
+  },
+  {
+    "id": "SI33",
+    "descricao": "Divisao com booleano",
+    "codigo": "no \"teste\" { real x = 2 / falso; }",
+    "erros": [
+      "S005"
+    ]
+  },
+  {
+    "id": "SI34",
+    "descricao": "Comparacao de ordem entre booleanos",
+    "codigo": "no \"teste\" { booleano x = verdadeiro > falso; }",
+    "erros": [
+      "S005"
+    ]
+  },
+  {
+    "id": "SI35",
+    "descricao": "Enrolar com texto",
+    "codigo": "no \"teste\" { enrolar ponta \"duas\"; }",
+    "erros": [
+      "S004"
+    ]
+  },
+  {
+    "id": "SI36",
+    "descricao": "Finalizar com booleano",
+    "codigo": "no \"teste\" { finalizar verdadeiro; }",
+    "erros": [
+      "S004"
+    ]
+  },
+  {
+    "id": "SI37",
+    "descricao": "Bloco inacessivel tambem e verificado",
+    "codigo": "no \"teste\" { se falso { x = 1; } }",
+    "erros": [
+      "S001"
+    ]
+  },
+  {
+    "id": "SI38",
+    "descricao": "Tipo interno nao modifica o externo",
+    "codigo": "no \"teste\" { inteiro x = 1; se verdadeiro { texto x = \"a\"; } finalizar x; }",
+    "erros": [
+      "S004"
+    ]
+  },
+  {
+    "id": "SV23",
+    "descricao": "Dois nos possuem tabelas independentes",
+    "codigo": "no \"a\" { inteiro x = 1; } no \"b\" { texto x = \"b\"; }",
+    "erros": []
+  },
+  {
+    "id": "SI39",
+    "descricao": "Variavel de um no nao existe em outro",
+    "codigo": "no \"a\" { inteiro x = 1; } no \"b\" { x = 2; }",
+    "erros": [
+      "S001"
+    ]
+  }
+]

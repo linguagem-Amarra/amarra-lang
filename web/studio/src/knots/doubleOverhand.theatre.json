@@ -1,0 +1,176 @@
+{
+  "definitionVersion": "0.4.0",
+  "revisionHistory": [
+    "amarra-double-overhand-v1"
+  ],
+  "sheetsById": {
+    "Knot": {
+      "staticOverrides": {
+        "byObject": {}
+      },
+      "sequence": {
+        "type": "PositionalSequence",
+        "length": 33,
+        "subUnitsPerUnit": 60,
+        "tracksByObject": {
+          "Construction": {
+            "trackIdByPropPath": {
+              "[\"loop\"]": "loop",
+              "[\"firstPass\"]": "firstPass",
+              "[\"secondPass\"]": "secondPass",
+              "[\"dressing\"]": "dressing",
+              "[\"tightening\"]": "tightening"
+            },
+            "trackData": {
+              "loop": {
+                "type": "BasicKeyframedTrack",
+                "keyframes": [
+                  {
+                    "id": "loop-start",
+                    "position": 0,
+                    "value": 0,
+                    "handles": [
+                      0.5,
+                      0.5,
+                      0.5,
+                      0.5
+                    ],
+                    "connectedRight": true
+                  },
+                  {
+                    "id": "loop-end",
+                    "position": 7,
+                    "value": 1,
+                    "handles": [
+                      0.5,
+                      0.5,
+                      0.5,
+                      0.5
+                    ],
+                    "connectedRight": false
+                  }
+                ]
+              },
+              "firstPass": {
+                "type": "BasicKeyframedTrack",
+                "keyframes": [
+                  {
+                    "id": "firstPass-start",
+                    "position": 7,
+                    "value": 0,
+                    "handles": [
+                      0.5,
+                      0.5,
+                      0.5,
+                      0.5
+                    ],
+                    "connectedRight": true
+                  },
+                  {
+                    "id": "firstPass-end",
+                    "position": 15,
+                    "value": 1,
+                    "handles": [
+                      0.5,
+                      0.5,
+                      0.5,
+                      0.5
+                    ],
+                    "connectedRight": false
+                  }
+                ]
+              },
+              "secondPass": {
+                "type": "BasicKeyframedTrack",
+                "keyframes": [
+                  {
+                    "id": "secondPass-start",
+                    "position": 15,
+                    "value": 0,
+                    "handles": [
+                      0.5,
+                      0.5,
+                      0.5,
+                      0.5
+                    ],
+                    "connectedRight": true
+                  },
+                  {
+                    "id": "secondPass-end",
+                    "position": 23,
+                    "value": 1,
+                    "handles": [
+                      0.5,
+                      0.5,
+                      0.5,
+                      0.5
+                    ],
+                    "connectedRight": false
+                  }
+                ]
+              },
+              "dressing": {
+                "type": "BasicKeyframedTrack",
+                "keyframes": [
+                  {
+                    "id": "dressing-start",
+                    "position": 23,
+                    "value": 0,
+                    "handles": [
+                      0.5,
+                      0.5,
+                      0.5,
+                      0.5
+                    ],
+                    "connectedRight": true
+                  },
+                  {
+                    "id": "dressing-end",
+                    "position": 25.7,
+                    "value": 1,
+                    "handles": [
+                      0.5,
+                      0.5,
+                      0.5,
+                      0.5
+                    ],
+                    "connectedRight": false
+                  }
+                ]
+              },
+              "tightening": {
+                "type": "BasicKeyframedTrack",
+                "keyframes": [
+                  {
+                    "id": "tightening-start",
+                    "position": 25.7,
+                    "value": 0,
+                    "handles": [
+                      0.5,
+                      0.5,
+                      0.5,
+                      0.5
+                    ],
+                    "connectedRight": true
+                  },
+                  {
+                    "id": "tightening-end",
+                    "position": 32,
+                    "value": 1,
+                    "handles": [
+                      0.5,
+                      0.5,
+                      0.5,
+                      0.5
+                    ],
+                    "connectedRight": false
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
