@@ -8,6 +8,34 @@ import { describe, motionCaption, stepDuration, stepName, type Diagnostic, type 
 import { KnotAnimationEngine } from './animation/KnotAnimationEngine'
 import { registeredKnot } from './knots/knotRegistry'
 import { compileInBrowser } from './staticCompiler'
+import victorAvatar from './assets/criadores/victor.jpg'
+import lucasAvatar from './assets/criadores/lucas.jpg'
+import magnoAvatar from './assets/criadores/magno.jpg'
+
+const creators = [
+  { name: 'Victor da Mata Abreu', handle: 'LilVictor39', avatar: victorAvatar,
+    bio: 'Trabalhou no compilador da Amarra e na ligação entre o código e a animação, incluindo o laço do tênis-jacaré.' },
+  { name: 'Lucas Nascimento', handle: 'lukasnascky', avatar: lucasAvatar,
+    bio: 'Participou da criação da Amarra e registrou no diário do projeto as primeiras etapas de desenvolvimento da linguagem.' },
+  { name: 'Magno', handle: 'MagnoVinicius', avatar: magnoAvatar,
+    bio: 'Contribuiu para a primeira versão do Studio 3D, com animações em Theatre.js para mostrar como a corda forma um nó.' },
+]
+
+function Creators() {
+  return <main className="creators-page">
+    <h1>Criadores da linguagem</h1>
+    <p className="creators-intro">Victor, Lucas e Magno criaram a Amarra para descrever, em português, os movimentos de uma corda ao dar um nó.</p>
+    <div className="creator-grid">
+      {creators.map(person => <article className="creator-card" key={person.handle}>
+        <img src={person.avatar} width="128" height="128" alt={`Avatar de ${person.name} no GitHub`} />
+        <h2>{person.name}</h2>
+        <p>{person.bio}</p>
+        <a href={`https://github.com/${person.handle}`} target="_blank" rel="noopener noreferrer"
+          aria-label={`Perfil de ${person.name} no GitHub`}>@{person.handle} <ArrowRight size={16} aria-hidden="true" /></a>
+      </article>)}
+    </div>
+  </main>
+}
 
 const staticSite = import.meta.env.VITE_STUDIO_STATIC === 'true'
 const sceneLabels: Record<string, string> = {
@@ -53,6 +81,8 @@ function Highlight({ line }: { line: string }) {
 }
 
 export default function App() {
+  const [showCreators, setShowCreators] = useState(() => window.location.hash === '#criadores')
+  const [studioVisited, setStudioVisited] = useState(!showCreators)
   const [examples, setExamples] = useState<Example[]>([])
   const [exampleId, setExampleId] = useState('no_simples_duplo')
   const [catalogQuery, setCatalogQuery] = useState('')
@@ -197,17 +227,33 @@ export default function App() {
     }
   }, [compile])
 
-  useEffect(() => { void loadExamples(); return () => { ++request.current } }, [loadExamples])
+  useEffect(() => {
+    const navigate = () => {
+      const creatorsOpen = window.location.hash === '#criadores'
+      setShowCreators(creatorsOpen)
+      if (creatorsOpen) setPlaying(false)
+      else setStudioVisited(true)
+      window.scrollTo(0, 0)
+    }
+    window.addEventListener('hashchange', navigate)
+    return () => window.removeEventListener('hashchange', navigate)
+  }, [setPlaying])
+
+  useEffect(() => {
+    if (!studioVisited) return
+    void loadExamples()
+    return () => { ++request.current }
+  }, [loadExamples, studioVisited])
 
   useEffect(() => {
     const handle = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+      if (!showCreators && (event.ctrlKey || event.metaKey) && event.key === 'Enter') {
         event.preventDefault(); void compile(code, selected)
       }
     }
     window.addEventListener('keydown', handle)
     return () => window.removeEventListener('keydown', handle)
-  }, [code, selected, compile])
+  }, [code, selected, compile, showCreators])
 
   useEffect(() => {
     engine.configure(plan?.passos ?? [], frames)
@@ -259,12 +305,17 @@ export default function App() {
   const clock = (value: number) => `${Math.floor(value / 60)}:${String(Math.floor(value % 60)).padStart(2, '0')}`
 
   return <div className="app-shell">
-    <header className="topbar"><Brand /><span className="topbar-divider" /><span className="workspace-name">Seu ateliê de nós</span>
+    <header className="topbar"><Brand /><span className="topbar-divider" />
+      <nav className="studio-nav" aria-label="Navegação principal">
+        <a href="#studio" aria-current={!showCreators ? 'page' : undefined}>Studio</a>
+        <a href="#criadores" aria-current={showCreators ? 'page' : undefined}>Criadores</a>
+      </nav>
       <div className="topbar-right">
         <button className="text-button" onClick={() => help.current?.showModal()}><CircleHelp size={16} /> Como usar</button></div>
     </header>
 
-    <main>
+    {showCreators && <Creators />}
+    <main hidden={showCreators}>
       <div className="page-heading"><div><div className="eyebrow">LINGUAGEM EM MOVIMENTO</div><h1>Cada comando, <span>um novo laço.</span></h1>
         <p>Escreva, execute e descubra como um nó ganha forma.</p></div><div className="heading-note"><span className="tiny-knot">⌘</span><span>Da lógica ao gesto.<br /><strong>Um passo de cada vez.</strong></span></div></div>
 
@@ -325,7 +376,7 @@ export default function App() {
         <section className="visualizer-panel" aria-label="Visualizador de nós"><div className="panel-header"><div className="panel-title"><ScanLine size={16} /><span>Visualização 3D</span></div><div className="scene-tools"><button className={`icon-button ${grid ? 'on' : ''}`} aria-label="Mostrar grade" aria-pressed={grid} title="Mostrar ou ocultar grade" onClick={() => setGrid(!grid)}><Grid2X2 size={15} /></button><button className="icon-button" aria-label="Restaurar câmera" title="Restaurar câmera" onClick={() => setCameraKey(k => k + 1)}><RotateCcw size={15} /></button>{document.fullscreenEnabled && <button className="icon-button" aria-label={fullscreen ? 'Sair da tela cheia' : 'Tela cheia'} title={fullscreen ? 'Sair da tela cheia' : 'Tela cheia'} onClick={() => { if (fullscreen) void document.exitFullscreen(); else void workspace.current?.requestFullscreen() }}>{fullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}</button>}</div></div>
             <div className="scene"><div className="scene-caption"><span className="eyebrow">{plan ? 'SEU NÓ, EM MOVIMENTO' : 'VISUALIZADOR'}</span><h2>{plan?.nome ?? 'Uma ideia começa aqui.'}</h2><span className="scene-model-label">{sceneLabels[definition?.id ?? ''] ?? 'Corda contínua · pontas A e B'}</span></div>
             <div className="scene-view-switch" role="group" aria-label="Enquadramento da corda"><button aria-pressed={!detail} onClick={() => setDetail(false)}>Visão geral</button><button aria-pressed={detail} onClick={() => setDetail(true)}>Foco no nó</button></div>
-            <RopeScene engine={engine} onPlayback={publishPlayback} frames={frames} progress={progress} cameraKey={cameraKey} showGrid={grid} detail={detail} />
+            {!showCreators && <RopeScene engine={engine} onPlayback={publishPlayback} frames={frames} progress={progress} cameraKey={cameraKey} showGrid={grid} detail={detail} />}
             {plan && !geometryReady && <div className="scene-preparing" role="status">{geometryError || 'Preparando trajetória contínua…'}</div>}
             {active && geometryReady && <div className="motion-caption"><span>{String(activeIndex + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}</span><strong>{motionCaption(active, frames[activeIndex + 1], Math.max(0, Math.min(1, poseProgress - activeIndex)))}</strong></div>}
             <div className="scene-legend"><span><i className="orange" />A · {(plan?.pontas[0] ?? 'ponta_direita').replaceAll('_', ' ')}</span><span><i className="blue" />B · {(plan?.pontas[1] ?? 'ponta_esquerda').replaceAll('_', ' ')}</span></div><span className="orbit-hint">Arraste para girar · Role para aproximar</span>
@@ -339,14 +390,6 @@ export default function App() {
         </section>
       </div>
       <footer>
-        <nav className="creator-credits" aria-labelledby="creator-heading">
-          <strong id="creator-heading">Criadores da linguagem</strong>
-          <ul>
-            <li><a href="https://github.com/LilVictor39" target="_blank" rel="noopener noreferrer">Victor da Mata Abreu</a></li>
-            <li><a href="https://github.com/lukasnascky" target="_blank" rel="noopener noreferrer">Lucas Nascimento</a></li>
-            <li><a href="https://github.com/MagnoVinicius" target="_blank" rel="noopener noreferrer">Magno</a></li>
-          </ul>
-        </nav>
         <span>AMARRA STUDIO <span className="footer-dot">·</span> Cada comando, um passo. Cada passo, um nó.</span>
         <span>Python + ANTLR4 <span className="footer-dot">/</span> React + Three.js</span>
       </footer>
