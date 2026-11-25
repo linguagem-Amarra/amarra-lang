@@ -1,14 +1,5 @@
 <a name="inicio"></a>
 
-# Amarra · Entrega final E5
-
-Escreva em português os passos de um nó e acompanhe a execução em 3D. **[Abrir o Amarra Studio no navegador](https://linguagem-amarra.github.io/amarra-lang/)**
-
-### Demonstração da E5
-
-1. Abra **Ver todos os nós** e selecione **Laço do tênis-jacaré**, um dos nove exemplos do catálogo.
-2. Acione **Reproduzir animação** e entre em **Tela cheia**. Acompanhe no editor os dois comandos `apertar` e observe o que acontece com o cadarço antes e depois de formar as alças.
-3. Para mostrar a análise do compilador, copie o [programa do tênis-jacaré](exemplos/laco_tenis_jacare.amr) na [interface clássica](https://linguagem-amarra.github.io/amarra-lang/classico/) e examine os tokens, a árvore sintática abstrata (AST) e os símbolos.
 
 Para executar o Studio localmente com a API Python, siga o [guia de instalação](docs/studio.md). Os testes do compilador e da animação rodam a cada publicação e podem ser consultados no [histórico do GitHub Actions](https://github.com/linguagem-Amarra/amarra-lang/actions/workflows/publicar-interface.yml).
 
