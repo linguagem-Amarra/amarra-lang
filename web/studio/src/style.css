@@ -1291,10 +1291,42 @@ kbd {
 footer {
   padding:22px 0 27px;
   display:flex;
+  flex-wrap:wrap;
+  gap:12px;
   justify-content:space-between;
   font-size:8px;
   letter-spacing:.2px;
   color:var(--text-quiet);
+}
+
+.creator-credits {
+  width:100%;
+  display:flex;
+  align-items:baseline;
+  flex-wrap:wrap;
+  gap:6px 18px;
+  font-size:13px;
+  color:var(--text-secondary);
+}
+
+.creator-credits ul {
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px 16px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.creator-credits a {
+  display:inline-block;
+  padding:4px 0;
+  color:var(--lime);
+  text-underline-offset:3px;
+}
+
+.creator-credits a:hover, .creator-credits a:focus-visible {
+  color:var(--lime-hover);
 }
 
 .footer-dot {
