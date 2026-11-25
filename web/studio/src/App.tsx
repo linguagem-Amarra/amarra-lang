@@ -11,6 +11,8 @@ import { compileInBrowser } from './staticCompiler'
 import victorAvatar from './assets/criadores/victor.jpg'
 import lucasAvatar from './assets/criadores/lucas.jpg'
 import magnoAvatar from './assets/criadores/magno.jpg'
+import baseDoCadarco from './assets/criadores/aperto-base.jpg'
+import lacoDoCadarco from './assets/criadores/aperto-laco.jpg'
 
 const creators = [
   { name: 'Victor da Mata Abreu', handle: 'LilVictor39', avatar: victorAvatar,
@@ -22,6 +24,7 @@ const creators = [
 ]
 
 function Creators() {
+  const [apertoFinal, setApertoFinal] = useState(false)
   return <main className="creators-page">
     <h1>Criadores da linguagem</h1>
     <p className="creators-intro">Victor, Lucas e Magno criaram a Amarra para descrever, em português, os movimentos de uma corda ao dar um nó.</p>
@@ -34,6 +37,39 @@ function Creators() {
           aria-label={`Perfil de ${person.name} no GitHub`}>@{person.handle} <ArrowRight size={16} aria-hidden="true" /></a>
       </article>)}
     </div>
+    <section className="creator-stories" aria-labelledby="curiosidades-title">
+      <h2 id="curiosidades-title">Curiosidades da Amarra</h2>
+      <div className="lace-story">
+        <div className="lace-copy">
+          <h3>Por que o tênis-jacaré precisa de dois apertos?</h3>
+          <div className="lace-picker" role="group" aria-label="Escolher aperto do cadarço">
+            <button type="button" aria-pressed={!apertoFinal} onClick={() => setApertoFinal(false)}>Primeiro aperto</button>
+            <button type="button" aria-pressed={apertoFinal} onClick={() => setApertoFinal(true)}>Aperto final</button>
+          </div>
+          <div aria-live="polite">
+            <p>{apertoFinal
+              ? 'Agora as alças estão cruzadas e uma delas já passou pela abertura no centro. O mesmo comando puxa as duas alças para os lados e fecha o laço.'
+              : 'Uma ponta cruza a outra e passa por baixo. Aqui, apertar puxa as pontas soltas e firma a base do nó sobre a língua do tênis.'}</p>
+            <pre><code><Highlight line={apertoFinal ? 'passar_baixo cadarco_esquerdo;' : 'passar_baixo cadarco_direito;'} />{'\n'}<Highlight line="apertar;" /></code></pre>
+          </div>
+        </div>
+        <img src={apertoFinal ? lacoDoCadarco : baseDoCadarco}
+          alt={apertoFinal ? 'Tênis-jacaré com as duas alças do laço apertadas.' : 'Tênis-jacaré com a base do nó apertada e as pontas do cadarço soltas.'}
+          width="680" height="380" loading="lazy" />
+      </div>
+      <div className="origin-stories">
+        <article>
+          <h3>O que um robô tem a ver com um cadarço?</h3>
+          <p>A inspiração veio de um robô que desenhava seguindo comandos. A equipe levou a ideia para os nós e trocou os traços do desenho por gestos como cruzar e dar uma volta.</p>
+          <a href="https://github.com/linguagem-Amarra/amarra-lang/blob/main/DIARIO.md" target="_blank" rel="noopener noreferrer">Ler o diário da equipe</a>
+        </article>
+        <article>
+          <h3>E se o laço mudar de nome?</h3>
+          <p>Você pode trocar o título “Laço do tênis-jacaré” por “Meu tênis favorito”. A animação continua a mesma porque o Studio reconhece a sequência de movimentos e qual ponta faz cada um.</p>
+          <a href="https://github.com/linguagem-Amarra/amarra-lang/blob/main/exemplos/laco_tenis_jacare.amr" target="_blank" rel="noopener noreferrer">Ver o programa do laço</a>
+        </article>
+      </div>
+    </section>
   </main>
 }
 
